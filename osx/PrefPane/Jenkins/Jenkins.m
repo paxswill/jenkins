@@ -76,7 +76,7 @@
 }
 
 -(void)savePlist{
-	
+	[self.launchdPlist writeToFile:self.plistPath atomically:YES];
 }
 
 -(BOOL)isRunning{
