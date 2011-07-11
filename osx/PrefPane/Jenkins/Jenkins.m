@@ -30,8 +30,11 @@
 @synthesize startButton;
 @synthesize updateButton;
 @synthesize autostart;
+@synthesize authorizationView;
 
 - (void)mainViewDidLoad{
+	// Setup authorization
+	
 	// Find the Jenkins launchd plist
 	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES);
 	NSString *libraryPath = [libraryPaths count] > 0 ? [[libraryPaths objectAtIndex:0] retain] 
@@ -77,6 +80,10 @@
 
 -(void)savePlist{
 	[self.launchdPlist writeToFile:self.plistPath atomically:YES];
+}
+
+-(BOOL)isUnlocked{
+	return [self.authorizationView authorizationState] == SFAuthorizationViewUnlockedState;
 }
 
 -(BOOL)isRunning{

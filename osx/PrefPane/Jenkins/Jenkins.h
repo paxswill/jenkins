@@ -7,9 +7,9 @@
 //
 
 #import <PreferencePanes/PreferencePanes.h>
+#import <SecurityInterface/SFAuthorizationView.h>
 
 @interface Jenkins : NSPreferencePane
-
 @property (nonatomic, readwrite, retain) NSMutableDictionary *launchdPlist;
 @property (nonatomic, readwrite, retain) NSString *plistPath;
 @property (nonatomic, readwrite, retain) NSString *plistName;
@@ -26,9 +26,12 @@
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
+@property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
 
 
 - (void)mainViewDidLoad;
+
+- (BOOL)isUnlocked;
 
 - (IBAction)startJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
