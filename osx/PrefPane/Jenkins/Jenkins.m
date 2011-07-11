@@ -109,12 +109,16 @@
 
 -(void)setRunning:(BOOL)runJenkins{
 	if(self.running != runJenkins){
+		// Unload (and implicitly stop) the daemon in all cases, as the configuartion may be changing
 		NSArray *unloadArgs = [NSArray arrayWithObjects:@"unload", [self.plistPath stringByAppendingString:self.plistName], nil];
-		NSArray *loadArgs = [NSArray arrayWithObjects:@"load", [self.plistPath stringByAppendingString:self.plistName], nil];
-		NSArray *startArgs = [NSArray arrayWithObjects:@"start", self.plistName, nil];
 		[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:unloadArgs];
-		[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:loadArgs];
-		[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:startArgs];
+		if(runJenkins){
+			// Reload and start the daemon
+			NSArray *loadArgs = [NSArray arrayWithObjects:@"load", [self.plistPath stringByAppendingString:self.plistName], nil];
+			NSArray *startArgs = [NSArray arrayWithObjects:@"start", self.plistName, nil];
+			[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:loadArgs];
+			[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:startArgs];
+		}
 	}
 }
 
