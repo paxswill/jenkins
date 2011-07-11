@@ -1,0 +1,317 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		24FEDBF413CB565500C6EEFF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF313CB565500C6EEFF /* Cocoa.framework */; };
+		24FEDBF613CB565500C6EEFF /* PreferencePanes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */; };
+		24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */; };
+		24FEDC0313CB565500C6EEFF /* Jenkins.h in Headers */ = {isa = PBXBuildFile; fileRef = 24FEDC0213CB565500C6EEFF /* Jenkins.h */; };
+		24FEDC0513CB565500C6EEFF /* Jenkins.m in Sources */ = {isa = PBXBuildFile; fileRef = 24FEDC0413CB565500C6EEFF /* Jenkins.m */; };
+		24FEDC0713CB565500C6EEFF /* Jenkins.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDC0613CB565500C6EEFF /* Jenkins.tiff */; };
+		24FEDC0A13CB565500C6EEFF /* Jenkins.xib in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDC0813CB565500C6EEFF /* Jenkins.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		24FEDBF013CB565500C6EEFF /* Jenkins.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Jenkins.prefPane; sourceTree = BUILT_PRODUCTS_DIR; };
+		24FEDBF313CB565500C6EEFF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PreferencePanes.framework; path = System/Library/Frameworks/PreferencePanes.framework; sourceTree = SDKROOT; };
+		24FEDBF813CB565500C6EEFF /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		24FEDBF913CB565500C6EEFF /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		24FEDBFA13CB565500C6EEFF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		24FEDBFD13CB565500C6EEFF /* Jenkins-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Jenkins-Info.plist"; sourceTree = "<group>"; };
+		24FEDBFF13CB565500C6EEFF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		24FEDC0113CB565500C6EEFF /* Jenkins-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jenkins-Prefix.pch"; sourceTree = "<group>"; };
+		24FEDC0213CB565500C6EEFF /* Jenkins.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Jenkins.h; sourceTree = "<group>"; };
+		24FEDC0413CB565500C6EEFF /* Jenkins.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Jenkins.m; sourceTree = "<group>"; };
+		24FEDC0613CB565500C6EEFF /* Jenkins.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Jenkins.tiff; sourceTree = "<group>"; };
+		24FEDC0913CB565500C6EEFF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/Jenkins.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		24FEDBEB13CB565500C6EEFF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24FEDBF413CB565500C6EEFF /* Cocoa.framework in Frameworks */,
+				24FEDBF613CB565500C6EEFF /* PreferencePanes.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		24FEDBE313CB565500C6EEFF = {
+			isa = PBXGroup;
+			children = (
+				24FEDBFB13CB565500C6EEFF /* Jenkins */,
+				24FEDBF213CB565500C6EEFF /* Frameworks */,
+				24FEDBF113CB565500C6EEFF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		24FEDBF113CB565500C6EEFF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				24FEDBF013CB565500C6EEFF /* Jenkins.prefPane */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		24FEDBF213CB565500C6EEFF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				24FEDBF313CB565500C6EEFF /* Cocoa.framework */,
+				24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */,
+				24FEDBF713CB565500C6EEFF /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		24FEDBF713CB565500C6EEFF /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				24FEDBF813CB565500C6EEFF /* AppKit.framework */,
+				24FEDBF913CB565500C6EEFF /* CoreData.framework */,
+				24FEDBFA13CB565500C6EEFF /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		24FEDBFB13CB565500C6EEFF /* Jenkins */ = {
+			isa = PBXGroup;
+			children = (
+				24FEDC0213CB565500C6EEFF /* Jenkins.h */,
+				24FEDC0413CB565500C6EEFF /* Jenkins.m */,
+				24FEDC0613CB565500C6EEFF /* Jenkins.tiff */,
+				24FEDC0813CB565500C6EEFF /* Jenkins.xib */,
+				24FEDBFC13CB565500C6EEFF /* Supporting Files */,
+			);
+			path = Jenkins;
+			sourceTree = "<group>";
+		};
+		24FEDBFC13CB565500C6EEFF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				24FEDBFD13CB565500C6EEFF /* Jenkins-Info.plist */,
+				24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */,
+				24FEDC0113CB565500C6EEFF /* Jenkins-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		24FEDBEC13CB565500C6EEFF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24FEDC0313CB565500C6EEFF /* Jenkins.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		24FEDBEF13CB565500C6EEFF /* Jenkins */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24FEDC0D13CB565500C6EEFF /* Build configuration list for PBXNativeTarget "Jenkins" */;
+			buildPhases = (
+				24FEDBEA13CB565500C6EEFF /* Sources */,
+				24FEDBEB13CB565500C6EEFF /* Frameworks */,
+				24FEDBEC13CB565500C6EEFF /* Headers */,
+				24FEDBED13CB565500C6EEFF /* Resources */,
+				24FEDBEE13CB565500C6EEFF /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Jenkins;
+			productName = Jenkins;
+			productReference = 24FEDBF013CB565500C6EEFF /* Jenkins.prefPane */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		24FEDBE513CB565500C6EEFF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "Will Ross";
+			};
+			buildConfigurationList = 24FEDBE813CB565500C6EEFF /* Build configuration list for PBXProject "Jenkins" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 24FEDBE313CB565500C6EEFF;
+			productRefGroup = 24FEDBF113CB565500C6EEFF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				24FEDBEF13CB565500C6EEFF /* Jenkins */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		24FEDBED13CB565500C6EEFF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */,
+				24FEDC0713CB565500C6EEFF /* Jenkins.tiff in Resources */,
+				24FEDC0A13CB565500C6EEFF /* Jenkins.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		24FEDBEE13CB565500C6EEFF /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		24FEDBEA13CB565500C6EEFF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24FEDC0513CB565500C6EEFF /* Jenkins.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				24FEDBFF13CB565500C6EEFF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		24FEDC0813CB565500C6EEFF /* Jenkins.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				24FEDC0913CB565500C6EEFF /* en */,
+			);
+			name = Jenkins.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		24FEDC0B13CB565500C6EEFF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+				);
+			};
+			name = Debug;
+		};
+		24FEDC0C13CB565500C6EEFF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wextra",
+				);
+			};
+			name = Release;
+		};
+		24FEDC0E13CB565500C6EEFF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Jenkins/Jenkins-Prefix.pch";
+				INFOPLIST_FILE = "Jenkins/Jenkins-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = prefPane;
+			};
+			name = Debug;
+		};
+		24FEDC0F13CB565500C6EEFF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Jenkins/Jenkins-Prefix.pch";
+				INFOPLIST_FILE = "Jenkins/Jenkins-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = prefPane;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		24FEDBE813CB565500C6EEFF /* Build configuration list for PBXProject "Jenkins" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24FEDC0B13CB565500C6EEFF /* Debug */,
+				24FEDC0C13CB565500C6EEFF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		24FEDC0D13CB565500C6EEFF /* Build configuration list for PBXNativeTarget "Jenkins" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24FEDC0E13CB565500C6EEFF /* Debug */,
+				24FEDC0F13CB565500C6EEFF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 24FEDBE513CB565500C6EEFF /* Project object */;
+}
