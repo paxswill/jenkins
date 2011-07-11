@@ -80,7 +80,7 @@
 }
 
 -(BOOL)isRunning{
-	// Get launchd listing
+	// Get launchd listing (/bin/launchctl list)
 	NSTask *existsTask = [[NSTask alloc] init];
 	[existsTask setLaunchPath:@"/bin/launchctl"];
 	[existsTask setArguments:[NSArray arrayWithObjects:@"list", nil]];
@@ -93,17 +93,24 @@
 	NSString *allLines = [[NSString alloc] initWithData:existsData encoding:NSUTF8StringEncoding];
 	NSArray *rawLines = [[allLines componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] retain];
 	[allLines release];
-	// Search for the job
+	/*
+	 Search for the job. THe format for each line is
+	 PID	ExitState	launchdLabel
+	 The space between each column is '\t'. If no value is given, the character '-' is substituted
+	 */
 	for(NSString *line in rawLines){
 		NSArray *lineData = [line componentsSeparatedByString:@"\t"];
 		if([[lineData objectAtIndex:2] isEqualToString:self.plistName]){
 			if([[lineData objectAtIndex:0] isEqualToString:@"-"]){
+				// Loaded, not running
 				return NO;
 			}else{
+				// Loaded and running
 				return YES;
 			}
 		}
 	}
+	// Not loaded
 	return NO;
 }
 
