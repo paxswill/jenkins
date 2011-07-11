@@ -8,9 +8,7 @@
 
 #import <PreferencePanes/PreferencePanes.h>
 
-@interface Jenkins : NSPreferencePane {
-	NSButton *updateJenkins;
-}
+@interface Jenkins : NSPreferencePane
 
 @property (nonatomic, readwrite, retain) NSMutableDictionary *launchdPlist;
 @property (nonatomic, readwrite, retain) NSString *plistPath;
@@ -27,6 +25,8 @@
 @property (nonatomic, readwrite, assign) IBOutlet NSTextField *otherField;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
+@property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
+
 
 - (void)mainViewDidLoad;
 

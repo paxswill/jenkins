@@ -29,6 +29,7 @@
 @synthesize otherField;
 @synthesize startButton;
 @synthesize updateButton;
+@synthesize autostart;
 
 - (void)mainViewDidLoad{
 	// Find the Jenkins launchd plist
@@ -54,6 +55,19 @@
 
 -(void)willSelect{
 	[self updatePlist];
+	// Se the start/stop button
+	if(self.running){
+		self.startButton.title = @"Stop";
+	}else{
+		self.startButton.title = @"Start";
+	}
+	// Set autostart checkbox
+	if(![[self.launchdPlist valueForKey:@"Disabled"] boolValue] && [[self.launchdPlist valueForKey:@"RunAtLoad"] boolValue]){
+		[self.autostart setState:NSOnState];
+	}else{
+		[self.autostart setState:NSOffState];
+	}
+	
 }
 
 -(void)updatePlist{
