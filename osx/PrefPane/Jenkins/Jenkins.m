@@ -18,6 +18,7 @@
 @synthesize launchdPlist;
 @synthesize plistPath;
 @synthesize plistName;
+@synthesize uiEnabled;
 
 @synthesize httpPortField;
 @synthesize httpsPortField;

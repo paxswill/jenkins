@@ -14,6 +14,7 @@
 @property (nonatomic, readwrite, retain) NSString *plistPath;
 @property (nonatomic, readwrite, retain) NSString *plistName;
 @property (nonatomic, readwrite, assign, getter = isRunning) BOOL running;
+@property (readwrite, assign) BOOL uiEnabled;
 
 @property (nonatomic, readwrite, assign) IBOutlet NSTextField *httpPortField;
 @property (nonatomic, readwrite, assign) IBOutlet NSTextField *httpsPortField;
