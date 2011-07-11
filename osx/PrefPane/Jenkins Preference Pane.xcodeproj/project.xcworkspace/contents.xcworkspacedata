@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Jenkins.xcodeproj">
+      location = "self:Jenkins Preference Pane.xcodeproj">
    </FileRef>
 </Workspace>

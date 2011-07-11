@@ -15,8 +15,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "24FEDBEF13CB565500C6EEFF"
                BuildableName = "Jenkins.prefPane"
-               BlueprintName = "Jenkins"
-               ReferencedContainer = "container:Jenkins.xcodeproj">
+               BlueprintName = "Jenkins Preference Pane"
+               ReferencedContainer = "container:Jenkins Preference Pane.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,6 +36,9 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Debug"
       enablesOpenGLESFrameCapture = "YES">
+      <PathRunnable
+         FilePath = "/Applications/System Preferences.app">
+      </PathRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
