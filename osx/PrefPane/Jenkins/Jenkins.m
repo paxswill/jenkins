@@ -9,8 +9,8 @@
 #import "Jenkins.h"
 
 @interface Jenkins()
--(void)updatePlist;
 -(void)loadPlist;
+-(void)savePlist;
 @end
 
 @implementation Jenkins
@@ -40,7 +40,7 @@
 	self.plistName = @"org.jenkins-ci.plist";
 	self.plistPath = [libraryPath stringByAppendingString:self.plistName];
 	[libraryPath release];
-	[self updatePlist];
+	[self loadPlist];
 	
 	// Start watching the various keys
 	[self addObserver:self forKeyPath:@"httpPortField" options:NSKeyValueObservingOptionNew context:NULL];
@@ -54,7 +54,7 @@
 }
 
 -(void)willSelect{
-	[self updatePlist];
+	[self loadPlist];
 	// Se the start/stop button
 	if(self.running){
 		self.startButton.title = @"Stop";
@@ -70,9 +70,13 @@
 	
 }
 
--(void)updatePlist{
+-(void)loadPlist{
 	self.launchdPlist = [NSMutableDictionary dictionaryWithContentsOfFile:self.plistPath];
 	NSAssert(self.launchdPlist, @"launchdPlist is not supposed to be null");
+}
+
+-(void)savePlist{
+	
 }
 
 -(BOOL)isRunning{
