@@ -253,6 +253,7 @@
 					NSMutableString *newProperty = [arg mutableCopy];
 					NSRange valueRange = NSMakeRange(3, [newProperty length] - 3);
 					[newProperty replaceCharactersInRange:valueRange withString:[Jenkins convertToArgumentString:value]];
+					[newProperty insertString:@"-" atIndex:0];
 					[args replaceObjectAtIndex:i withObject:newProperty];
 					[newProperty release];
 					return;
