@@ -177,38 +177,47 @@
 	[self savePlist];
 }
 
--(NSString *)getLaunchOption:(NSString *)option{
-	// option is the full option, dashes included
+// This method is tenuous and needs some major tests for all edge cases
+-(id<NSObject>)getLaunchOption:(NSString *)option{
+	// option is the name of the option 
 	NSArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
 	// If the Program key is missing, args[0] is used as the executable
 	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 0 : 1;
-	NSInteger count = (int)[args count];
-	NSInteger i;
-	NSString *arg = nil;
-	for(i = executableOffset; i < count; ++i){
-		arg = [args objectAtIndex:i];
-		NSRange optionRange = [arg rangeOfString:option];
-		if(optionRange.location != NSNotFound){
-			[arg retain];
-			break;
+	NSInteger count = [args count];
+	for(NSInteger i = executableOffset; i < count; ++i){
+		// Trim the leading '-'
+		NSString *arg = [[args objectAtIndex:i] substringFromIndex:1];
+		// In three cases, the first character is a specific character
+		if(([arg characterAtIndex:0] == '-' || [arg characterAtIndex:0] == 'D') && [arg rangeOfString:@"="].location != NSNotFound){
+			// Winstone Argument and Java System Property
+			NSRange equalRange = [arg rangeOfString:@"="];
+			if(equalRange.location != NSNotFound){
+				if([[arg substringToIndex:equalRange.location] isEqualToString:option]){
+					return [[[arg substringFromIndex:(equalRange.location + 1)] retain] autorelease];
+				}
+			}
+		}else if([arg characterAtIndex:0] == 'X'){
+			// Java extension
+			// Currently, this only supports -Xms# -Xmx# and -Xss#
+			if([arg characterAtIndex:1] == 'm'){
+				if([arg characterAtIndex:2] == 's' || [arg characterAtIndex:2] == 'x'){
+					return [NSNumber numberWithInteger:[[arg substringFromIndex:3] integerValue]];
+				}
+			}else if([arg characterAtIndex:1] == 's' && [arg characterAtIndex:2] == 's'){
+				return [NSNumber numberWithInteger:[[arg substringFromIndex:3] integerValue]];
+			}else{
+				// Other Extensions (to be implemented later)
+			}
+		}else{
+			// Something else, either a seperated value or a simple flag
+			if([arg isEqualToString:option]){
+				// Simple flag
+				return [NSNumber numberWithBool:YES];
+			}else if((i + 1 < count) && [[args objectAtIndex:(i + 1)] characterAtIndex:0] != '-'){
+				return [args objectAtIndex:++i];
+			}
 		}
 	}
-	if([arg characterAtIndex:1] == '-' || [arg characterAtIndex:1] == 'D'){
-		// Winstone argument (--option=value)
-		// Java System property (-DOption=Value)
-		NSRange valueRange = [arg rangeOfString:@"="];
-		valueRange = NSMakeRange(valueRange.location + 1, [arg length] - 1);
-		return [arg substringWithRange:valueRange];
-	}else{
-		if([arg characterAtIndex:1] == 'X'){
-			// Java Non-standard option (-Xoption[=,:]value
-			NSRange valueRange = [arg rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"=:"]];
-			valueRange = NSMakeRange(valueRange.location + 1, [arg length] - 1);
-			return [arg substringWithRange:valueRange];
-		}
-	}
-	
-	
 	return nil;
 }
 

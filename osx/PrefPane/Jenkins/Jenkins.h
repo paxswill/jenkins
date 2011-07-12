@@ -9,6 +9,13 @@
 #import <PreferencePanes/PreferencePanes.h>
 #import <SecurityInterface/SFAuthorizationView.h>
 
+typedef enum{
+	JCIWinstoneLaunchOption = 0,    // --Option=Value
+	JCIJavaSystemProperty,      // -DOption=value
+	JCIJavaExtension,           // -XOptionValue
+	JCISeperated,               // -Option [Value]
+} JCILaunchOption;
+
 @interface Jenkins : NSPreferencePane
 @property (nonatomic, readwrite, retain) NSMutableDictionary *launchdPlist;
 @property (nonatomic, readwrite, retain) NSString *plistPath;
@@ -33,10 +40,10 @@
 - (void)mainViewDidLoad;
 
 - (BOOL)isUnlocked;
--(NSString *)getLaunchOption:(NSString *)option;
+-(NSString *)getEnvironmentVariable:(NSString *)varName;
 -(void)setEnvironmentVariable:(NSString *)varName value:(id)value;
--(NSString *)getLaunchOption:(NSString *)option;
--(NSString *)setLaunchOption:(NSArray *)option;
+-(id<NSObject>)getLaunchOption:(NSString *)option;
+-(void)setLaunchOption:(NSArray *)option value:(NSString *)value type:(JCILaunchOption)optionType;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
 
