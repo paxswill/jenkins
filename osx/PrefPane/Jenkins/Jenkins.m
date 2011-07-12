@@ -59,7 +59,7 @@
 
 -(void)willSelect{
 	[self loadPlist];
-	// Se the start/stop button
+	// Set the start/stop button
 	if(self.running){
 		self.startButton.title = @"Stop";
 	}else{
@@ -102,7 +102,7 @@
 	NSArray *rawLines = [[allLines componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] retain];
 	[allLines release];
 	/*
-	 Search for the job. THe format for each line is
+	 Search for the job. The format for each line is
 	 PID	ExitState	launchdLabel
 	 The space between each column is '\t'. If no value is given, the character '-' is substituted
 	 */
@@ -124,7 +124,7 @@
 
 -(void)setRunning:(BOOL)runJenkins{
 	if(self.running != runJenkins){
-		// Unload (and implicitly stop) the daemon in all cases, as the configuartion may be changing
+		// Unload (and implicitly stop) the daemon in all cases, as the configuration may be changing
 		NSArray *unloadArgs = [NSArray arrayWithObjects:@"unload", [self.plistPath stringByAppendingString:self.plistName], nil];
 		[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:unloadArgs];
 		if(runJenkins){
@@ -137,12 +137,12 @@
 	}
 }
 
-- (IBAction)startJenkins:(id)sender{
-	
+- (IBAction)toggleJenkins:(id)sender{
+	self.running = !self.running;
 }
 
 - (IBAction)updateJenkins:(id)sender{
-	
+	// This will be an extensive task
 }
 
 @end

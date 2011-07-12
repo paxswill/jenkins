@@ -34,7 +34,7 @@
 
 - (BOOL)isUnlocked;
 
-- (IBAction)startJenkins:(id)sender;
+- (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
 
 @end
