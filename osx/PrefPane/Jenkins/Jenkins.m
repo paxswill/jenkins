@@ -49,13 +49,13 @@
 	[self loadPlist];
 	
 	// Load in the current values
-	self.httpPortField.stringValue = [[self getLaunchOption:@"httpPort"] description];
-	self.httpsPortField.stringValue = [[self getLaunchOption:@"httpsPort"] description];
-	self.ajpPortField.stringValue = [[self getLaunchOption:@"ajp13Port"] description];
-	self.jenkinsWarField.stringValue = [[self getLaunchOption:@"jar"] description];
-	self.prefixField.stringValue = [[self getLaunchOption:@"prefix"] description];
-	self.heapSizeField.stringValue = [[self getLaunchOption:@"mx"] description];
-	self.jenkinsHomeField.stringValue = [[self getEnvironmentVariable:@"JENKINS_HOME"] description];
+	self.httpPortField.stringValue = [self getLaunchOption:@"httpPort"];
+	self.httpsPortField.stringValue = [self getLaunchOption:@"httpsPort"];
+	self.ajpPortField.stringValue = [self getLaunchOption:@"ajp13Port"];
+	self.jenkinsWarField.stringValue = [self getLaunchOption:@"jar"];
+	self.prefixField.stringValue = [self getLaunchOption:@"prefix"];
+	self.heapSizeField.stringValue = [self getLaunchOption:@"mx"];
+	self.jenkinsHomeField.stringValue = [self getEnvironmentVariable:@"JENKINS_HOME"];
 	//self.otherField.stringValue = [[self getLaunchOption:@"httpPort"] description];
 	// Start watching the various keys
 	[self addObserver:self.httpPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
@@ -186,7 +186,7 @@
 }
 
 // This method is tenuous and needs some major tests for all edge cases
--(id<NSObject>)getLaunchOption:(NSString *)option{
+-(NSString *)getLaunchOption:(NSString *)option{
 	NSArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
 	// If the Program key is missing, args[0] is used as the executable
 	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 1 : 0;
@@ -218,7 +218,7 @@
 					return [args objectAtIndex:++i];
 				}else{
 					// simple flag
-					return [NSNumber numberWithBool:YES];
+					return @"YES";
 				}
 			}
 		}

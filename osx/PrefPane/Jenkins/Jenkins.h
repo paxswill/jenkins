@@ -42,7 +42,7 @@ typedef enum{
 - (BOOL)isUnlocked;
 -(NSString *)getEnvironmentVariable:(NSString *)varName;
 -(void)setEnvironmentVariable:(NSString *)varName value:(id)value;
--(id<NSObject>)getLaunchOption:(NSString *)option;
+-(NSString *)getLaunchOption:(NSString *)option;
 -(void)setLaunchOption:(NSString *)option value:(id<NSObject>)value type:(JCILaunchOption)optionType;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
