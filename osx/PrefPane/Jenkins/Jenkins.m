@@ -149,27 +149,22 @@
 }
 
 -(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-	if(object != self){
-		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-		return;
-	}
 	id newValue = [change objectForKey:NSKeyValueChangeNewKey];
-	if([keyPath isEqualToString:@"httpPortField"]){
-		
-	}else if([keyPath isEqualToString:@"httpsPortField"]){
-		
-	}else if([keyPath isEqualToString:@"ajpPortField"]){
-		
-	}else if([keyPath isEqualToString:@"jenkinsWarField"]){
-		
-	}else if([keyPath isEqualToString:@"prefixField"]){
-		
-	}else if([keyPath isEqualToString:@"heapSizeField"]){
-		
-	}else if([keyPath isEqualToString:@"jenkinsHomeField"]){
-		NSMutableDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
-		[env setValue:newValue forKey:@"JENKINS_HOME"];
-	}else if([keyPath isEqualToString:@"otherField"]){
+	if(object == self.httpPortField){
+		[self setLaunchOption:@"httpPort" value:newValue type:JCIWinstoneLaunchOption];
+	}else if(object == self.httpsPortField){
+		[self setLaunchOption:@"httpsPort" value:newValue type:JCIWinstoneLaunchOption];
+	}else if(object == self.ajpPortField){
+		[self setLaunchOption:@"ajp13Port" value:newValue type:JCIWinstoneLaunchOption];
+	}else if(object == self.jenkinsWarField){
+		[self setLaunchOption:@"jar" value:newValue type:JCISeparated];
+	}else if(object == self.prefixField){
+		[self setLaunchOption:@"prefix" value:newValue type:JCIWinstoneLaunchOption];
+	}else if(object == self.heapSizeField){
+		[self setLaunchOption:@"mx" value:newValue type:JCIJavaExtension];
+	}else if(object == self.jenkinsHomeField){
+		[self setEnvironmentVariable:@"JENKINS_HOME" value:newValue];
+	}else if(object == self.otherField){
 		
 	}else{
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
