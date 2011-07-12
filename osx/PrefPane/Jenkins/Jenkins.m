@@ -208,7 +208,7 @@
 				// Other Extensions (to be implemented later)
 			}
 		}else{
-			// Something else, either a seperated value or a simple flag
+			// Something else, either a separated value or a simple flag
 			if([arg isEqualToString:option]){
 				// Simple flag
 				return [NSNumber numberWithBool:YES];
@@ -260,7 +260,7 @@
 					// Other Extensions (to be implemented later)
 				}
 				break;
-			case JCISeperated:
+			case JCISeparated:
 				if([arg isEqualToString:option]){
 					[args replaceObjectAtIndex:(i + 1) withObject:[Jenkins convertToArgumentString:value]];
 					return;
@@ -279,8 +279,7 @@
 		case JCIJavaExtension:
 			
 			break;
-		case JCISeperated:
-			
+		case JCISeparated:
 			break;
 	}
 }

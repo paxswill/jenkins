@@ -13,7 +13,7 @@ typedef enum{
 	JCIWinstoneLaunchOption = 0,    // --Option=Value
 	JCIJavaSystemProperty,      // -DOption=value
 	JCIJavaExtension,           // -XOptionValue
-	JCISeperated,               // -Option [Value]
+	JCISeparated,               // -Option [Value]
 } JCILaunchOption;
 
 @interface Jenkins : NSPreferencePane
