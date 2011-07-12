@@ -208,10 +208,10 @@
 			// Currently, this only supports -Xms# -Xmx# and -Xss#
 			if([arg characterAtIndex:1] == 'm'){
 				if([arg characterAtIndex:2] == 's' || [arg characterAtIndex:2] == 'x'){
-					return [NSNumber numberWithInteger:[[arg substringFromIndex:3] integerValue]];
+					return [arg substringFromIndex:3];
 				}
 			}else if([arg characterAtIndex:1] == 's' && [arg characterAtIndex:2] == 's'){
-				return [NSNumber numberWithInteger:[[arg substringFromIndex:3] integerValue]];
+				return [arg substringFromIndex:3];
 			}else{
 				// Other Extensions (to be implemented later)
 			}
