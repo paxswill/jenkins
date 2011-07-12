@@ -21,14 +21,7 @@
 @synthesize plistName;
 @synthesize uiEnabled;
 
-@synthesize httpPortField;
-@synthesize httpsPortField;
-@synthesize ajpPortField;
-@synthesize jenkinsWarField;
-@synthesize prefixField;
-@synthesize heapSizeField;
-@synthesize jenkinsHomeField;
-@synthesize otherField;
+@synthesize otherFlags;
 @synthesize startButton;
 @synthesize updateButton;
 @synthesize autostart;
@@ -55,23 +48,14 @@
 	[self loadPlist];
 	
 	// Load in the current values
-	self.httpPortField.stringValue = [self getLaunchOption:@"httpPort"] == nil ? @"" : [self getLaunchOption:@"httpPort"];
-	self.httpsPortField.stringValue = [self getLaunchOption:@"httpsPort"] == nil ? @"" : [self getLaunchOption:@"httpsPort"];
-	self.ajpPortField.stringValue = [self getLaunchOption:@"ajp13Port"] == nil ? @"" : [self getLaunchOption:@"ajp13Port"];
-	self.jenkinsWarField.stringValue = [self getLaunchOption:@"jar"] == nil ? @"" : [self getLaunchOption:@"jar"];
-	self.prefixField.stringValue = [self getLaunchOption:@"prefix"] == nil ? @"" : [self getLaunchOption:@"prefix"];
-	self.heapSizeField.stringValue = [self getLaunchOption:@"mx"] == nil ? @"" : [self getLaunchOption:@"mx"];
-	self.jenkinsHomeField.stringValue = [self getEnvironmentVariable:@"JENKINS_HOME"] == nil ? @"" : [self getEnvironmentVariable:@"JENKINS_HOME"];
+	self.httpPort = [self getLaunchOption:@"httpPort"] == nil ? @"" : [self getLaunchOption:@"httpPort"];
+	self.httpsPort = [self getLaunchOption:@"httpsPort"] == nil ? @"" : [self getLaunchOption:@"httpsPort"];
+	self.ajpPort = [self getLaunchOption:@"ajp13Port"] == nil ? @"" : [self getLaunchOption:@"ajp13Port"];
+	self.jenkinsWar = [self getLaunchOption:@"jar"] == nil ? @"" : [self getLaunchOption:@"jar"];
+	self.prefix = [self getLaunchOption:@"prefix"] == nil ? @"" : [self getLaunchOption:@"prefix"];
+	self.heapSize = [self getLaunchOption:@"mx"] == nil ? @"" : [self getLaunchOption:@"mx"];
+	self.jenkinsHome = [self getEnvironmentVariable:@"JENKINS_HOME"] == nil ? @"" : [self getEnvironmentVariable:@"JENKINS_HOME"];
 	//self.otherField.stringValue = [[self getLaunchOption:@"httpPort"] description];
-	// Start watching the various keys
-	[self addObserver:self.httpPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self.httpsPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self.ajpPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self.jenkinsWarField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self.prefixField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self.heapSizeField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self.jenkinsHomeField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
-	//[self addObserver:self.otherField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
 }
 
 -(void)willSelect{
@@ -155,29 +139,6 @@
 			[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:loadArgs];
 			[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:startArgs];
 		}
-	}
-}
-
--(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-	id newValue = [change objectForKey:NSKeyValueChangeNewKey];
-	if(object == self.httpPortField){
-		[self setLaunchOption:@"httpPort" value:newValue type:JCIWinstoneLaunchOption];
-	}else if(object == self.httpsPortField){
-		[self setLaunchOption:@"httpsPort" value:newValue type:JCIWinstoneLaunchOption];
-	}else if(object == self.ajpPortField){
-		[self setLaunchOption:@"ajp13Port" value:newValue type:JCIWinstoneLaunchOption];
-	}else if(object == self.jenkinsWarField){
-		[self setLaunchOption:@"jar" value:newValue type:JCISeparated];
-	}else if(object == self.prefixField){
-		[self setLaunchOption:@"prefix" value:newValue type:JCIWinstoneLaunchOption];
-	}else if(object == self.heapSizeField){
-		[self setLaunchOption:@"mx" value:newValue type:JCIJavaExtension];
-	}else if(object == self.jenkinsHomeField){
-		[self setEnvironmentVariable:@"JENKINS_HOME" value:newValue];
-	}else if(object == self.otherField){
-		
-	}else{
-		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
 
@@ -316,7 +277,65 @@
 	// This will be an extensive task
 }
 
-#pragma mark - SAAuthorizationView Delegate
+#pragma mark - Bindings integration
+
+-(NSString *)httpPort{
+	return [self getLaunchOption:@"httpPort"];
+}
+
+-(void)setHttpPort:(NSString *)portNum{
+	[self setLaunchOption:@"httpPort" value:portNum type:JCIWinstoneLaunchOption];
+}
+
+-(NSString *)httpsPort{
+	return [self getLaunchOption:@"httpsPort"];
+}
+
+-(void)setHttpsPort:(NSString *)portNum{
+	[self setLaunchOption:@"httpsPort" value:portNum type:JCIWinstoneLaunchOption];
+}
+
+-(NSString *)ajpPort{
+	return [self getLaunchOption:@"ajp13Port"];
+}
+
+-(void)setAjpPort:(NSString *)portNum{
+	[self setLaunchOption:@"ajp13Port" value:portNum type:JCIWinstoneLaunchOption];
+}
+
+-(NSString *)jenkinsWar{
+	return [self getLaunchOption:@"jar"];
+}
+
+-(void)setJenkinsWar:(NSString *)warPath{
+	[self setLaunchOption:@"jar" value:warPath type:JCISeparated];
+}
+
+-(NSString *)prefix{
+	return [self getLaunchOption:@"prefix"];
+}
+
+-(void)setPrefix:(NSString *)prefix{
+	[self setLaunchOption:@"prefix" value:prefix type:JCIWinstoneLaunchOption];
+}
+
+-(NSString *)heapSize{
+	return [self getLaunchOption:@"mx"];
+}
+
+-(void)setHeapSize:(NSString *)heapSize{
+	[self setLaunchOption:@"mx" value:heapSize type:JCIJavaExtension];
+}
+
+-(NSString *)jenkinsHome{
+	return [self getEnvironmentVariable:@"JENKINS_HOME"];
+}
+
+-(void)setJenkinsHome:(NSString *)homePath{
+	[self setEnvironmentVariable:@"JENKINS_HOME" value:homePath];
+}
+
+#pragma mark - SFAuthorizationView Delegate
 
 - (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];

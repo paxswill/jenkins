@@ -23,14 +23,14 @@ typedef enum{
 @property (nonatomic, readwrite, assign, getter = isRunning) BOOL running;
 @property (readwrite, assign) BOOL uiEnabled;
 
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *httpPortField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *httpsPortField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *ajpPortField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *jenkinsWarField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *prefixField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *heapSizeField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *jenkinsHomeField;
-@property (nonatomic, readwrite, assign) IBOutlet NSTextField *otherField;
+@property (nonatomic, readwrite, retain) NSString *httpPort;
+@property (nonatomic, readwrite, retain) NSString *httpsPort;
+@property (nonatomic, readwrite, retain) NSString *ajpPort;
+@property (nonatomic, readwrite, retain) NSString *jenkinsWar;
+@property (nonatomic, readwrite, retain) NSString *prefix;
+@property (nonatomic, readwrite, retain) NSString *heapSize;
+@property (nonatomic, readwrite, retain) NSString *jenkinsHome;
+@property (nonatomic, readwrite, retain) NSString *otherFlags;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;

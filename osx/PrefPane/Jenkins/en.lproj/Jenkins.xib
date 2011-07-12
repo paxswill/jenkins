@@ -550,7 +550,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="76813867"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {2560, 1578}}</string>
 				<string key="NSMinSize">{224.664, 32}</string>
 				<string key="NSMaxSize">{1e+13, 1e+13}</string>
 			</object>
@@ -568,70 +568,6 @@
 						<reference key="destination" ref="660800786"/>
 					</object>
 					<int key="connectionID">26</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">httpPortField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="108966875"/>
-					</object>
-					<int key="connectionID">158</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">httpsPortField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="552932933"/>
-					</object>
-					<int key="connectionID">159</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">ajpPortField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="724422594"/>
-					</object>
-					<int key="connectionID">160</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">jenkinsWarField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="379452981"/>
-					</object>
-					<int key="connectionID">161</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">prefixField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="662193504"/>
-					</object>
-					<int key="connectionID">162</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">heapSizeField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="60632069"/>
-					</object>
-					<int key="connectionID">163</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">jenkinsHomeField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="961700245"/>
-					</object>
-					<int key="connectionID">164</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">otherField</string>
-						<reference key="source" ref="294453543"/>
-						<reference key="destination" ref="378661885"/>
-					</object>
-					<int key="connectionID">165</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -857,6 +793,118 @@
 					</object>
 					<int key="connectionID">209</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: httpPort</string>
+						<reference key="source" ref="108966875"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="108966875"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: httpPort</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">httpPort</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">211</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: httpsPort</string>
+						<reference key="source" ref="552932933"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="552932933"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: httpsPort</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">httpsPort</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">213</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: ajpPort</string>
+						<reference key="source" ref="724422594"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="724422594"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: ajpPort</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">ajpPort</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">215</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: jenkinsWar</string>
+						<reference key="source" ref="379452981"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="379452981"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: jenkinsWar</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">jenkinsWar</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">217</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: prefix</string>
+						<reference key="source" ref="662193504"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="662193504"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: prefix</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">prefix</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">219</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: heapSize</string>
+						<reference key="source" ref="60632069"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="60632069"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: heapSize</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">heapSize</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">221</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: jenkinsHome</string>
+						<reference key="source" ref="961700245"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="961700245"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">value: jenkinsHome</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">jenkinsHome</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">223</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -948,7 +996,6 @@
 							<reference ref="379452981"/>
 							<reference ref="244558546"/>
 							<reference ref="662193504"/>
-							<reference ref="60632069"/>
 							<reference ref="536520544"/>
 							<reference ref="735658881"/>
 							<reference ref="290699996"/>
@@ -957,6 +1004,7 @@
 							<reference ref="213030691"/>
 							<reference ref="108966875"/>
 							<reference ref="961700245"/>
+							<reference ref="60632069"/>
 						</object>
 						<reference key="parent" ref="564206575"/>
 					</object>
@@ -1379,7 +1427,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">209</int>
+			<int key="maxID">223</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1423,31 +1471,15 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ajpPortField</string>
 							<string>authorizationView</string>
 							<string>autostart</string>
-							<string>heapSizeField</string>
-							<string>httpPortField</string>
-							<string>httpsPortField</string>
-							<string>jenkinsHomeField</string>
-							<string>jenkinsWarField</string>
-							<string>otherField</string>
-							<string>prefixField</string>
 							<string>startButton</string>
 							<string>updateButton</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSTextField</string>
 							<string>SFAuthorizationView</string>
 							<string>NSButton</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
-							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
 						</object>
@@ -1456,25 +1488,13 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ajpPortField</string>
 							<string>authorizationView</string>
 							<string>autostart</string>
-							<string>heapSizeField</string>
-							<string>httpPortField</string>
-							<string>httpsPortField</string>
-							<string>jenkinsHomeField</string>
-							<string>jenkinsWarField</string>
-							<string>otherField</string>
-							<string>prefixField</string>
 							<string>startButton</string>
 							<string>updateButton</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">ajpPortField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">authorizationView</string>
 								<string key="candidateClassName">SFAuthorizationView</string>
@@ -1482,34 +1502,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">autostart</string>
 								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">heapSizeField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">httpPortField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">httpsPortField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">jenkinsHomeField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">jenkinsWarField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">otherField</string>
-								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">prefixField</string>
-								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">startButton</string>
