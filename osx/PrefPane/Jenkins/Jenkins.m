@@ -46,16 +46,6 @@
 	self.plistPath = [libraryPath stringByAppendingString:self.plistName];
 	[libraryPath release];
 	[self loadPlist];
-	
-	// Load in the current values
-	self.httpPort = [self getLaunchOption:@"httpPort"] == nil ? @"" : [self getLaunchOption:@"httpPort"];
-	self.httpsPort = [self getLaunchOption:@"httpsPort"] == nil ? @"" : [self getLaunchOption:@"httpsPort"];
-	self.ajpPort = [self getLaunchOption:@"ajp13Port"] == nil ? @"" : [self getLaunchOption:@"ajp13Port"];
-	self.jenkinsWar = [self getLaunchOption:@"jar"] == nil ? @"" : [self getLaunchOption:@"jar"];
-	self.prefix = [self getLaunchOption:@"prefix"] == nil ? @"" : [self getLaunchOption:@"prefix"];
-	self.heapSize = [self getLaunchOption:@"mx"] == nil ? @"" : [self getLaunchOption:@"mx"];
-	self.jenkinsHome = [self getEnvironmentVariable:@"JENKINS_HOME"] == nil ? @"" : [self getEnvironmentVariable:@"JENKINS_HOME"];
-	//self.otherField.stringValue = [[self getLaunchOption:@"httpPort"] description];
 }
 
 -(void)willSelect{
