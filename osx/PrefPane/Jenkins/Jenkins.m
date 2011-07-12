@@ -39,7 +39,7 @@
 	[self.authorizationView setAutoupdate:YES];
 	AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
     AuthorizationRights rights = {1, &items};
-	[self.authorizationView setAuthorizationRights:rights];
+	[self.authorizationView setAuthorizationRights:&rights];
 	self.authorizationView.delegate = self;
 	self.uiEnabled = [self isUnlocked];
 	
