@@ -119,8 +119,11 @@
 	 The space between each column is '\t'. If no value is given, the character '-' is substituted
 	 */
 	for(NSString *line in rawLines){
+		if([line isEqualToString:@""]){
+			continue;
+		}
 		NSArray *lineData = [line componentsSeparatedByString:@"\t"];
-		if([[lineData objectAtIndex:2] isEqualToString:self.plistName]){
+		if([[lineData objectAtIndex:2] isEqualToString:@"org.jenkins-ci"]){
 			if([[lineData objectAtIndex:0] isEqualToString:@"-"]){
 				// Loaded, not running
 				return NO;
