@@ -36,6 +36,12 @@
 
 - (void)mainViewDidLoad{
 	// Setup authorization
+	[self.authorizationView setAutoupdate:YES];
+	AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
+    AuthorizationRights rights = {1, &items};
+	[self.authorizationView setAuthorizationRights:rights];
+	self.authorizationView.delegate = self;
+	self.uiEnabled = [self isUnlocked];
 	
 	// Find the Jenkins launchd plist
 	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSLocalDomainMask, YES);
@@ -308,6 +314,16 @@
 
 - (IBAction)updateJenkins:(id)sender{
 	// This will be an extensive task
+}
+
+#pragma mark - SAAuthorizationView Delegate
+
+- (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
+    self.uiEnabled = [self isUnlocked];
+}
+
+- (void)authorizationViewDidDeauthorize:(SFAuthorizationView *)view {
+    self.uiEnabled = [self isUnlocked];
 }
 
 @end
