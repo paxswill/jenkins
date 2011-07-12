@@ -47,15 +47,24 @@
 	[libraryPath release];
 	[self loadPlist];
 	
+	// Load in the current values
+	self.httpPortField.stringValue = [[self getLaunchOption:@"httpPort"] description];
+	self.httpsPortField.stringValue = [[self getLaunchOption:@"httpsPort"] description];
+	self.ajpPortField.stringValue = [[self getLaunchOption:@"ajp13Port"] description];
+	self.jenkinsWarField.stringValue = [[self getLaunchOption:@"jar"] description];
+	self.prefixField.stringValue = [[self getLaunchOption:@"prefix"] description];
+	self.heapSizeField.stringValue = [[self getLaunchOption:@"mx"] description];
+	self.jenkinsHomeField.stringValue = [[self getEnvironmentVariable:@"JENKINS_HOME"] description];
+	//self.otherField.stringValue = [[self getLaunchOption:@"httpPort"] description];
 	// Start watching the various keys
-	[self addObserver:self forKeyPath:@"httpPortField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"httpsPortField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"ajpPortField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"jenkinsWarField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"prefixField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"heapSizeField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"jenkinsHomeField" options:NSKeyValueObservingOptionNew context:NULL];
-	[self addObserver:self forKeyPath:@"otherField" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.httpPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.httpsPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.ajpPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.jenkinsWarField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.prefixField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.heapSizeField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	[self addObserver:self.jenkinsHomeField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
+	//[self addObserver:self.otherField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
 }
 
 -(void)willSelect{
