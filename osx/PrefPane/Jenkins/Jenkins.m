@@ -75,7 +75,8 @@
 }
 
 -(void)loadPlist{
-	self.launchdPlist = [NSMutableDictionary dictionaryWithContentsOfFile:self.plistPath];
+	NSData *plistData = [NSData dataWithContentsOfFile:self.plistPath];
+	self.launchdPlist = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListMutableContainersAndLeaves format:NULL errorDescription:NULL];
 	NSAssert(self.launchdPlist, @"launchdPlist is not supposed to be null");
 }
 
