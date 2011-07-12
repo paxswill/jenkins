@@ -189,7 +189,7 @@
 -(id<NSObject>)getLaunchOption:(NSString *)option{
 	NSArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
 	// If the Program key is missing, args[0] is used as the executable
-	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 0 : 1;
+	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 1 : 0;
 	NSInteger count = [args count];
 	for(NSInteger i = executableOffset; i < count; ++i){
 		// Trim the leading '-'
