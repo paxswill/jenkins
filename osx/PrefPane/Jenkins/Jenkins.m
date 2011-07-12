@@ -11,6 +11,7 @@
 @interface Jenkins()
 -(void)loadPlist;
 -(void)savePlist;
++(NSString *)convertToArgumentString:(id<NSObject>)obj;
 @end
 
 @implementation Jenkins
@@ -178,7 +179,6 @@
 
 // This method is tenuous and needs some major tests for all edge cases
 -(id<NSObject>)getLaunchOption:(NSString *)option{
-	// option is the name of the option 
 	NSArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
 	// If the Program key is missing, args[0] is used as the executable
 	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 0 : 1;
@@ -218,6 +218,81 @@
 		}
 	}
 	return nil;
+}
+
+-(void)setLaunchOption:(NSString *)option value:(id<NSObject>)value type:(JCILaunchOption)optionType{
+	NSMutableArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
+	// If the Program key is missing, args[0] is used as the executable
+	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 0 : 1;
+	NSInteger count = [args count];
+	// Try to find the argument if defined
+	for(NSInteger i = executableOffset; i < count; ++i){
+		NSString *arg = [[args objectAtIndex:i] substringFromIndex:1];
+		switch (optionType) {
+			case JCIWinstoneLaunchOption:
+			case JCIJavaSystemProperty:
+				if(([arg characterAtIndex:0] == '-' || [arg characterAtIndex:0] == 'D') && 
+				   [arg rangeOfString:@"="].location != NSNotFound){
+					NSMutableString *newProperty = [arg mutableCopy];
+					NSRange equalRange = [arg rangeOfString:@"="];
+					if(equalRange.location != NSNotFound){
+						if([[arg substringToIndex:equalRange.location] isEqualToString:option]){
+							NSRange valueRange = NSMakeRange(equalRange.location + 1, ([arg length] - equalRange.location - 1));
+							[newProperty replaceCharactersInRange:valueRange withString:[Jenkins convertToArgumentString:value]];
+							[newProperty insertString:@"-" atIndex:0];
+							[args replaceObjectAtIndex:i withObject:newProperty];
+							[newProperty release];
+							return;
+						}
+					}
+				}
+				break;
+			case JCIJavaExtension:
+				if(([arg characterAtIndex:1] == 'm' && ([arg characterAtIndex:2] == 's' || [arg characterAtIndex:2] == 'x')) ||
+				   ([arg characterAtIndex:1] == 's' && [arg characterAtIndex:2] == 's')){
+					NSMutableString *newProperty = [arg mutableCopy];
+					NSRange valueRange = NSMakeRange(3, [newProperty length] - 3);
+					[newProperty replaceCharactersInRange:valueRange withString:[Jenkins convertToArgumentString:value]];
+					[args replaceObjectAtIndex:i withObject:newProperty];
+					[newProperty release];
+					return;
+				}else{
+					// Other Extensions (to be implemented later)
+				}
+				break;
+			case JCISeperated:
+				if([arg isEqualToString:option]){
+					[args replaceObjectAtIndex:(i + 1) withObject:[Jenkins convertToArgumentString:value]];
+					return;
+				}
+				break;
+		}
+	}
+	// Not found, add it
+	switch (optionType) {
+		case JCIWinstoneLaunchOption:
+			
+			break;
+		case JCIJavaSystemProperty:
+			
+			break;
+		case JCIJavaExtension:
+			
+			break;
+		case JCISeperated:
+			
+			break;
+	}
+}
+
+// This would be nice to put in a category on NSString, NSNumber and possibly other classes, but PrefPanes run within
+// System Preferences.app, and categories can collide.
++(NSString *)convertToArgumentString:(id<NSObject>)obj{
+	if([obj isKindOfClass:[NSNumber class]] && strcmp([(NSNumber *)obj objCType], @encode(BOOL))){
+		return ([(NSNumber *)obj boolValue] ? @"true" : @"false");
+	}else{
+		return [obj description];
+	}
 }
 
 - (IBAction)toggleJenkins:(id)sender{

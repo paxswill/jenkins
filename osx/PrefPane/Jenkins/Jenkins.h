@@ -43,7 +43,7 @@ typedef enum{
 -(NSString *)getEnvironmentVariable:(NSString *)varName;
 -(void)setEnvironmentVariable:(NSString *)varName value:(id)value;
 -(id<NSObject>)getLaunchOption:(NSString *)option;
--(void)setLaunchOption:(NSArray *)option value:(NSString *)value type:(JCILaunchOption)optionType;
+-(void)setLaunchOption:(NSString *)option value:(id<NSObject>)value type:(JCILaunchOption)optionType;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
 
