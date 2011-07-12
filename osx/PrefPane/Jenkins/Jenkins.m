@@ -76,13 +76,30 @@
 }
 
 -(void)loadPlist{
+	// Reading is unprivileged, so no auth services 
 	NSData *plistData = [NSData dataWithContentsOfFile:self.plistPath];
 	self.launchdPlist = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListMutableContainersAndLeaves format:NULL errorDescription:NULL];
 	NSAssert(self.launchdPlist, @"launchdPlist is not supposed to be null");
 }
 
 -(void)savePlist{
-	[self.launchdPlist writeToFile:self.plistPath atomically:YES];
+	// Create a pipe, and use it to funnel the plist data to the elevated process
+	// Set up the pipe
+	NSPipe *authPipe = [[NSPipe alloc] init];
+	NSFileHandle *writeHandle = [authPipe fileHandleForWriting];
+	FILE *bridge = fdopen([[authPipe fileHandleForReading] fileDescriptor], "r");
+	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.launchdPlist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
+	// Set up the task
+	NSString *helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
+	const char *argv[] = {[self.plistPath UTF8String], NULL};
+	// Write on a thread, or we will deadlock for data length longer than 4096 bytes
+	[NSThread detachNewThreadSelector:@selector(writeData:) toTarget:writeHandle withObject:plistData];
+	// Spawn the privileged process
+	AuthorizationExecuteWithPrivileges([[self.authorizationView authorization] authorizationRef], [helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &bridge);
+	// The execution call above blocks until it's done, and the thread is done then.
+	fclose(bridge);
+	[writeHandle closeFile];
+	[authPipe release];
 }
 
 -(BOOL)isUnlocked{
