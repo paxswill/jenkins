@@ -33,7 +33,10 @@
 - (void)mainViewDidLoad;
 
 - (BOOL)isUnlocked;
-
+-(NSString *)getLaunchOption:(NSString *)option;
+-(void)setEnvironmentVariable:(NSString *)varName value:(id)value;
+-(NSString *)getLaunchOption:(NSString *)option;
+-(NSString *)setLaunchOption:(NSArray *)option;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
 

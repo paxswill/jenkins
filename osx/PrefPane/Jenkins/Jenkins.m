@@ -143,6 +143,7 @@
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 		return;
 	}
+	id newValue = [change objectForKey:NSKeyValueChangeNewKey];
 	if([keyPath isEqualToString:@"httpPortField"]){
 		
 	}else if([keyPath isEqualToString:@"httpsPortField"]){
@@ -156,12 +157,59 @@
 	}else if([keyPath isEqualToString:@"heapSizeField"]){
 		
 	}else if([keyPath isEqualToString:@"jenkinsHomeField"]){
-		
+		NSMutableDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
+		[env setValue:newValue forKey:@"JENKINS_HOME"];
 	}else if([keyPath isEqualToString:@"otherField"]){
 		
 	}else{
 		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
+}
+
+-(NSString *)getEnvironmentVariable:(NSString *)varName{
+	NSDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
+	return [env valueForKey:varName];
+}
+
+-(void)setEnvironmentVariable:(NSString *)varName value:(id)value{
+	NSMutableDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
+	[env setValue:value forKey:varName];
+	[self savePlist];
+}
+
+-(NSString *)getLaunchOption:(NSString *)option{
+	// option is the full option, dashes included
+	NSArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
+	// If the Program key is missing, args[0] is used as the executable
+	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 0 : 1;
+	NSInteger count = (int)[args count];
+	NSInteger i;
+	NSString *arg = nil;
+	for(i = executableOffset; i < count; ++i){
+		arg = [args objectAtIndex:i];
+		NSRange optionRange = [arg rangeOfString:option];
+		if(optionRange.location != NSNotFound){
+			[arg retain];
+			break;
+		}
+	}
+	if([arg characterAtIndex:1] == '-' || [arg characterAtIndex:1] == 'D'){
+		// Winstone argument (--option=value)
+		// Java System property (-DOption=Value)
+		NSRange valueRange = [arg rangeOfString:@"="];
+		valueRange = NSMakeRange(valueRange.location + 1, [arg length] - 1);
+		return [arg substringWithRange:valueRange];
+	}else{
+		if([arg characterAtIndex:1] == 'X'){
+			// Java Non-standard option (-Xoption[=,:]value
+			NSRange valueRange = [arg rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"=:"]];
+			valueRange = NSMakeRange(valueRange.location + 1, [arg length] - 1);
+			return [arg substringWithRange:valueRange];
+		}
+	}
+	
+	
+	return nil;
 }
 
 - (IBAction)toggleJenkins:(id)sender{
