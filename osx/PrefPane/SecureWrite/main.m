@@ -22,7 +22,7 @@ int main (int argc, const char * argv[])
 	}
 	// The pipe handle should already be open
 	int readFD = fcntl(STDIN_FILENO, F_DUPFD, 0);
-	int writeFD = open(argv[2], O_WRONLY | O_CREAT);
+	int writeFD = open(argv[1], O_WRONLY | O_CREAT);
 	assert(writeFD > 0);
 	size_t bufferSize = 1024;
 	size_t actualSize;
