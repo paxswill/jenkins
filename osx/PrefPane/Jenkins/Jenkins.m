@@ -40,8 +40,9 @@
 	// Find the Jenkins launchd plist
 	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSLocalDomainMask, YES);
 	NSString *libraryPath = [libraryPaths count] > 0 ? [[libraryPaths objectAtIndex:0] retain] 
-	                                                 : @"/Library/LaunchDaemons/";
+	                                                 : @"/Library";
 	[libraryPaths release];
+	libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
 	self.plistName = @"org.jenkins-ci.plist";
 	self.plistPath = [libraryPath stringByAppendingString:self.plistName];
 	[libraryPath release];
