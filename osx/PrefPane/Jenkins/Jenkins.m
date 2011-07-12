@@ -49,13 +49,13 @@
 	[self loadPlist];
 	
 	// Load in the current values
-	self.httpPortField.stringValue = [self getLaunchOption:@"httpPort"];
-	self.httpsPortField.stringValue = [self getLaunchOption:@"httpsPort"];
-	self.ajpPortField.stringValue = [self getLaunchOption:@"ajp13Port"];
-	self.jenkinsWarField.stringValue = [self getLaunchOption:@"jar"];
-	self.prefixField.stringValue = [self getLaunchOption:@"prefix"];
-	self.heapSizeField.stringValue = [self getLaunchOption:@"mx"];
-	self.jenkinsHomeField.stringValue = [self getEnvironmentVariable:@"JENKINS_HOME"];
+	self.httpPortField.stringValue = [self getLaunchOption:@"httpPort"] == nil ? @"" : [self getLaunchOption:@"httpPort"];
+	self.httpsPortField.stringValue = [self getLaunchOption:@"httpsPort"] == nil ? @"" : [self getLaunchOption:@"httpsPort"];
+	self.ajpPortField.stringValue = [self getLaunchOption:@"ajp13Port"] == nil ? @"" : [self getLaunchOption:@"ajp13Port"];
+	self.jenkinsWarField.stringValue = [self getLaunchOption:@"jar"] == nil ? @"" : [self getLaunchOption:@"jar"];
+	self.prefixField.stringValue = [self getLaunchOption:@"prefix"] == nil ? @"" : [self getLaunchOption:@"prefix"];
+	self.heapSizeField.stringValue = [self getLaunchOption:@"mx"] == nil ? @"" : [self getLaunchOption:@"mx"];
+	self.jenkinsHomeField.stringValue = [self getEnvironmentVariable:@"JENKINS_HOME"] == nil ? @"" : [self getEnvironmentVariable:@"JENKINS_HOME"];
 	//self.otherField.stringValue = [[self getLaunchOption:@"httpPort"] description];
 	// Start watching the various keys
 	[self addObserver:self.httpPortField forKeyPath:@"stringValue" options:NSKeyValueObservingOptionNew context:NULL];
