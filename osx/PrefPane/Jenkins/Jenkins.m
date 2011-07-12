@@ -137,6 +137,32 @@
 	}
 }
 
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+	if(object != self){
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+		return;
+	}
+	if([keyPath isEqualToString:@"httpPortField"]){
+		
+	}else if([keyPath isEqualToString:@"httpsPortField"]){
+		
+	}else if([keyPath isEqualToString:@"ajpPortField"]){
+		
+	}else if([keyPath isEqualToString:@"jenkinsWarField"]){
+		
+	}else if([keyPath isEqualToString:@"prefixField"]){
+		
+	}else if([keyPath isEqualToString:@"heapSizeField"]){
+		
+	}else if([keyPath isEqualToString:@"jenkinsHomeField"]){
+		
+	}else if([keyPath isEqualToString:@"otherField"]){
+		
+	}else{
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	}
+}
+
 - (IBAction)toggleJenkins:(id)sender{
 	self.running = !self.running;
 }
