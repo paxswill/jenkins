@@ -174,7 +174,6 @@
 -(void)setEnvironmentVariable:(NSString *)varName value:(id)value{
 	NSMutableDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
 	[env setValue:value forKey:varName];
-	[self savePlist];
 }
 
 // This method is tenuous and needs some major tests for all edge cases
