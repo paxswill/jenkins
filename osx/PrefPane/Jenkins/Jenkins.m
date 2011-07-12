@@ -46,16 +46,6 @@
 	self.plistPath = [libraryPath stringByAppendingString:self.plistName];
 	[libraryPath release];
 	[self loadPlist];
-	
-	// Load in the current values
-	self.httpPort = [self getLaunchOption:@"httpPort"] == nil ? @"" : [self getLaunchOption:@"httpPort"];
-	self.httpsPort = [self getLaunchOption:@"httpsPort"] == nil ? @"" : [self getLaunchOption:@"httpsPort"];
-	self.ajpPort = [self getLaunchOption:@"ajp13Port"] == nil ? @"" : [self getLaunchOption:@"ajp13Port"];
-	self.jenkinsWar = [self getLaunchOption:@"jar"] == nil ? @"" : [self getLaunchOption:@"jar"];
-	self.prefix = [self getLaunchOption:@"prefix"] == nil ? @"" : [self getLaunchOption:@"prefix"];
-	self.heapSize = [self getLaunchOption:@"mx"] == nil ? @"" : [self getLaunchOption:@"mx"];
-	self.jenkinsHome = [self getEnvironmentVariable:@"JENKINS_HOME"] == nil ? @"" : [self getEnvironmentVariable:@"JENKINS_HOME"];
-	//self.otherField.stringValue = [[self getLaunchOption:@"httpPort"] description];
 }
 
 -(void)willSelect{
@@ -72,14 +62,27 @@
 	}else{
 		[self.autostart setState:NSOffState];
 	}
-	
 }
 
 -(void)loadPlist{
 	// Reading is unprivileged, so no auth services 
 	NSData *plistData = [NSData dataWithContentsOfFile:self.plistPath];
+	[self willChangeValueForKey:@"httpPort"];
+	[self willChangeValueForKey:@"httpsPort"];
+	[self willChangeValueForKey:@"ajpPort"];
+	[self willChangeValueForKey:@"jenkinsWar"];
+	[self willChangeValueForKey:@"prefix"];
+	[self willChangeValueForKey:@"heapSize"];
+	[self willChangeValueForKey:@"jenkinsHome"];
 	self.launchdPlist = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListMutableContainersAndLeaves format:NULL errorDescription:NULL];
 	NSAssert(self.launchdPlist, @"launchdPlist is not supposed to be null");
+	[self didChangeValueForKey:@"httpPort"];
+	[self didChangeValueForKey:@"httpsPort"];
+	[self didChangeValueForKey:@"ajpPort"];
+	[self didChangeValueForKey:@"jenkinsWar"];
+	[self didChangeValueForKey:@"prefix"];
+	[self didChangeValueForKey:@"heapSize"];
+	[self didChangeValueForKey:@"jenkinsHome"];
 }
 
 -(void)savePlist{
