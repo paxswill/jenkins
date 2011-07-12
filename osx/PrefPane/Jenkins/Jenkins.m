@@ -272,15 +272,16 @@
 	// Not found, add it
 	switch (optionType) {
 		case JCIWinstoneLaunchOption:
-			
+			[args addObject:[NSString stringWithFormat:@"--%@=%@", option, [Jenkins convertToArgumentString:value]]];
 			break;
 		case JCIJavaSystemProperty:
-			
+			[args addObject:[NSString stringWithFormat:@"-D%@=%@", option, [Jenkins convertToArgumentString:value]]];
 			break;
 		case JCIJavaExtension:
-			
+			[args addObject:[NSString stringWithFormat:@"-X%@%@", option, [Jenkins convertToArgumentString:value]]];
 			break;
 		case JCISeparated:
+			[args addObject:[NSString stringWithFormat:@"-%@ %@", option, [Jenkins convertToArgumentString:value]]];
 			break;
 	}
 }
