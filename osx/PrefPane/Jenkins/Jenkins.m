@@ -38,7 +38,7 @@
 	// Setup authorization
 	
 	// Find the Jenkins launchd plist
-	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES);
+	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSLocalDomainMask, YES);
 	NSString *libraryPath = [libraryPaths count] > 0 ? [[libraryPaths objectAtIndex:0] retain] 
 	                                                 : @"/Library/LaunchDaemons/";
 	[libraryPaths release];
