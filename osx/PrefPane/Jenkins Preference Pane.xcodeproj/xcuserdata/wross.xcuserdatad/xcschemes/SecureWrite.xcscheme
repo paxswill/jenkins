@@ -13,9 +13,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "24FEDBEF13CB565500C6EEFF"
-               BuildableName = "Jenkins Preference Pane.prefPane"
-               BlueprintName = "Jenkins Preference Pane"
+               BlueprintIdentifier = "24828E8F13CCCF9800A1A1D4"
+               BuildableName = "SecureWrite"
+               BlueprintName = "SecureWrite"
                ReferencedContainer = "container:Jenkins Preference Pane.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -36,9 +36,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Debug"
       debugDocumentVersioning = "YES">
-      <PathRunnable
-         FilePath = "/Applications/System Preferences.app">
-      </PathRunnable>
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "24828E8F13CCCF9800A1A1D4"
+            BuildableName = "SecureWrite"
+            BlueprintName = "SecureWrite"
+            ReferencedContainer = "container:Jenkins Preference Pane.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -48,6 +54,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "24828E8F13CCCF9800A1A1D4"
+            BuildableName = "SecureWrite"
+            BlueprintName = "SecureWrite"
+            ReferencedContainer = "container:Jenkins Preference Pane.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

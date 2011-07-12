@@ -9,9 +9,19 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>SecureWrite.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>24828E8F13CCCF9800A1A1D4</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>24FEDBEF13CB565500C6EEFF</key>
 		<dict>
 			<key>primary</key>

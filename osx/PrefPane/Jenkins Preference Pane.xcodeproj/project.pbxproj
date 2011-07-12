@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		240D05FA13CB98A7004CB15E /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 240D05F913CB98A7004CB15E /* SecurityInterface.framework */; };
+		24828E9313CCCF9800A1A1D4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24828E9213CCCF9800A1A1D4 /* Foundation.framework */; };
+		24828E9613CCCF9800A1A1D4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 24828E9513CCCF9800A1A1D4 /* main.m */; };
+		24828E9A13CCCF9800A1A1D4 /* SecureWrite.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 24828E9913CCCF9800A1A1D4 /* SecureWrite.1 */; };
+		24828EA113CCD3EA00A1A1D4 /* SecureWrite in Resources */ = {isa = PBXBuildFile; fileRef = 24828E9013CCCF9800A1A1D4 /* SecureWrite */; };
 		24FEDBF413CB565500C6EEFF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF313CB565500C6EEFF /* Cocoa.framework */; };
 		24FEDBF613CB565500C6EEFF /* PreferencePanes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */; };
 		24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */; };
@@ -17,8 +21,36 @@
 		24FEDC0A13CB565500C6EEFF /* Jenkins.xib in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDC0813CB565500C6EEFF /* Jenkins.xib */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		24828E9F13CCD3E300A1A1D4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 24FEDBE513CB565500C6EEFF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 24828E8F13CCCF9800A1A1D4;
+			remoteInfo = SecureWrite;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		24828E8E13CCCF9800A1A1D4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				24828E9A13CCCF9800A1A1D4 /* SecureWrite.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		240D05F913CB98A7004CB15E /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = System/Library/Frameworks/SecurityInterface.framework; sourceTree = SDKROOT; };
+		24828E9013CCCF9800A1A1D4 /* SecureWrite */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SecureWrite; sourceTree = BUILT_PRODUCTS_DIR; };
+		24828E9213CCCF9800A1A1D4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		24828E9513CCCF9800A1A1D4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		24828E9813CCCF9800A1A1D4 /* SecureWrite-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SecureWrite-Prefix.pch"; sourceTree = "<group>"; };
+		24828E9913CCCF9800A1A1D4 /* SecureWrite.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SecureWrite.1; sourceTree = "<group>"; };
 		24FEDBF013CB565500C6EEFF /* Jenkins Preference Pane.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Jenkins Preference Pane.prefPane"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24FEDBF313CB565500C6EEFF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PreferencePanes.framework; path = System/Library/Frameworks/PreferencePanes.framework; sourceTree = SDKROOT; };
@@ -35,6 +67,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		24828E8D13CCCF9800A1A1D4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24828E9313CCCF9800A1A1D4 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		24FEDBEB13CB565500C6EEFF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,10 +88,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		24828E9413CCCF9800A1A1D4 /* SecureWrite */ = {
+			isa = PBXGroup;
+			children = (
+				24828E9513CCCF9800A1A1D4 /* main.m */,
+				24828E9913CCCF9800A1A1D4 /* SecureWrite.1 */,
+				24828E9713CCCF9800A1A1D4 /* Supporting Files */,
+			);
+			path = SecureWrite;
+			sourceTree = "<group>";
+		};
+		24828E9713CCCF9800A1A1D4 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				24828E9813CCCF9800A1A1D4 /* SecureWrite-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		24FEDBE313CB565500C6EEFF = {
 			isa = PBXGroup;
 			children = (
 				24FEDBFB13CB565500C6EEFF /* Jenkins */,
+				24828E9413CCCF9800A1A1D4 /* SecureWrite */,
 				24FEDBF213CB565500C6EEFF /* Frameworks */,
 				24FEDBF113CB565500C6EEFF /* Products */,
 			);
@@ -61,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				24FEDBF013CB565500C6EEFF /* Jenkins Preference Pane.prefPane */,
+				24828E9013CCCF9800A1A1D4 /* SecureWrite */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -71,6 +131,7 @@
 				240D05F913CB98A7004CB15E /* SecurityInterface.framework */,
 				24FEDBF313CB565500C6EEFF /* Cocoa.framework */,
 				24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */,
+				24828E9213CCCF9800A1A1D4 /* Foundation.framework */,
 				24FEDBF713CB565500C6EEFF /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -122,6 +183,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		24828E8F13CCCF9800A1A1D4 /* SecureWrite */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24828E9D13CCCF9800A1A1D4 /* Build configuration list for PBXNativeTarget "SecureWrite" */;
+			buildPhases = (
+				24828E8C13CCCF9800A1A1D4 /* Sources */,
+				24828E8D13CCCF9800A1A1D4 /* Frameworks */,
+				24828E8E13CCCF9800A1A1D4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SecureWrite;
+			productName = SecureWrite;
+			productReference = 24828E9013CCCF9800A1A1D4 /* SecureWrite */;
+			productType = "com.apple.product-type.tool";
+		};
 		24FEDBEF13CB565500C6EEFF /* Jenkins Preference Pane */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 24FEDC0D13CB565500C6EEFF /* Build configuration list for PBXNativeTarget "Jenkins Preference Pane" */;
@@ -135,6 +213,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				24828EA013CCD3E300A1A1D4 /* PBXTargetDependency */,
 			);
 			name = "Jenkins Preference Pane";
 			productName = Jenkins;
@@ -162,6 +241,7 @@
 			projectRoot = "";
 			targets = (
 				24FEDBEF13CB565500C6EEFF /* Jenkins Preference Pane */,
+				24828E8F13CCCF9800A1A1D4 /* SecureWrite */,
 			);
 		};
 /* End PBXProject section */
@@ -171,6 +251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24828EA113CCD3EA00A1A1D4 /* SecureWrite in Resources */,
 				24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */,
 				24FEDC0713CB565500C6EEFF /* Jenkins.tiff in Resources */,
 				24FEDC0A13CB565500C6EEFF /* Jenkins.xib in Resources */,
@@ -190,6 +271,14 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		24828E8C13CCCF9800A1A1D4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				24828E9613CCCF9800A1A1D4 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		24FEDBEA13CB565500C6EEFF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -199,6 +288,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		24828EA013CCD3E300A1A1D4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 24828E8F13CCCF9800A1A1D4 /* SecureWrite */;
+			targetProxy = 24828E9F13CCD3E300A1A1D4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */ = {
@@ -220,6 +317,28 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		24828E9B13CCCF9800A1A1D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_ENABLE_OBJC_GC = unsupported;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SecureWrite/SecureWrite-Prefix.pch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		24828E9C13CCCF9800A1A1D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_ENABLE_OBJC_GC = unsupported;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SecureWrite/SecureWrite-Prefix.pch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		24FEDC0B13CB565500C6EEFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -302,6 +421,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		24828E9D13CCCF9800A1A1D4 /* Build configuration list for PBXNativeTarget "SecureWrite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				24828E9B13CCCF9800A1A1D4 /* Debug */,
+				24828E9C13CCCF9800A1A1D4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		24FEDBE813CB565500C6EEFF /* Build configuration list for PBXProject "Jenkins Preference Pane" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
