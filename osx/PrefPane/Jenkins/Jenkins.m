@@ -206,22 +206,20 @@
 		}else if([arg characterAtIndex:0] == 'X'){
 			// Java extension
 			// Currently, this only supports -Xms# -Xmx# and -Xss#
-			if([arg characterAtIndex:1] == 'm'){
-				if([arg characterAtIndex:2] == 's' || [arg characterAtIndex:2] == 'x'){
-					return [arg substringFromIndex:3];
-				}
-			}else if([arg characterAtIndex:1] == 's' && [arg characterAtIndex:2] == 's'){
+			if([option isEqualToString:@"mx"] ||
+			   [option isEqualToString:@"ms"] ||
+			   [option isEqualToString:@"ss"]){
 				return [arg substringFromIndex:3];
-			}else{
-				// Other Extensions (to be implemented later)
 			}
 		}else{
 			// Something else, either a separated value or a simple flag
 			if([arg isEqualToString:option]){
-				// Simple flag
-				return [NSNumber numberWithBool:YES];
-			}else if((i + 1 < count) && [[args objectAtIndex:(i + 1)] characterAtIndex:0] != '-'){
-				return [args objectAtIndex:++i];
+				if((i + 1 < count) && [[args objectAtIndex:(i + 1)] characterAtIndex:0] != '-'){
+					return [args objectAtIndex:++i];
+				}else{
+					// simple flag
+					return [NSNumber numberWithBool:YES];
+				}
 			}
 		}
 	}
