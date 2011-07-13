@@ -16,7 +16,26 @@ typedef enum{
 	JCISeparated,               // -Option [Value]
 } JCILaunchOption;
 
-@interface Jenkins : NSPreferencePane
+@interface Jenkins : NSPreferencePane{
+	NSMutableDictionary *launchdPlist;
+	NSString *plistPath;
+	NSString *plistName;
+	BOOL running;
+	BOOL uiEnabled;
+
+	NSString *httpPort;
+	NSString *httpsPort;
+	NSString *ajpPort;
+	NSString *jenkinsWar;
+	NSString *prefix;
+	NSString *heapSize;
+	NSString *jenkinsHome;
+	NSString *otherFlags;
+	NSButton *startButton;
+	NSButton *updateButton;
+	NSButton *autostart;
+	SFAuthorizationView *authorizationView;
+}
 @property (nonatomic, readwrite, retain) NSMutableDictionary *launchdPlist;
 @property (nonatomic, readwrite, retain) NSString *plistPath;
 @property (nonatomic, readwrite, retain) NSString *plistName;
