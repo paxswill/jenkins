@@ -118,21 +118,18 @@ static NSSet *propertySet = nil;
 }
 
 -(void)save{
-	// Create a pipe, and use it to funnel the plist data to the elevated process
-	// Set up the pipe
-	NSPipe *authPipe = [[NSPipe alloc] init];
-	NSFileHandle *writeHandle = [authPipe fileHandleForWriting];
-	FILE *bridge = fdopen([[authPipe fileHandleForReading] fileDescriptor], "r");
-	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.plist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
+	// Set up for elevated execution
+	FILE *pipe;
 	const char *argv[] = {[self.path UTF8String], NULL};
-	// Write on a thread, or we will deadlock for data length longer than 4096 bytes
-	[NSThread detachNewThreadSelector:@selector(writeData:) toTarget:writeHandle withObject:plistData];
 	// Spawn the privileged process
-	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &bridge);
-	// The execution call above blocks until it's done, and the thread is done then.
-	fclose(bridge);
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
+	// Write the data out
+	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.plist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
+	int writeFD = fileno(pipe);
+	NSFileHandle *writeHandle = [[NSFileHandle alloc] initWithFileDescriptor:writeFD];
+	[writeHandle writeData:plistData];
 	[writeHandle closeFile];
-	[authPipe release];
+	fclose(pipe);
 }
 
 -(BOOL)isRunning{
