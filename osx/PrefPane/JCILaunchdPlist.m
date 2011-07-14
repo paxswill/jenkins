@@ -243,7 +243,14 @@ static NSSet *propertySet = nil;
 id plistGetProxy(id self, SEL selector){
 	NSString *propertyName = [NSStringFromSelector(selector) capitalizedString];
 	id value = [[self plist] objectForKey:propertyName];
+	// Massage program arguments
+	if([propertyName isEqualToString:@"ProgramArguments"] && [[self plist] objectForKey:@"Program"] == nil){
+		NSMutableArray *args = [value mutableCopy];
+		[args removeObjectAtIndex:0];
+		return [args autorelease];
+	}
 	if(value == nil){
+		// Provide for default values
 		if([propertyName isEqualToString:@"Program"]){
 			if([self programArguments] != nil){
 				return [[self programArguments] objectAtIndex:0];
