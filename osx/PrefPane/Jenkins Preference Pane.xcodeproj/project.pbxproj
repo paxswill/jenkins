@@ -13,6 +13,8 @@
 		24828E9A13CCCF9800A1A1D4 /* SecureWrite.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 24828E9913CCCF9800A1A1D4 /* SecureWrite.1 */; };
 		24828EA113CCD3EA00A1A1D4 /* SecureWrite in Resources */ = {isa = PBXBuildFile; fileRef = 24828E9013CCCF9800A1A1D4 /* SecureWrite */; };
 		24828EA913CCDE4C00A1A1D4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24828EA813CCDE4C00A1A1D4 /* Security.framework */; };
+		24D15E1B13CF4A8700ABB3A3 /* JCILaunchdPlist.h in Headers */ = {isa = PBXBuildFile; fileRef = 24D15E1913CF4A8700ABB3A3 /* JCILaunchdPlist.h */; };
+		24D15E1C13CF4A8700ABB3A3 /* JCILaunchdPlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D15E1A13CF4A8700ABB3A3 /* JCILaunchdPlist.m */; };
 		24FEDBF413CB565500C6EEFF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF313CB565500C6EEFF /* Cocoa.framework */; };
 		24FEDBF613CB565500C6EEFF /* PreferencePanes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */; };
 		24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */; };
@@ -53,6 +55,8 @@
 		24828E9813CCCF9800A1A1D4 /* SecureWrite-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SecureWrite-Prefix.pch"; sourceTree = "<group>"; };
 		24828E9913CCCF9800A1A1D4 /* SecureWrite.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = SecureWrite.1; sourceTree = "<group>"; };
 		24828EA813CCDE4C00A1A1D4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		24D15E1913CF4A8700ABB3A3 /* JCILaunchdPlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JCILaunchdPlist.h; sourceTree = "<group>"; };
+		24D15E1A13CF4A8700ABB3A3 /* JCILaunchdPlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JCILaunchdPlist.m; sourceTree = "<group>"; };
 		24FEDBF013CB565500C6EEFF /* Jenkins Preference Pane.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Jenkins Preference Pane.prefPane"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24FEDBF313CB565500C6EEFF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PreferencePanes.framework; path = System/Library/Frameworks/PreferencePanes.framework; sourceTree = SDKROOT; };
@@ -112,6 +116,8 @@
 		24FEDBE313CB565500C6EEFF = {
 			isa = PBXGroup;
 			children = (
+				24D15E1913CF4A8700ABB3A3 /* JCILaunchdPlist.h */,
+				24D15E1A13CF4A8700ABB3A3 /* JCILaunchdPlist.m */,
 				24FEDBFB13CB565500C6EEFF /* Jenkins */,
 				24828E9413CCCF9800A1A1D4 /* SecureWrite */,
 				24FEDBF213CB565500C6EEFF /* Frameworks */,
@@ -181,6 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24FEDC0313CB565500C6EEFF /* Jenkins.h in Headers */,
+				24D15E1B13CF4A8700ABB3A3 /* JCILaunchdPlist.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +295,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24FEDC0513CB565500C6EEFF /* Jenkins.m in Sources */,
+				24D15E1C13CF4A8700ABB3A3 /* JCILaunchdPlist.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +440,7 @@
 				24828E9C13CCCF9800A1A1D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		24FEDBE813CB565500C6EEFF /* Build configuration list for PBXProject "Jenkins Preference Pane" */ = {
 			isa = XCConfigurationList;
