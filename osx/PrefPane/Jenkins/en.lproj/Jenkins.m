@@ -45,7 +45,7 @@
 	[self.authorizationView setAuthorizationRights:&rights];
 	self.authorizationView.delegate = self;
 	self.uiEnabled = [self isUnlocked];
-	self.plist.authorizationView = self.authorizationView;
+	self.plist.authorization = self.authorizationView.authorization;
 }
 
 -(void)willSelect{
@@ -265,6 +265,14 @@
 
 - (void)authorizationViewDidDeauthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];
+}
+
+- (void)authorizationViewCreatedAuthorization:(SFAuthorizationView *)view{
+	self.plist.authorization = view.authorization;
+}
+
+- (void)authorizationViewReleasedAuthorization:(SFAuthorizationView *)view{
+	self.plist.authorization = nil;
 }
 
 @end
