@@ -105,6 +105,13 @@ static NSSet *propertySet = nil;
 	
 }
 
++(NSString *)makeFirstCapital:(NSString *)string{
+	NSMutableString *capString = [string mutableCopy];
+	char first = toupper([string characterAtIndex:0]);
+	[capString replaceCharactersInRange:NSMakeRange(0, 1) withString:[NSString stringWithCharacters:(const unichar *)&first length:1]];
+	return [capString autorelease];
+}
+
 -(void)read{
 	NSData *plistData = [NSData dataWithContentsOfFile:self.path];
 	self.plist = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListMutableContainersAndLeaves format:NULL errorDescription:NULL];
@@ -241,7 +248,7 @@ static NSSet *propertySet = nil;
 @end
 
 id plistGetProxy(id self, SEL selector){
-	NSString *propertyName = [NSStringFromSelector(selector) capitalizedString];
+	NSString *propertyName = [JCILaunchdPlist makeFirstCapital:NSStringFromSelector(selector)];
 	id value = [[self plist] objectForKey:propertyName];
 	// Massage program arguments
 	if([propertyName isEqualToString:@"ProgramArguments"] && [[self plist] objectForKey:@"Program"] == nil){
@@ -308,7 +315,7 @@ id plistGetProxy(id self, SEL selector){
 void plistSetProxy(id self, SEL selector, id value){
 	NSString *littleName = NSStringFromSelector(selector);
 	[self willChangeValueForKey:littleName];
-	NSString *propertyName = [littleName capitalizedString];
+	NSString *propertyName = [JCILaunchdPlist makeFirstCapital:littleName];
 	[[self plist] setValue:value forKey:propertyName];
 	[self didChangeValueForKey:littleName];
 	[self save];

@@ -70,4 +70,6 @@
 -(void)start;
 -(void)stop;
 
++(NSString *)makeFirstCapital:(NSString *)string;
+
 @end
