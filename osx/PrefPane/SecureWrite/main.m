@@ -27,12 +27,10 @@ int main (int argc, const char * argv[])
 	size_t bufferSize = 1024;
 	size_t actualSize;
 	void *buffer = malloc(bufferSize);
-	actualSize = read(readFD, buffer, bufferSize);
-	while(actualSize != 0){
+	while(actualSize = read(readFD, buffer, bufferSize), actualSize != 0){
 		assert(actualSize > 0);
 		ssize_t writtenBytes = write(writeFD, buffer, actualSize);
 		assert(writtenBytes > 0);
-		actualSize = read(readFD, buffer, bufferSize);
 	}
 	free(buffer);
 	close(writeFD);
