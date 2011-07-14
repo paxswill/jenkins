@@ -68,6 +68,7 @@ static NSSet *propertySet = nil;
 
 @synthesize plist;
 @synthesize path;
+@synthesize authorization;
 
 -(id)initWithPath:(NSString *)plistPath{
 	if((self = [super init])){
@@ -110,7 +111,21 @@ static NSSet *propertySet = nil;
 }
 
 -(void)save{
-	
+	// Create a pipe, and use it to funnel the plist data to the elevated process
+	// Set up the pipe
+	NSPipe *authPipe = [[NSPipe alloc] init];
+	NSFileHandle *writeHandle = [authPipe fileHandleForWriting];
+	FILE *bridge = fdopen([[authPipe fileHandleForReading] fileDescriptor], "r");
+	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.plist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
+	const char *argv[] = {"-c", [[NSString stringWithFormat:@" cat > %@", self.path] UTF8String], NULL};
+	// Write on a thread, or we will deadlock for data length longer than 4096 bytes
+	[NSThread detachNewThreadSelector:@selector(writeData:) toTarget:writeHandle withObject:plistData];
+	// Spawn the privileged process
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/sh", kAuthorizationFlagDefaults, (char * const *)argv, &bridge);
+	// The execution call above blocks until it's done, and the thread is done then.
+	fclose(bridge);
+	[writeHandle closeFile];
+	[authPipe release];
 }
 
 -(BOOL)isRunning{

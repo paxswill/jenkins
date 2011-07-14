@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AvailabilityMacros.h>
+#import <SecurityFoundation/SFAuthorization.h>
 
 @interface JCILaunchdPlist : NSObject{
 @private
@@ -62,6 +62,7 @@
 @property (nonatomic, retain, readonly) NSMutableDictionary *plist;
 @property (nonatomic, retain, readwrite) NSString *path;
 @property (nonatomic, assign, readwrite, getter=isRunning) BOOL running;
+@property (nonatomic, retain, readwrite) SFAuthorization *authorization;
 
 -(id)initWithPath:(NSString *)plistPath;
 -(void)load;
