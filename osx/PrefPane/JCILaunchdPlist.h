@@ -63,6 +63,7 @@
 @property (nonatomic, retain, readwrite) NSString *path;
 @property (nonatomic, assign, readwrite, getter=isRunning) BOOL running;
 @property (nonatomic, retain, readwrite) SFAuthorization *authorization;
+@property (nonatomic, retain, readwrite) NSString *helperPath;
 
 -(id)initWithPath:(NSString *)plistPath;
 -(void)load;

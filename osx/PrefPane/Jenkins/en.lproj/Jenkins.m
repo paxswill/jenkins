@@ -33,6 +33,7 @@
 		libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
 		self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
 		[libraryPath release];
+		self.plist.helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
 	}
 	return self;
 }
