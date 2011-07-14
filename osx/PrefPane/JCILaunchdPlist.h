@@ -12,6 +12,9 @@
 @interface JCILaunchdPlist : NSObject{
 @private
 	NSMutableDictionary *plist;
+	NSString *path;
+	SFAuthorization *authorization;
+	NSString *helperPath;
 }
 // launchd.plist values
 @property (nonatomic, retain, readwrite) NSString *label;
