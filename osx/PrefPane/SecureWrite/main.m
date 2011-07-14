@@ -15,22 +15,34 @@
 
 int main (int argc, const char * argv[])
 {
-	fprintf(stderr, "Elevated reading in progress");
+	fprintf(stderr, "Elevated reading in progress\n");
 	// A file handle, and a path are required in argv
 	if(argc != 2){
+		fprintf(stderr, "argc = %d\n", argc);
 		exit(1);
 	}
+	fprintf(stderr, "Path: %s\n", argv[1]);
 	// The pipe handle should already be open
 	int readFD = fcntl(STDIN_FILENO, F_DUPFD, 0);
 	int writeFD = open(argv[1], O_WRONLY | O_CREAT);
-	assert(writeFD > 0);
+	if(writeFD < 0){
+		fprintf(stderr, "Error opening file: %s (%d)\n", strerror(errno), errno);
+		exit(1);
+	}
 	size_t bufferSize = 1024;
 	size_t actualSize;
 	void *buffer = malloc(bufferSize);
 	while(actualSize = read(readFD, buffer, bufferSize), actualSize != 0){
-		assert(actualSize > 0);
+		fprintf(stderr, "Writing %d bytes\n", actualSize);
+		if(writeFD < 0){
+			fprintf(stderr, "Error reading file: %s (%d)\n", strerror(errno), errno);
+			exit(1);
+		}
 		ssize_t writtenBytes = write(writeFD, buffer, actualSize);
-		assert(writtenBytes > 0);
+		if(writeFD < 0){
+			fprintf(stderr, "Error writing file: %s (%d)\n", strerror(errno), errno);
+			exit(1);
+		}
 	}
 	free(buffer);
 	close(writeFD);
