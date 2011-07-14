@@ -69,6 +69,8 @@
 -(void)unload;
 -(void)start;
 -(void)stop;
+-(void)read;
+-(void)save;
 
 +(NSString *)makeFirstCapital:(NSString *)string;
 

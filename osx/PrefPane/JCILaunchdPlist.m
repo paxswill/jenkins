@@ -16,8 +16,7 @@ static NSSet *propertySet = nil;
 
 @interface JCILaunchdPlist()
 @property (nonatomic, retain, readwrite) NSMutableDictionary *plist;
--(void)read;
--(void)save;
+
 @end
 
 @implementation JCILaunchdPlist

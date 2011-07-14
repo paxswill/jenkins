@@ -74,6 +74,7 @@
 
 -(void)setEnvironmentVariable:(NSString *)varName value:(id)value{
 	[self.plist.environmentVariables setValue:value forKey:varName];
+	[self.plist save];
 }
 
 // This method is tenuous and needs some major tests for all edge cases
@@ -177,6 +178,7 @@
 			[args addObject:[NSString stringWithFormat:@"-%@ %@", option, [Jenkins convertToArgumentString:value]]];
 			break;
 	}
+	[self.plist save];
 }
 
 // This would be nice to put in a category on NSString, NSNumber and possibly other classes, but PrefPanes run within
