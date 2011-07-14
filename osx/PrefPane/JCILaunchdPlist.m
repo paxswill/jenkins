@@ -130,19 +130,14 @@ static NSSet *propertySet = nil;
 	return [capString autorelease];
 }
 
-
-
 -(BOOL)isRunning{
 	// Get launchd listing (/bin/launchctl list)
-	NSTask *existsTask = [[NSTask alloc] init];
-	[existsTask setLaunchPath:@"/bin/launchctl"];
-	[existsTask setArguments:[NSArray arrayWithObjects:@"list", nil]];
-	NSPipe *existsPipe = [[NSPipe alloc] init];
-	[existsTask setStandardOutput:existsPipe];
-	[existsTask launch];
-	[existsTask waitUntilExit];
-	NSFileHandle *existsOutput = [existsPipe fileHandleForReading];
-	NSData *existsData = [[existsOutput readDataToEndOfFile] retain];
+	FILE *pipe;
+	const char *argv[] = { "list", NULL };
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
+	NSFileHandle *fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileno(pipe) closeOnDealloc:YES];
+	NSData *existsData = [[fileHandle readDataToEndOfFile] retain];
+	[fileHandle release];
 	NSString *allLines = [[NSString alloc] initWithData:existsData encoding:NSUTF8StringEncoding];
 	NSArray *rawLines = [[allLines componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] retain];
 	[allLines release];
