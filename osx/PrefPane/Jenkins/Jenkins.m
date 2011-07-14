@@ -9,16 +9,12 @@
 #import "Jenkins.h"
 
 @interface Jenkins()
--(void)loadPlist;
--(void)savePlist;
 +(NSString *)convertToArgumentString:(id<NSObject>)obj;
 @end
 
 @implementation Jenkins
 
-@synthesize launchdPlist;
-@synthesize plistPath;
-@synthesize plistName;
+@synthesize plist;
 @synthesize uiEnabled;
 
 @synthesize otherFlags;
@@ -42,144 +38,45 @@
 	                                                 : @"/Library";
 	[libraryPaths release];
 	libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
-	self.plistName = @"org.jenkins-ci.plist";
-	self.plistPath = [libraryPath stringByAppendingString:self.plistName];
+	NSString *plistPath = @"org.jenkins-ci.plist";
+	self.plist = [[[JCILaunchdPlist alloc] initWithPath:plistPath] autorelease];
 	[libraryPath release];
-	[self loadPlist];
+	self.plist.authorization = self.authorizationView.authorization;
 }
 
 -(void)willSelect{
-	[self loadPlist];
 	// Set the start/stop button
-	if(self.running){
+	if(self.plist.running){
 		self.startButton.title = @"Stop";
 	}else{
 		self.startButton.title = @"Start";
 	}
 	// Set autostart checkbox
-	if(![[self.launchdPlist valueForKey:@"Disabled"] boolValue] && [[self.launchdPlist valueForKey:@"RunAtLoad"] boolValue]){
+	if(![self.plist.disabled boolValue] && [self.plist.runAtLoad boolValue]){
 		[self.autostart setState:NSOnState];
 	}else{
 		[self.autostart setState:NSOffState];
 	}
 }
 
--(void)loadPlist{
-	// Reading is unprivileged, so no auth services 
-	NSData *plistData = [NSData dataWithContentsOfFile:self.plistPath];
-	[self willChangeValueForKey:@"httpPort"];
-	[self willChangeValueForKey:@"httpsPort"];
-	[self willChangeValueForKey:@"ajpPort"];
-	[self willChangeValueForKey:@"jenkinsWar"];
-	[self willChangeValueForKey:@"prefix"];
-	[self willChangeValueForKey:@"heapSize"];
-	[self willChangeValueForKey:@"jenkinsHome"];
-	self.launchdPlist = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListMutableContainersAndLeaves format:NULL errorDescription:NULL];
-	NSAssert(self.launchdPlist, @"launchdPlist is not supposed to be null");
-	[self didChangeValueForKey:@"httpPort"];
-	[self didChangeValueForKey:@"httpsPort"];
-	[self didChangeValueForKey:@"ajpPort"];
-	[self didChangeValueForKey:@"jenkinsWar"];
-	[self didChangeValueForKey:@"prefix"];
-	[self didChangeValueForKey:@"heapSize"];
-	[self didChangeValueForKey:@"jenkinsHome"];
-}
-
--(void)savePlist{
-	// Create a pipe, and use it to funnel the plist data to the elevated process
-	// Set up the pipe
-	NSPipe *authPipe = [[NSPipe alloc] init];
-	NSFileHandle *writeHandle = [authPipe fileHandleForWriting];
-	FILE *bridge = fdopen([[authPipe fileHandleForReading] fileDescriptor], "r");
-	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.launchdPlist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
-	// Set up the task
-	NSString *helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
-	const char *argv[] = {[self.plistPath UTF8String], NULL};
-	// Write on a thread, or we will deadlock for data length longer than 4096 bytes
-	[NSThread detachNewThreadSelector:@selector(writeData:) toTarget:writeHandle withObject:plistData];
-	// Spawn the privileged process
-	AuthorizationExecuteWithPrivileges([[self.authorizationView authorization] authorizationRef], [helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &bridge);
-	// The execution call above blocks until it's done, and the thread is done then.
-	fclose(bridge);
-	[writeHandle closeFile];
-	[authPipe release];
-}
-
 -(BOOL)isUnlocked{
 	return [self.authorizationView authorizationState] == SFAuthorizationViewUnlockedState;
 }
 
--(BOOL)isRunning{
-	// Get launchd listing (/bin/launchctl list)
-	NSTask *existsTask = [[NSTask alloc] init];
-	[existsTask setLaunchPath:@"/bin/launchctl"];
-	[existsTask setArguments:[NSArray arrayWithObjects:@"list", nil]];
-	NSPipe *existsPipe = [[NSPipe alloc] init];
-	[existsTask setStandardOutput:existsPipe];
-	[existsTask launch];
-	[existsTask waitUntilExit];
-	NSFileHandle *existsOutput = [existsPipe fileHandleForReading];
-	NSData *existsData = [[existsOutput readDataToEndOfFile] retain];
-	NSString *allLines = [[NSString alloc] initWithData:existsData encoding:NSUTF8StringEncoding];
-	NSArray *rawLines = [[allLines componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] retain];
-	[allLines release];
-	/*
-	 Search for the job. The format for each line is
-	 PID	ExitState	launchdLabel
-	 The space between each column is '\t'. If no value is given, the character '-' is substituted
-	 */
-	for(NSString *line in rawLines){
-		if([line isEqualToString:@""]){
-			continue;
-		}
-		NSArray *lineData = [line componentsSeparatedByString:@"\t"];
-		if([[lineData objectAtIndex:2] isEqualToString:@"org.jenkins-ci"]){
-			if([[lineData objectAtIndex:0] isEqualToString:@"-"]){
-				// Loaded, not running
-				return NO;
-			}else{
-				// Loaded and running
-				return YES;
-			}
-		}
-	}
-	// Not loaded
-	return NO;
-}
-
--(void)setRunning:(BOOL)runJenkins{
-	if(self.running != runJenkins){
-		// Unload (and implicitly stop) the daemon in all cases, as the configuration may be changing
-		NSArray *unloadArgs = [NSArray arrayWithObjects:@"unload", self.plistPath, nil];
-		[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:unloadArgs];
-		if(runJenkins){
-			// Reload and start the daemon
-			NSArray *loadArgs = [NSArray arrayWithObjects:@"load", self.plistPath, nil];
-			NSArray *startArgs = [NSArray arrayWithObjects:@"start", self.plistName, nil];
-			[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:loadArgs];
-			[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:startArgs];
-		}
-	}
-}
 
 -(NSString *)getEnvironmentVariable:(NSString *)varName{
-	NSDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
-	return [env valueForKey:varName];
+	return [self.plist.environmentVariables valueForKey:varName];
 }
 
 -(void)setEnvironmentVariable:(NSString *)varName value:(id)value{
-	NSMutableDictionary *env = [self.launchdPlist objectForKey:@"EnvironmentVariables"];
-	[env setValue:value forKey:varName];
-	[self savePlist];
+	[self.plist.environmentVariables setValue:value forKey:varName];
 }
 
 // This method is tenuous and needs some major tests for all edge cases
 -(NSString *)getLaunchOption:(NSString *)option{
-	NSArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
-	// If the Program key is missing, args[0] is used as the executable
-	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 1 : 0;
+	NSArray *args = self.plist.programArguments;
 	NSInteger count = [args count];
-	for(NSInteger i = executableOffset; i < count; ++i){
+	for(NSInteger i = 0; i < count; ++i){
 		// Trim the leading '-'
 		NSString *arg = [[args objectAtIndex:i] substringFromIndex:1];
 		// In three cases, the first character is a specific character
@@ -215,12 +112,10 @@
 }
 
 -(void)setLaunchOption:(NSString *)option value:(id<NSObject>)value type:(JCILaunchOption)optionType{
-	NSMutableArray *args = [self.launchdPlist objectForKey:@"ProgramArguments"];
-	// If the Program key is missing, args[0] is used as the executable
-	NSInteger executableOffset = [self.launchdPlist objectForKey:@"Program"] == nil ? 0 : 1;
+	NSMutableArray *args = self.plist.programArguments;
 	NSInteger count = [args count];
 	// Try to find the argument if defined
-	for(NSInteger i = executableOffset; i < count; ++i){
+	for(NSInteger i = 0; i < count; ++i){
 		NSString *arg = [[args objectAtIndex:i] substringFromIndex:1];
 		switch (optionType) {
 			case JCIWinstoneLaunchOption:
@@ -278,7 +173,6 @@
 			[args addObject:[NSString stringWithFormat:@"-%@ %@", option, [Jenkins convertToArgumentString:value]]];
 			break;
 	}
-	[self savePlist];
 }
 
 // This would be nice to put in a category on NSString, NSNumber and possibly other classes, but PrefPanes run within
@@ -292,7 +186,7 @@
 }
 
 - (IBAction)toggleJenkins:(id)sender{
-	self.running = !self.running;
+	self.plist.running = !self.plist.running;
 }
 
 - (IBAction)updateJenkins:(id)sender{

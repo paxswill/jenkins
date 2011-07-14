@@ -8,6 +8,7 @@
 
 #import <PreferencePanes/PreferencePanes.h>
 #import <SecurityInterface/SFAuthorizationView.h>
+#import "JCILaunchdPlist.h"
 
 typedef enum{
 	JCIWinstoneLaunchOption = 0,    // --Option=Value
@@ -17,10 +18,7 @@ typedef enum{
 } JCILaunchOption;
 
 @interface Jenkins : NSPreferencePane{
-	NSMutableDictionary *launchdPlist;
-	NSString *plistPath;
-	NSString *plistName;
-	BOOL running;
+	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
 
 	NSString *httpPort;
@@ -36,10 +34,7 @@ typedef enum{
 	NSButton *autostart;
 	SFAuthorizationView *authorizationView;
 }
-@property (nonatomic, readwrite, retain) NSMutableDictionary *launchdPlist;
-@property (nonatomic, readwrite, retain) NSString *plistPath;
-@property (nonatomic, readwrite, retain) NSString *plistName;
-@property (nonatomic, readwrite, assign, getter = isRunning) BOOL running;
+@property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
 
 @property (nonatomic, readwrite, retain) NSString *httpPort;
