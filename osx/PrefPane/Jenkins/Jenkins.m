@@ -23,6 +23,20 @@
 @synthesize autostart;
 @synthesize authorizationView;
 
+-(id)initWithBundle:(NSBundle *)bundle{
+	if((self = [super initWithBundle:bundle])){
+		// Find the Jenkins launchd plist
+		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSLocalDomainMask, YES);
+		NSString *libraryPath = [libraryPaths count] > 0 ? [[libraryPaths objectAtIndex:0] retain] 
+		: @"/Library";
+		[libraryPaths release];
+		libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
+		self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
+		[libraryPath release];
+	}
+	return self;
+}
+
 - (void)mainViewDidLoad{
 	// Setup authorization
 	[self.authorizationView setAutoupdate:YES];
@@ -31,15 +45,6 @@
 	[self.authorizationView setAuthorizationRights:&rights];
 	self.authorizationView.delegate = self;
 	self.uiEnabled = [self isUnlocked];
-	
-	// Find the Jenkins launchd plist
-	NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSLocalDomainMask, YES);
-	NSString *libraryPath = [libraryPaths count] > 0 ? [[libraryPaths objectAtIndex:0] retain] 
-	                                                 : @"/Library";
-	[libraryPaths release];
-	libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
-	self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
-	[libraryPath release];
 	self.plist.authorization = self.authorizationView.authorization;
 }
 
