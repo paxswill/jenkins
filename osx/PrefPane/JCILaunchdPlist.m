@@ -105,13 +105,6 @@ static NSSet *propertySet = nil;
 	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
-+(NSString *)makeFirstCapital:(NSString *)string{
-	NSMutableString *capString = [string mutableCopy];
-	const unichar first = [[string capitalizedString] characterAtIndex:0];
-	[capString replaceCharactersInRange:NSMakeRange(0, 1) withString:[NSString stringWithCharacters:&first length:1]];
-	return [capString autorelease];
-}
-
 -(void)read{
 	NSData *plistData = [NSData dataWithContentsOfFile:self.path];
 	self.plist = [NSPropertyListSerialization propertyListFromData:plistData mutabilityOption:NSPropertyListMutableContainersAndLeaves format:NULL errorDescription:NULL];
@@ -131,6 +124,15 @@ static NSSet *propertySet = nil;
 	[writeHandle closeFile];
 	fclose(pipe);
 }
+
++(NSString *)makeFirstCapital:(NSString *)string{
+	NSMutableString *capString = [string mutableCopy];
+	const unichar first = [[string capitalizedString] characterAtIndex:0];
+	[capString replaceCharactersInRange:NSMakeRange(0, 1) withString:[NSString stringWithCharacters:&first length:1]];
+	return [capString autorelease];
+}
+
+
 
 -(BOOL)isRunning{
 	// Get launchd listing (/bin/launchctl list)
