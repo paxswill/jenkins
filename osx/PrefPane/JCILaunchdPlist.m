@@ -86,23 +86,23 @@ static NSSet *propertySet = nil;
 
 -(void)load{
 	// Reload and start the daemon
-	NSArray *loadArgs = [NSArray arrayWithObjects:@"load", self.path, nil];
-	NSArray *startArgs = [NSArray arrayWithObjects:@"start", self.path, nil];
-	[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:loadArgs];
-	[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:startArgs];
+	const char *argv[] = { "load", [self.path UTF8String], NULL };
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
 -(void)unload{
-	NSArray *unloadArgs = [NSArray arrayWithObjects:@"unload", self.path, nil];
-	[NSTask launchedTaskWithLaunchPath:@"/bin/launchctl" arguments:unloadArgs];
+	const char *argv[] = { "unload", [self.path UTF8String], NULL };
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
 -(void)start{
-	
+	const char *argv[] = { "start", [self.label UTF8String], NULL };
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
 -(void)stop{
-	
+	const char *argv[] = { "stop", [self.label UTF8String], NULL };
+	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
 +(NSString *)makeFirstCapital:(NSString *)string{
