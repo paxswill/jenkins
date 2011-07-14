@@ -38,8 +38,7 @@
 	                                                 : @"/Library";
 	[libraryPaths release];
 	libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
-	NSString *plistPath = @"org.jenkins-ci.plist";
-	self.plist = [[[JCILaunchdPlist alloc] initWithPath:plistPath] autorelease];
+	self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
 	[libraryPath release];
 	self.plist.authorization = self.authorizationView.authorization;
 }
