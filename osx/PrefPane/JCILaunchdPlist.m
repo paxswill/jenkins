@@ -107,8 +107,8 @@ static NSSet *propertySet = nil;
 
 +(NSString *)makeFirstCapital:(NSString *)string{
 	NSMutableString *capString = [string mutableCopy];
-	char first = toupper([string characterAtIndex:0]);
-	[capString replaceCharactersInRange:NSMakeRange(0, 1) withString:[NSString stringWithCharacters:(const unichar *)&first length:1]];
+	const unichar first = [[string capitalizedString] characterAtIndex:0];
+	[capString replaceCharactersInRange:NSMakeRange(0, 1) withString:[NSString stringWithCharacters:&first length:1]];
 	return [capString autorelease];
 }
 
