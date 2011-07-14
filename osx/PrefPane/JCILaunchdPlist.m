@@ -295,6 +295,9 @@ id plistGetProxy(id self, SEL selector){
 		}else if([propertyName isEqualToString:@"HopefullyExitsFirst"]){
 			// Inferred from the man page
 			return [NSNumber numberWithBool:NO];
+		}else if([propertyName isEqualToString:@"Disabled"]){
+			// Inferred from man page
+			return [NSNumber numberWithBool:NO];
 		}
 	}else{
 		return value;
