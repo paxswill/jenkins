@@ -1,18 +1,18 @@
 //
-//  Jenkins.m
+//  JCIPrefPane.m
 //  Jenkins
 //
 //  Created by William Ross on 7/11/11.
 //  Copyright 2011 Naval Research Lab. All rights reserved.
 //
 
-#import "Jenkins.h"
+#import "JCIPrefPane.h"
 
-@interface Jenkins()
+@interface JCIPrefPane()
 +(NSString *)convertToArgumentString:(id<NSObject>)obj;
 @end
 
-@implementation Jenkins
+@implementation JCIPrefPane
 
 @synthesize plist;
 @synthesize uiEnabled;
@@ -133,7 +133,7 @@
 					if(equalRange.location != NSNotFound){
 						if([[arg substringToIndex:equalRange.location] isEqualToString:option]){
 							NSRange valueRange = NSMakeRange(equalRange.location + 1, ([arg length] - equalRange.location - 1));
-							[newProperty replaceCharactersInRange:valueRange withString:[Jenkins convertToArgumentString:value]];
+							[newProperty replaceCharactersInRange:valueRange withString:[JCIPrefPane convertToArgumentString:value]];
 							[newProperty insertString:@"-" atIndex:0];
 							[args replaceObjectAtIndex:i withObject:newProperty];
 							[newProperty release];
@@ -147,7 +147,7 @@
 				   ([arg characterAtIndex:1] == 's' && [arg characterAtIndex:2] == 's')){
 					NSMutableString *newProperty = [arg mutableCopy];
 					NSRange valueRange = NSMakeRange(3, [newProperty length] - 3);
-					[newProperty replaceCharactersInRange:valueRange withString:[Jenkins convertToArgumentString:value]];
+					[newProperty replaceCharactersInRange:valueRange withString:[JCIPrefPane convertToArgumentString:value]];
 					[newProperty insertString:@"-" atIndex:0];
 					[args replaceObjectAtIndex:i withObject:newProperty];
 					[newProperty release];
@@ -158,7 +158,7 @@
 				break;
 			case JCISeparated:
 				if([arg isEqualToString:option]){
-					[args replaceObjectAtIndex:(i + 1) withObject:[Jenkins convertToArgumentString:value]];
+					[args replaceObjectAtIndex:(i + 1) withObject:[JCIPrefPane convertToArgumentString:value]];
 					return;
 				}
 				break;
@@ -167,16 +167,16 @@
 	// Not found, add it
 	switch (optionType) {
 		case JCIWinstoneLaunchOption:
-			[args addObject:[NSString stringWithFormat:@"--%@=%@", option, [Jenkins convertToArgumentString:value]]];
+			[args addObject:[NSString stringWithFormat:@"--%@=%@", option, [JCIPrefPane convertToArgumentString:value]]];
 			break;
 		case JCIJavaSystemProperty:
-			[args addObject:[NSString stringWithFormat:@"-D%@=%@", option, [Jenkins convertToArgumentString:value]]];
+			[args addObject:[NSString stringWithFormat:@"-D%@=%@", option, [JCIPrefPane convertToArgumentString:value]]];
 			break;
 		case JCIJavaExtension:
-			[args addObject:[NSString stringWithFormat:@"-X%@%@", option, [Jenkins convertToArgumentString:value]]];
+			[args addObject:[NSString stringWithFormat:@"-X%@%@", option, [JCIPrefPane convertToArgumentString:value]]];
 			break;
 		case JCISeparated:
-			[args addObject:[NSString stringWithFormat:@"-%@ %@", option, [Jenkins convertToArgumentString:value]]];
+			[args addObject:[NSString stringWithFormat:@"-%@ %@", option, [JCIPrefPane convertToArgumentString:value]]];
 			break;
 	}
 	[self.plist save];

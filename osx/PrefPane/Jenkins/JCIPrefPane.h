@@ -1,5 +1,5 @@
 //
-//  Jenkins.h
+//  JCIPrefPane.h
 //  Jenkins
 //
 //  Created by William Ross on 7/11/11.
@@ -17,7 +17,7 @@ typedef enum{
 	JCISeparated,               // -Option [Value]
 } JCILaunchOption;
 
-@interface Jenkins : NSPreferencePane{
+@interface JCIPrefPane : NSPreferencePane{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
 

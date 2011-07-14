@@ -31,6 +31,6 @@
 	<key>NSPrefPaneIconLabel</key>
 	<string>Jenkins</string>
 	<key>NSPrincipalClass</key>
-	<string>Jenkins</string>
+	<string>JCIPrefPane</string>
 </dict>
 </plist>
