@@ -118,11 +118,9 @@ static NSSet *propertySet = nil;
 	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
 	// Write the data out
 	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.plist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
-	int writeFD = fileno(pipe);
-	NSFileHandle *writeHandle = [[NSFileHandle alloc] initWithFileDescriptor:writeFD];
+	NSFileHandle *writeHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileno(pipe) closeOnDealloc:YES];
 	[writeHandle writeData:plistData];
 	[writeHandle closeFile];
-	fclose(pipe);
 }
 
 +(NSString *)makeFirstCapital:(NSString *)string{
