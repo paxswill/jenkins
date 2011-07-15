@@ -302,11 +302,9 @@ static const NSSet *javaOptions;
 	}else if(rowIndex == jenkinsHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
 		return @"Jenkins Options";
 	}else{
-		// This section is evil and should be rewritten
-		int offset = 0;
+		int offset = 1;
 		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
 			// Environment Variable
-			offset = 1;
 			return [[self.variables objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
 			// Java
