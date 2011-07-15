@@ -364,24 +364,28 @@ static const JCIComboSource *environmentVariableSource;
 	return row == environmentHeaderIndex || row == javaHeaderIndex || row == jenkinsHeaderIndex;
 }
 
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
+	if(![self tableView:aTableView isGroupRow:rowIndex] && [[aTableColumn identifier] isEqualToString:@"option"]){
+		NSComboBoxCell *comboCell = (NSComboBoxCell *)aCell;
+		[comboCell setUsesDataSource:YES];
+		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
+			// Environment Variable
+			[comboCell setDataSource:environmentVariableSource];
+		}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
+			// Java
+			[comboCell setDataSource:javaComboSource];
+		}else if(rowIndex > jenkinsHeaderIndex){
+			// Jenkins
+			[comboCell setDataSource:jenkinsComboSource];
+		}
+	}
+}
+
 - (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
 	if([self tableView:tableView isGroupRow:row]){
 		return [[[NSTextFieldCell alloc] init] autorelease];
 	}else if(tableColumn != nil && [[tableColumn identifier] isEqualToString:@"option"]){
-		NSComboBoxCell *combo = [[NSComboBoxCell alloc] init];
-		[combo setUsesDataSource:YES];
-		if(row < javaHeaderIndex && row > environmentHeaderIndex){
-			// Environment Variable
-			[combo setDataSource:(id<NSComboBoxCellDataSource>)environmentVariableSource];
-		}else if(row < jenkinsHeaderIndex && row > javaHeaderIndex){
-			// Java
-			[combo setDataSource:(id<NSComboBoxCellDataSource>)javaComboSource];
-		}else if(row > jenkinsHeaderIndex){
-			// Jenkins
-			[combo setDataSource:(id<NSComboBoxCellDataSource>)jenkinsComboSource];
-		}else{
-			return nil;
-		}
+		return [tableColumn dataCellForRow:row];
 	}else if(tableColumn == nil){
 		return nil;
 	}else{
