@@ -72,11 +72,7 @@
 
 -(void)willSelect{
 	// Set the start/stop button
-	if(self.plist.running){
-		self.startButton.title = @"Stop";
-	}else{
-		self.startButton.title = @"Start";
-	}
+	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
 	// Set autostart checkbox
 	if(![self.plist.disabled boolValue] && [self.plist.runAtLoad boolValue]){
 		[self.autostart setState:NSOnState];
@@ -316,6 +312,7 @@
 
 - (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];
+	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
 }
 
 - (void)authorizationViewDidDeauthorize:(SFAuthorizationView *)view {
