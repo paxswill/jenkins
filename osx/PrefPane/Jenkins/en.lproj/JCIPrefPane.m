@@ -304,17 +304,18 @@ static const NSSet *javaOptions;
 	}else{
 		// This section is evil and should be rewritten
 		int offset = 0;
-		offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
-		offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
-		offset += [self.jenkinsArgs count] > 0 ? [self.jenkinsArgs count] + 1 : 0;
 		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
 			// Environment Variable
+			offset = 1;
 			return [[self.variables objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
 			// Java
+			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
 			return [[self.javaArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else if(rowIndex > jenkinsHeaderIndex){
 			// Jenkins
+			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+			offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
 			return [[self.jenkinsArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else{
 			return nil;
