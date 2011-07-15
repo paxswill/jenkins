@@ -10,13 +10,6 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "JCILaunchdPlist.h"
 
-typedef enum{
-	JCIWinstoneLaunchOption = 0,    // --Option=Value
-	JCIJavaSystemProperty,      // -DOption=value
-	JCIJavaExtension,           // -XOptionValue
-	JCISeparated,               // -Option [Value]
-} JCILaunchOption;
-
 @interface JCIPrefPane : NSPreferencePane{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
@@ -41,10 +34,7 @@ typedef enum{
 - (void)mainViewDidLoad;
 
 - (BOOL)isUnlocked;
--(NSString *)getEnvironmentVariable:(NSString *)varName;
--(void)setEnvironmentVariable:(NSString *)varName value:(id)value;
 -(NSString *)getLaunchOption:(NSString *)option;
--(void)setLaunchOption:(NSString *)option value:(id<NSObject>)value type:(JCILaunchOption)optionType;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
 

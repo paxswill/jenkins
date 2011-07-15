@@ -9,8 +9,11 @@
 #import "JCIPrefPane.h"
 #import <objc/runtime.h>
 
+static const NSSet *javaOptions;
+
 @interface JCIPrefPane()
-+(NSString *)convertToArgumentString:(id<NSObject>)obj;
++(NSString *)convertToArgumentString:(NSDictionary *)argumentDict;
++(NSMutableDictionary *)parseJavaArgument:(NSString *)arg;
 -(NSMutableArray *)variablesDictionaryArray;
 -(NSMutableArray *)argumentsDictionaryArray;
 @end
@@ -38,6 +41,41 @@
 		class_addProtocol([JCIPrefPane class], delegateProtocol);
 		class_addProtocol([JCIPrefPane class], dataSourceProtocol);
 	}
+}
+
++(void)initialize{
+	// Skip the "Show something and exit" options
+	javaOptions = [[NSSet alloc] initWithObjects:
+				   @"-client",
+				   @"-server",
+				   @"-classpath"
+				   @"-cp",
+				   @"-d32",
+				   @"-d64",
+				   @"-enableassertions",
+				   @"-ea",
+				   @"-disableassertions",
+				   @"-da",
+				   @"-enablesystemassertions",
+				   @"-esa",
+				   @"-disablesystemassertions",
+				   @"-dsa",
+				   @"-jar",
+				   @"-verbose",
+				   @"-verbose:gc",
+				   @"-verbose:jni",
+				   @"-showversion",
+				   @"-Xint",
+				   @"-Xbatch",
+				   @"-Xdebug",
+				   @"-Xcheck:jni",
+				   @"-Xfuture",
+				   @"-Xnoclassgc",
+				   @"-Xincgc",
+				   @"-Xprof",
+				   @"-Xrs",
+				   @"-XX:+UseAltSigs",
+				   nil];
 }
 
 -(id)initWithBundle:(NSBundle *)bundle{
@@ -132,127 +170,91 @@
 	return [self.authorizationView authorizationState] == SFAuthorizationViewUnlockedState;
 }
 
-
--(NSString *)getEnvironmentVariable:(NSString *)varName{
-	return [self.plist.environmentVariables valueForKey:varName];
-}
-
--(void)setEnvironmentVariable:(NSString *)varName value:(id)value{
-	[self.plist.environmentVariables setValue:value forKey:varName];
-	[self.plist save];
-}
-
-// This method is tenuous and needs some major tests for all edge cases
--(NSString *)getLaunchOption:(NSString *)option{
-	NSArray *args = self.plist.programArguments;
-	NSInteger count = [args count];
-	for(NSInteger i = 0; i < count; ++i){
-		// Trim the leading '-'
-		NSString *arg = [[args objectAtIndex:i] substringFromIndex:1];
-		// In three cases, the first character is a specific character
-		if(([arg characterAtIndex:0] == '-' || [arg characterAtIndex:0] == 'D') && [arg rangeOfString:@"="].location != NSNotFound){
-			// Winstone Argument and Java System Property
-			NSRange equalRange = [arg rangeOfString:@"="];
-			if(equalRange.location != NSNotFound){
-				if([[arg substringToIndex:equalRange.location] isEqualToString:option]){
-					return [[[arg substringFromIndex:(equalRange.location + 1)] retain] autorelease];
-				}
-			}
-		}else if([arg characterAtIndex:0] == 'X'){
-			// Java extension
-			// Currently, this only supports -Xms# -Xmx# and -Xss#
-			if([option isEqualToString:@"mx"] ||
-			   [option isEqualToString:@"ms"] ||
-			   [option isEqualToString:@"ss"]){
-				return [arg substringFromIndex:3];
-			}
-		}else{
-			// Something else, either a separated value or a simple flag
-			if([arg isEqualToString:option]){
-				if((i + 1 < count) && [[args objectAtIndex:(i + 1)] characterAtIndex:0] != '-'){
-					return [args objectAtIndex:++i];
-				}else{
-					// simple flag
-					return @"YES";
-				}
-			}
-		}
++(NSMutableDictionary *)parseJavaArgument:(NSString *)arg{
+	if([javaOptions containsObject:arg]){
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNull null], @"value", arg, @"option", nil];
+	}else if([arg rangeOfString:@"-agentlib:"].location == 0){
+		NSString *option = [arg substringToIndex:9];
+		NSString *value = [arg substringFromIndex:9];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-agentpath:"].location == 0){
+		NSString *option = [arg substringToIndex:10];
+		NSString *value = [arg substringFromIndex:10];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if(([arg rangeOfString:@"-D"].location == 0) && ([arg rangeOfString:@"="].location != NSNotFound)){
+		NSRange equalRange = [arg rangeOfString:@"="];
+		NSString *option = [arg substringToIndex:(equalRange.location + 1)];
+		NSString *value = [arg substringFromIndex:(equalRange.location + 1)];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-enableassertions:"].location == 0){
+		NSString *option = [arg substringToIndex:17];
+		NSString *value = [arg substringFromIndex:17];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-ea:"].location == 0){
+		NSString *option = [arg substringToIndex:3];
+		NSString *value = [arg substringFromIndex:3];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-disableassertions:"].location == 0){
+		NSString *option = [arg substringToIndex:19];
+		NSString *value = [arg substringFromIndex:19];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-da:"].location == 0){
+		NSString *option = [arg substringToIndex:3];
+		NSString *value = [arg substringFromIndex:3];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-javaagent:"].location == 0){
+		NSString *option = [arg substringToIndex:11];
+		NSString *value = [arg substringFromIndex:11];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-verbose:"].location == 0){
+		NSString *option = [arg substringToIndex:9];
+		NSString *value = [arg substringFromIndex:9];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"−Xbootclasspath:"].location == 0){
+		NSString *option = [arg substringToIndex:16];
+		NSString *value = [arg substringFromIndex:16];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"−Xbootclasspath/a:"].location == 0){
+		NSString *option = [arg substringToIndex:18];
+		NSString *value = [arg substringFromIndex:18];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"−Xbootclasspath/p:"].location == 0){
+		NSString *option = [arg substringToIndex:18];
+		NSString *value = [arg substringFromIndex:18];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-Xloggc:"].location == 0){
+		NSString *option = [arg substringToIndex:8];
+		NSString *value = [arg substringFromIndex:8];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-Xms"].location == 0){
+		NSString *option = [arg substringToIndex:4];
+		NSString *value = [arg substringFromIndex:4];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-Xmx"].location == 0){
+		NSString *option = [arg substringToIndex:4];
+		NSString *value = [arg substringFromIndex:4];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-Xrunhprof:"].location == 0){
+		NSString *option = [arg substringToIndex:11];
+		NSString *value = [arg substringFromIndex:11];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else if([arg rangeOfString:@"-Xss"].location == 0){
+		NSString *option = [arg substringToIndex:4];
+		NSString *value = [arg substringFromIndex:4];
+		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
+	}else{
+		return nil;
 	}
-	return nil;
-}
-
--(void)setLaunchOption:(NSString *)option value:(id<NSObject>)value type:(JCILaunchOption)optionType{
-	NSMutableArray *args = self.plist.programArguments;
-	NSInteger count = [args count];
-	// Try to find the argument if defined
-	for(NSInteger i = 0; i < count; ++i){
-		NSString *arg = [[args objectAtIndex:i] substringFromIndex:1];
-		switch (optionType) {
-			case JCIWinstoneLaunchOption:
-			case JCIJavaSystemProperty:
-				if(([arg characterAtIndex:0] == '-' || [arg characterAtIndex:0] == 'D') && 
-				   [arg rangeOfString:@"="].location != NSNotFound){
-					NSMutableString *newProperty = [arg mutableCopy];
-					NSRange equalRange = [arg rangeOfString:@"="];
-					if(equalRange.location != NSNotFound){
-						if([[arg substringToIndex:equalRange.location] isEqualToString:option]){
-							NSRange valueRange = NSMakeRange(equalRange.location + 1, ([arg length] - equalRange.location - 1));
-							[newProperty replaceCharactersInRange:valueRange withString:[JCIPrefPane convertToArgumentString:value]];
-							[newProperty insertString:@"-" atIndex:0];
-							[args replaceObjectAtIndex:i withObject:newProperty];
-							[newProperty release];
-							return;
-						}
-					}
-				}
-				break;
-			case JCIJavaExtension:
-				if(([arg characterAtIndex:1] == 'm' && ([arg characterAtIndex:2] == 's' || [arg characterAtIndex:2] == 'x')) ||
-				   ([arg characterAtIndex:1] == 's' && [arg characterAtIndex:2] == 's')){
-					NSMutableString *newProperty = [arg mutableCopy];
-					NSRange valueRange = NSMakeRange(3, [newProperty length] - 3);
-					[newProperty replaceCharactersInRange:valueRange withString:[JCIPrefPane convertToArgumentString:value]];
-					[newProperty insertString:@"-" atIndex:0];
-					[args replaceObjectAtIndex:i withObject:newProperty];
-					[newProperty release];
-					return;
-				}else{
-					// Other Extensions (to be implemented later)
-				}
-				break;
-			case JCISeparated:
-				if([arg isEqualToString:option]){
-					[args replaceObjectAtIndex:(i + 1) withObject:[JCIPrefPane convertToArgumentString:value]];
-					return;
-				}
-				break;
-		}
-	}
-	// Not found, add it
-	switch (optionType) {
-		case JCIWinstoneLaunchOption:
-			[args addObject:[NSString stringWithFormat:@"--%@=%@", option, [JCIPrefPane convertToArgumentString:value]]];
-			break;
-		case JCIJavaSystemProperty:
-			[args addObject:[NSString stringWithFormat:@"-D%@=%@", option, [JCIPrefPane convertToArgumentString:value]]];
-			break;
-		case JCIJavaExtension:
-			[args addObject:[NSString stringWithFormat:@"-X%@%@", option, [JCIPrefPane convertToArgumentString:value]]];
-			break;
-		case JCISeparated:
-			[args addObject:[NSString stringWithFormat:@"-%@ %@", option, [JCIPrefPane convertToArgumentString:value]]];
-			break;
-	}
-	[self.plist save];
 }
 
 // This would be nice to put in a category on NSString, NSNumber and possibly other classes, but PrefPanes run within
 // System Preferences.app, and categories can collide.
-+(NSString *)convertToArgumentString:(id<NSObject>)obj{
-	if([obj isKindOfClass:[NSNumber class]] && strcmp([(NSNumber *)obj objCType], @encode(BOOL))){
-		return ([(NSNumber *)obj boolValue] ? @"true" : @"false");
++(NSString *)convertToArgumentString:(NSDictionary *)argumentDict{
+	id<NSObject> value = [argumentDict valueForKey:@"value"];
+	if(value != [NSNull null]){
+		return [[argumentDict valueForKey:@"option"] stringByAppendingString:(NSString *)value];
 	}else{
-		return [obj description];
+		return [argumentDict valueForKey:@"option"];
 	}
 }
 
@@ -285,7 +287,7 @@
 	NSInteger argCount = (NSInteger)[self.arguments count];
 	if(varCount > 0 && rowIndex == 0 && [[aTableColumn identifier] isEqualToString:@"option"]){
 		return @"Environment Variables";
-	}else if((varCount == 0 && argCount > 0 && rowIndex == 0) || (varCount > 0 && argCount > 0 && rowIndex == (varCount + 1)) && [[aTableColumn identifier] isEqualToString:@"option"]){
+	}else if((varCount == 0 && argCount > 0 && rowIndex == 0) || ((varCount > 0 && argCount > 0 && rowIndex == (varCount + 1)) && [[aTableColumn identifier] isEqualToString:@"option"])){
 		return @"Launch Arguments";
 	}else if(rowIndex < (varCount + 1) && rowIndex > 0){
 		// Environment Variable Data row
