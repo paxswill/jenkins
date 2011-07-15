@@ -333,6 +333,26 @@ static const JCIComboSource *environmentVariableSource;
 	}
 }
 
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
+	NSMutableDictionary *argumentDict = nil;
+	int offset = 1;
+	if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
+		// Environment Variable
+		argumentDict = [self.variables objectAtIndex:(rowIndex - offset)];
+	}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
+		// Java
+		offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+		argumentDict = [self.javaArgs objectAtIndex:(rowIndex - offset)];
+	}else if(rowIndex > jenkinsHeaderIndex){
+		// Jenkins
+		offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+		offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
+		argumentDict = [self.jenkinsArgs objectAtIndex:(rowIndex - offset)];
+	}
+	[argumentDict setValue:anObject forKey:[aTableColumn identifier]];
+}
+
+
 #pragma mark - NSTableViewDelegate
 
 -(void)setHeaderIndices{
@@ -362,6 +382,10 @@ static const JCIComboSource *environmentVariableSource;
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row{
 	return row == environmentHeaderIndex || row == javaHeaderIndex || row == jenkinsHeaderIndex;
+}
+
+- (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
+	return ![self tableView:aTableView isGroupRow:rowIndex];
 }
 
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
