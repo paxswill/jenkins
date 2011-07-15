@@ -8,6 +8,7 @@
 
 #import "JCIPrefPane.h"
 #import <objc/runtime.h>
+#import "JCIComboSource.h"
 
 static const NSSet *javaOptions;
 
@@ -33,6 +34,8 @@ static const NSSet *javaOptions;
 @synthesize javaArgs;
 
 +(void)load{
+	// 10.6 formalized a lot of previously informal protocols
+	// Here we add the NSTableView delegate and dataSource protocols
 	SInt32 majorVersion;
 	SInt32 minorVersion;
 	Gestalt(gestaltSystemVersionMajor, &majorVersion);
@@ -359,7 +362,20 @@ static const NSSet *javaOptions;
 	if([self tableView:tableView isGroupRow:row]){
 		return [[[NSTextFieldCell alloc] init] autorelease];
 	}else if(tableColumn != nil && [[tableColumn identifier] isEqualToString:@"option"]){
-		return [[[NSComboBoxCell alloc] init] autorelease];
+		NSComboBoxCell *combo = [[NSComboBoxCell alloc] init];
+		[combo setUsesDataSource:YES];
+		JCIOptionType type;
+		if(row < javaHeaderIndex && row > environmentHeaderIndex){
+			// Environment Variable
+			type = JCIEnvironmentVariable;
+		}else if(row < jenkinsHeaderIndex && row > javaHeaderIndex){
+			// Java
+			type = JCIJavaArgument;
+		}else if(row > jenkinsHeaderIndex){
+			// Jenkins
+			type = JCIJenkinsArgument;
+		}
+		[combo setDataSource:[[[JCIComboSource alloc] initWithType:type] autorelease]];
 	}else{
 		return [[[NSTextFieldCell alloc] init] autorelease];
 	}
