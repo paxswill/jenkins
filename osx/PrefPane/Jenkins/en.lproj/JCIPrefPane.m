@@ -376,6 +376,8 @@ static const NSSet *javaOptions;
 			type = JCIJenkinsArgument;
 		}
 		[combo setDataSource:[[[JCIComboSource alloc] initWithType:type] autorelease]];
+	}else if(tableColumn == nil){
+		return nil;
 	}else{
 		return [[[NSTextFieldCell alloc] init] autorelease];
 	}
