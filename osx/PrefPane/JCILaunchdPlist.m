@@ -312,6 +312,16 @@ void plistSetProxy(id self, SEL selector, id value){
 	NSString *littleName = NSStringFromSelector(selector);
 	[self willChangeValueForKey:littleName];
 	NSString *propertyName = [JCILaunchdPlist makeFirstCapital:littleName];
+	// Un-massage the input
+	if([propertyName isEqualToString:@"ProgramArguments"]){
+		if([self program] == nil){
+			NSRange argumentsRange = NSMakeRange(1, [[self programArguments] count] - 2);
+			[[self programArguments] replaceObjectsInRange:argumentsRange withObjectsFromArray:value];
+			[self didChangeValueForKey:littleName];
+			[self save];
+			return;
+		}
+	}
 	[[self plist] setValue:value forKey:propertyName];
 	[self didChangeValueForKey:littleName];
 	[self save];

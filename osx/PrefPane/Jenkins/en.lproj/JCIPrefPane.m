@@ -102,8 +102,6 @@ static const JCIComboSource *environmentVariableSource;
 		[self updateVariablesDictionaryArray];
 		[self updateArgumentsDictionaryArray];
 		self.plist.helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
-		[self.plist addObserver:self forKeyPath:@"environmentVariables" options:  NSKeyValueObservingOptionNew context:NULL];
-		[self.plist addObserver:self forKeyPath:@"programArguments" options:  NSKeyValueObservingOptionNew context:NULL];
 	}
 	return self;
 }
@@ -129,6 +127,20 @@ static const JCIComboSource *environmentVariableSource;
 		[self.autostart setState:NSOffState];
 	}
 }
+
+-(BOOL)isUnlocked{
+	return [self.authorizationView authorizationState] == SFAuthorizationViewUnlockedState;
+}
+
+- (IBAction)toggleJenkins:(id)sender{
+	self.plist.running = !self.plist.running;
+}
+
+- (IBAction)updateJenkins:(id)sender{
+	// This will be an extensive task
+}
+
+#pragma mark - PLIST Interface
 
 -(void)updateVariablesDictionaryArray{
 	NSMutableArray *vars = [[NSMutableArray alloc] initWithCapacity:[self.plist.environmentVariables count]];
@@ -174,20 +186,6 @@ static const JCIComboSource *environmentVariableSource;
 		}
 	}
 	[self setHeaderIndices];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-	if([keyPath isEqualToString:@"environmentVariables"] && object == self){
-		
-	}else if([keyPath isEqualToString:@"programArguments"] && object == self){
-		
-	}else{
-		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-	}
-}
-
--(BOOL)isUnlocked{
-	return [self.authorizationView authorizationState] == SFAuthorizationViewUnlockedState;
 }
 
 +(NSMutableDictionary *)parseJavaArgument:(NSString *)arg{
@@ -278,12 +276,23 @@ static const JCIComboSource *environmentVariableSource;
 	}
 }
 
-- (IBAction)toggleJenkins:(id)sender{
-	self.plist.running = !self.plist.running;
-}
-
-- (IBAction)updateJenkins:(id)sender{
-	// This will be an extensive task
+-(void)saveArguments{
+	NSMutableArray *newArgs = [[NSMutableArray alloc] init];
+	// First the Java arguments (except for -jar)
+	NSMutableDictionary *jarDict = nil;
+	for(NSMutableDictionary *arg in self.javaArgs){
+		if([[arg valueForKey:@"option"] isEqualToString:@"-jar "]){
+			jarDict = [arg retain];
+		}else{
+			[newArgs addObject:[JCIPrefPane convertToArgumentString:arg]];
+		}
+	}
+	// Now add the jar after all java options
+	[newArgs addObject:[JCIPrefPane convertToArgumentString:jarDict]];
+	// Add Jenkins arguments
+	for(NSMutableDictionary *arg in self.jenkinsArgs){
+		[newArgs addObject:[JCIPrefPane convertToArgumentString:arg]];
+	}
 }
 
 #pragma mark - NSTableViewDataSource
