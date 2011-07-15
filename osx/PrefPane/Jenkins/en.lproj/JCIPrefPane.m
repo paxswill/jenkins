@@ -48,11 +48,11 @@ static const NSSet *javaOptions;
 +(void)initialize{
 	// Skip the "Show something and exit" options
 	javaOptions = [[NSSet alloc] initWithObjects:
-				   @"-jar",
+				   @"-jar ",
 				   @"-client",
 				   @"-server",
-				   @"-classpath"
-				   @"-cp",
+				   @"-classpath "
+				   @"-cp ",
 				   @"-d32",
 				   @"-d64",
 				   @"-enableassertions",
