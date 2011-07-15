@@ -21,35 +21,22 @@ typedef enum{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
 
-	NSString *httpPort;
-	NSString *httpsPort;
-	NSString *ajpPort;
-	NSString *jenkinsWar;
-	NSString *prefix;
-	NSString *heapSize;
-	NSString *jenkinsHome;
-	NSString *otherFlags;
 	NSButton *startButton;
 	NSButton *updateButton;
 	NSButton *autostart;
 	SFAuthorizationView *authorizationView;
+	NSMutableArray *variables;
+	NSMutableArray *arguments;
 }
 @property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
 
-@property (nonatomic, readwrite, retain) NSString *httpPort;
-@property (nonatomic, readwrite, retain) NSString *httpsPort;
-@property (nonatomic, readwrite, retain) NSString *ajpPort;
-@property (nonatomic, readwrite, retain) NSString *jenkinsWar;
-@property (nonatomic, readwrite, retain) NSString *prefix;
-@property (nonatomic, readwrite, retain) NSString *heapSize;
-@property (nonatomic, readwrite, retain) NSString *jenkinsHome;
-@property (nonatomic, readwrite, retain) NSString *otherFlags;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
 @property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
-
+@property (nonatomic, readwrite, retain) NSMutableArray *variables;
+@property (nonatomic, readwrite, retain) NSMutableArray *arguments;
 
 - (void)mainViewDidLoad;
 

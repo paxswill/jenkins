@@ -7,9 +7,12 @@
 //
 
 #import "JCIPrefPane.h"
+#import <objc/runtime.h>
 
 @interface JCIPrefPane()
 +(NSString *)convertToArgumentString:(id<NSObject>)obj;
+-(NSMutableArray *)variablesDictionaryArray;
+-(NSMutableArray *)argumentsDictionaryArray;
 @end
 
 @implementation JCIPrefPane
@@ -17,11 +20,25 @@
 @synthesize plist;
 @synthesize uiEnabled;
 
-@synthesize otherFlags;
 @synthesize startButton;
 @synthesize updateButton;
 @synthesize autostart;
 @synthesize authorizationView;
+@synthesize variables;
+@synthesize arguments;
+
++(void)load{
+	SInt32 majorVersion;
+	SInt32 minorVersion;
+	Gestalt(gestaltSystemVersionMajor, &majorVersion);
+	Gestalt(gestaltSystemVersionMinor, &minorVersion);
+	if(majorVersion >= 10 && minorVersion >= 6){
+		Protocol *delegateProtocol = objc_getProtocol("NSTableViewDelegate");
+		Protocol *dataSourceProtocol = objc_getProtocol("NSTableViewDataSource");
+		class_addProtocol([JCIPrefPane class], delegateProtocol);
+		class_addProtocol([JCIPrefPane class], dataSourceProtocol);
+	}
+}
 
 -(id)initWithBundle:(NSBundle *)bundle{
 	if((self = [super initWithBundle:bundle])){
@@ -33,7 +50,11 @@
 		libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
 		self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
 		[libraryPath release];
+		self.variables = [self variablesDictionaryArray];
+		self.arguments = [self argumentsDictionaryArray];
 		self.plist.helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
+		[self.plist addObserver:self forKeyPath:@"environmentVariables" options:  NSKeyValueObservingOptionNew context:NULL];
+		[self.plist addObserver:self forKeyPath:@"programArguments" options:  NSKeyValueObservingOptionNew context:NULL];
 	}
 	return self;
 }
@@ -61,6 +82,53 @@
 		[self.autostart setState:NSOnState];
 	}else{
 		[self.autostart setState:NSOffState];
+	}
+}
+
+-(NSMutableArray *)variablesDictionaryArray{
+	NSMutableArray *vars = [[NSMutableArray alloc] initWithCapacity:[self.plist.environmentVariables count]];
+	for(NSString *key in self.plist.environmentVariables){
+		NSMutableDictionary *varDict = [NSMutableDictionary dictionaryWithCapacity:2];
+		[varDict setValue:key forKey:@"option"];
+		[varDict setValue:[self.plist.environmentVariables valueForKey:key] forKey:@"value"];
+		[vars addObject:varDict];
+	}
+	return [vars autorelease];
+}
+
+-(NSMutableArray *)argumentsDictionaryArray{
+	NSMutableArray *args = [[NSMutableArray alloc] initWithCapacity:[self.plist.programArguments count]];
+	NSArray *rawArgs = [self.plist.programArguments copy];
+	for(int i = (int)[rawArgs count] - 1; i >= 0; --i){
+		NSString *argument = [rawArgs objectAtIndex:i];
+		id<NSObject> value = [NSNull null];
+		if([argument characterAtIndex:0] != '-'){
+			// Go back for the argument
+			value = argument;
+			argument = [rawArgs objectAtIndex:--i];
+			
+		}else if([argument rangeOfString:@"="].location != NSNotFound){
+			// Split argument
+			NSRange equalRange = [argument rangeOfString:@"="];
+			value = [argument substringFromIndex:(equalRange.location + 1)];
+			argument = [argument substringToIndex:(equalRange.location + 1)];
+		}
+		//else: the argument is a simple flag
+		NSMutableDictionary *argDict = [NSMutableDictionary dictionaryWithCapacity:2];
+		[argDict setValue:argument forKey:@"option"];
+		[argDict setValue:value forKey:@"value"];
+		[args addObject:argDict];
+	}
+	return [args autorelease];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
+	if([keyPath isEqualToString:@"environmentVariables"] && object == self){
+		
+	}else if([keyPath isEqualToString:@"programArguments"] && object == self){
+		
+	}else{
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	}
 }
 
@@ -200,62 +268,48 @@
 	// This will be an extensive task
 }
 
-#pragma mark - Bindings integration
+#pragma mark - NSTableViewDataSource
 
--(NSString *)httpPort{
-	return [self getLaunchOption:@"httpPort"];
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView{
+	NSInteger count = 0;
+	// If there are to be rows in that section, add an extra row for a header
+	if([self.plist.environmentVariables count] > 0){
+		count += [self.variables count];
+		count += 1;
+	}
+	if([self.plist.programArguments count] > 0){
+		count += [self.arguments count];
+		count += 1;
+	}
+	return count;
 }
 
--(void)setHttpPort:(NSString *)portNum{
-	[self setLaunchOption:@"httpPort" value:portNum type:JCIWinstoneLaunchOption];
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
+	NSInteger varCount = (NSInteger)[self.variables count];
+	NSInteger argCount = (NSInteger)[self.arguments count];
+	if(varCount > 0 && rowIndex == 0){
+		return @"Environment Variables";
+	}else if((varCount == 0 && argCount > 0 && rowIndex == 0) || (varCount > 0 && argCount > 0 && rowIndex == (varCount + 1))) && {
+		return @"Launch Arguments";
+	}else if(rowIndex < (varCount + 1) && rowIndex > 0){
+		// Environment Variable Data row
+		return [[self.variables objectAtIndex:(rowIndex - 1)] valueForKey:[aTableColumn identifier]];
+	}else if(rowIndex > (varCount + 1)){
+		// Arguments data row
+		return [[self.arguments objectAtIndex:(rowIndex - varCount - 2)] valueForKey:[aTableColumn identifier]];
+	}else{
+		return nil;
+	}
 }
 
--(NSString *)httpsPort{
-	return [self getLaunchOption:@"httpsPort"];
-}
+#pragma mark - NSTableViewDelegate
 
--(void)setHttpsPort:(NSString *)portNum{
-	[self setLaunchOption:@"httpsPort" value:portNum type:JCIWinstoneLaunchOption];
-}
-
--(NSString *)ajpPort{
-	return [self getLaunchOption:@"ajp13Port"];
-}
-
--(void)setAjpPort:(NSString *)portNum{
-	[self setLaunchOption:@"ajp13Port" value:portNum type:JCIWinstoneLaunchOption];
-}
-
--(NSString *)jenkinsWar{
-	return [self getLaunchOption:@"jar"];
-}
-
--(void)setJenkinsWar:(NSString *)warPath{
-	[self setLaunchOption:@"jar" value:warPath type:JCISeparated];
-}
-
--(NSString *)prefix{
-	return [self getLaunchOption:@"prefix"];
-}
-
--(void)setPrefix:(NSString *)prefix{
-	[self setLaunchOption:@"prefix" value:prefix type:JCIWinstoneLaunchOption];
-}
-
--(NSString *)heapSize{
-	return [self getLaunchOption:@"mx"];
-}
-
--(void)setHeapSize:(NSString *)heapSize{
-	[self setLaunchOption:@"mx" value:heapSize type:JCIJavaExtension];
-}
-
--(NSString *)jenkinsHome{
-	return [self getEnvironmentVariable:@"JENKINS_HOME"];
-}
-
--(void)setJenkinsHome:(NSString *)homePath{
-	[self setEnvironmentVariable:@"JENKINS_HOME" value:homePath];
+- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row{
+	if(row == 0 || ([self.variables count] > 0 && [self.arguments count] > 0 && (row == (NSInteger)[self.variables count] + 1))){
+		return YES;
+	}else{
+		return NO;
+	}
 }
 
 #pragma mark - SFAuthorizationView Delegate
