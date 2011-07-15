@@ -130,6 +130,13 @@ static NSSet *propertySet = nil;
 	return [capString autorelease];
 }
 
++(NSString *)makeFirstLowercase:(NSString *)string{
+    NSMutableString *littleString = [string mutableCopy];
+	const unichar first = [[string lowercaseString] characterAtIndex:0];
+	[littleString replaceCharactersInRange:NSMakeRange(0, 1) withString:[NSString stringWithCharacters:&first length:1]];
+	return [littleString autorelease];
+}
+
 -(BOOL)isRunning{
 	// Get launchd listing (/bin/launchctl list)
 	FILE *pipe;
@@ -184,7 +191,8 @@ static NSSet *propertySet = nil;
 	NSString *selector = NSStringFromSelector(sel);
 	NSRange setRange = [selector rangeOfString:@"set"];
 	BOOL isSetter = setRange.location == 0;
-	NSString *trimmedSelector = isSetter ? [selector substringWithRange:NSMakeRange(3, ([selector length] - 3))] : selector;
+	NSString *trimmedSelector = isSetter ? [selector substringWithRange:NSMakeRange(3, ([selector length] - 4))] : selector;
+    trimmedSelector = [JCILaunchdPlist makeFirstLowercase:trimmedSelector];
 	if([propertySet containsObject:trimmedSelector]){
 		if(isSetter){
 			// setter

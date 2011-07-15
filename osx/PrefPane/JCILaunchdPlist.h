@@ -77,5 +77,5 @@
 -(void)save;
 
 +(NSString *)makeFirstCapital:(NSString *)string;
-
++(NSString *)makeFirstLowercase:(NSString *)string;
 @end
