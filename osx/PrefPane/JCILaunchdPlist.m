@@ -184,7 +184,7 @@ static NSSet *propertySet = nil;
 	NSString *selector = NSStringFromSelector(sel);
 	NSRange setRange = [selector rangeOfString:@"set"];
 	BOOL isSetter = setRange.location == 0;
-	NSString *trimmedSelector = isSetter ? [selector substringFromIndex:setRange.length] : selector;
+	NSString *trimmedSelector = isSetter ? [selector substringWithRange:NSMakeRange(3, ([selector length] - 3))] : selector;
 	if([propertySet containsObject:trimmedSelector]){
 		if(isSetter){
 			// setter
