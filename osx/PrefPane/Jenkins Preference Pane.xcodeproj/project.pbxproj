@@ -385,8 +385,11 @@
 				OTHER_CFLAGS = "";
 				SDKROOT = macosx;
 				WARNING_CFLAGS = (
+					"-pedantic",
 					"-Wall",
 					"-Wextra",
+					"-Wno-import",
+					"-Wno-unused-parameter",
 				);
 			};
 			name = Debug;
@@ -410,8 +413,11 @@
 				OTHER_CFLAGS = "";
 				SDKROOT = macosx;
 				WARNING_CFLAGS = (
+					"-pedantic",
 					"-Wall",
 					"-Wextra",
+					"-Wno-import",
+					"-Wno-unused-parameter",
 				);
 			};
 			name = Release;
