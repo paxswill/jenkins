@@ -182,13 +182,16 @@ static NSSet *propertySet = nil;
 
 +(BOOL)resolveInstanceMethod:(SEL)sel{
 	NSString *selector = NSStringFromSelector(sel);
-	if([propertySet containsObject:selector]){
-		if([selector rangeOfString:@"set"].location == NSNotFound){
-			// getter
-			return class_addMethod([self class], sel, (IMP)&plistGetProxy, "@:");
-		}else{
+	NSRange setRange = [selector rangeOfString:@"set"];
+	BOOL isSetter = setRange.location == 0;
+	NSString *trimmedSelector = isSetter ? [selector substringFromIndex:setRange.length] : selector;
+	if([propertySet containsObject:trimmedSelector]){
+		if(isSetter){
 			// setter
 			return class_addMethod([self class], sel, (IMP)&plistSetProxy, "@:@");
+		}else{
+			// getter
+			return class_addMethod([self class], sel, (IMP)&plistGetProxy, "@:");
 		}
 	}else{
 		return NO;
@@ -309,7 +312,7 @@ id plistGetProxy(id self, SEL selector){
 }
 
 void plistSetProxy(id self, SEL selector, id value){
-	NSString *littleName = NSStringFromSelector(selector);
+	NSString *littleName = [NSStringFromSelector(selector) substringFromIndex:3];
 	[self willChangeValueForKey:littleName];
 	NSString *propertyName = [JCILaunchdPlist makeFirstCapital:littleName];
 	// Un-massage the input
