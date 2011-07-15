@@ -149,7 +149,7 @@ static const NSSet *javaOptions;
 		NSMutableDictionary *argDict = [JCIPrefPane parseJavaArgument:argument];
 		if(argDict){
 			if(value != [NSNull null]){
-				[argDict setValue:value forKey:@"Value"];
+				[argDict setValue:value forKey:@"value"];
 			}
 			[self.javaArgs addObject:argDict];
 		}else{
