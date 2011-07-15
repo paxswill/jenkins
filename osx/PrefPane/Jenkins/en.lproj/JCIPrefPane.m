@@ -317,6 +317,8 @@ static const NSSet *javaOptions;
 			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
 			offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
 			return [[self.jenkinsArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
+		}else{
+			return nil;
 		}
 	}
 }
