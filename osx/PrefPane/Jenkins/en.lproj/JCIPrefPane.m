@@ -287,9 +287,9 @@
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
 	NSInteger varCount = (NSInteger)[self.variables count];
 	NSInteger argCount = (NSInteger)[self.arguments count];
-	if(varCount > 0 && rowIndex == 0){
+	if(varCount > 0 && rowIndex == 0 && [[aTableColumn identifier] isEqualToString:@"option"]){
 		return @"Environment Variables";
-	}else if((varCount == 0 && argCount > 0 && rowIndex == 0) || (varCount > 0 && argCount > 0 && rowIndex == (varCount + 1))) && {
+	}else if((varCount == 0 && argCount > 0 && rowIndex == 0) || (varCount > 0 && argCount > 0 && rowIndex == (varCount + 1)) && [[aTableColumn identifier] isEqualToString:@"option"]){
 		return @"Launch Arguments";
 	}else if(rowIndex < (varCount + 1) && rowIndex > 0){
 		// Environment Variable Data row
