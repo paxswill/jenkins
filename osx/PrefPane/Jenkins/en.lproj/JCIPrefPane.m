@@ -21,6 +21,7 @@ static const JCIComboSource *environmentVariableSource;
 -(void)updateVariablesDictionaryArray;
 -(void)updateArgumentsDictionaryArray;
 -(void)setHeaderIndices;
+-(void)saveArguments;
 @end
 
 @implementation JCIPrefPane
@@ -293,6 +294,7 @@ static const JCIComboSource *environmentVariableSource;
 	for(NSMutableDictionary *arg in self.jenkinsArgs){
 		[newArgs addObject:[JCIPrefPane convertToArgumentString:arg]];
 	}
+	self.plist.programArguments = [newArgs autorelease];
 }
 
 #pragma mark - NSTableViewDataSource
@@ -359,6 +361,7 @@ static const JCIComboSource *environmentVariableSource;
 		argumentDict = [self.jenkinsArgs objectAtIndex:(rowIndex - offset)];
 	}
 	[argumentDict setValue:anObject forKey:[aTableColumn identifier]];
+	[self saveArguments];
 }
 
 
