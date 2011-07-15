@@ -330,21 +330,21 @@ static const NSSet *javaOptions;
 		environmentHeaderIndex = 0;
 		offset += [self.variables count] + 1;
 	}else{
-		environmentHeaderIndex = -1;
+		environmentHeaderIndex = INT_MAX;
 	}
 	// Java
 	if([self.javaArgs count] > 0){
 		javaHeaderIndex = offset;
 		offset += [self.javaArgs count] + 1;
 	}else{
-		javaHeaderIndex = -1;
+		javaHeaderIndex = INT_MAX;
 	}
 	// Jenkins
 	if([self.jenkinsArgs count] > 0){
 		jenkinsHeaderIndex = offset;
 		offset += [self.jenkinsArgs count] + 1;
 	}else{
-		jenkinsHeaderIndex = -1;
+		jenkinsHeaderIndex = INT_MAX;
 	}
 }
 
