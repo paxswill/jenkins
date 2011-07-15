@@ -48,6 +48,7 @@ static const NSSet *javaOptions;
 +(void)initialize{
 	// Skip the "Show something and exit" options
 	javaOptions = [[NSSet alloc] initWithObjects:
+				   @"-jar",
 				   @"-client",
 				   @"-server",
 				   @"-classpath"
@@ -143,10 +144,13 @@ static const NSSet *javaOptions;
 		if([argument characterAtIndex:0] != '-'){
 			// Go back for the argument
 			value = argument;
-			argument = [rawArgs objectAtIndex:--i];
+			argument = [[rawArgs objectAtIndex:--i] stringByAppendingString:@" "];
 		}
 		NSMutableDictionary *argDict = [JCIPrefPane parseJavaArgument:argument];
 		if(argDict){
+			if(value != [NSNull null]){
+				[argDict setValue:value forKey:@"Value"];
+			}
 			[self.javaArgs addObject:argDict];
 		}else{
 			if([argument rangeOfString:@"="].location != NSNotFound){
