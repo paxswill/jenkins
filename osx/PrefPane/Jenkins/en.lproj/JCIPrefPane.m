@@ -11,6 +11,9 @@
 #import "JCIComboSource.h"
 
 static const NSSet *javaOptions;
+static const JCIComboSource *javaComboSource;
+static const JCIComboSource *jenkinsComboSource;
+static const JCIComboSource *environmentVariableSource;
 
 @interface JCIPrefPane()
 +(NSString *)convertToArgumentString:(NSDictionary *)argumentDict;
@@ -81,6 +84,9 @@ static const NSSet *javaOptions;
 				   @"-Xrs",
 				   @"-XX:+UseAltSigs",
 				   nil];
+	javaComboSource = [[JCIComboSource alloc] initWithType:JCIJavaArgument];
+	jenkinsComboSource = [[JCIComboSource alloc] initWithType:JCIJenkinsArgument];
+	environmentVariableSource = [[JCIComboSource alloc] initWithType:JCIEnvironmentVariable];
 }
 
 -(id)initWithBundle:(NSBundle *)bundle{
@@ -364,18 +370,18 @@ static const NSSet *javaOptions;
 	}else if(tableColumn != nil && [[tableColumn identifier] isEqualToString:@"option"]){
 		NSComboBoxCell *combo = [[NSComboBoxCell alloc] init];
 		[combo setUsesDataSource:YES];
-		JCIOptionType type;
 		if(row < javaHeaderIndex && row > environmentHeaderIndex){
 			// Environment Variable
-			type = JCIEnvironmentVariable;
+			[combo setDataSource:(id<NSComboBoxCellDataSource>)environmentVariableSource];
 		}else if(row < jenkinsHeaderIndex && row > javaHeaderIndex){
 			// Java
-			type = JCIJavaArgument;
+			[combo setDataSource:(id<NSComboBoxCellDataSource>)javaComboSource];
 		}else if(row > jenkinsHeaderIndex){
 			// Jenkins
-			type = JCIJenkinsArgument;
+			[combo setDataSource:(id<NSComboBoxCellDataSource>)jenkinsComboSource];
+		}else{
+			return nil;
 		}
-		[combo setDataSource:[[[JCIComboSource alloc] initWithType:type] autorelease]];
 	}else if(tableColumn == nil){
 		return nil;
 	}else{
