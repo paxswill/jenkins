@@ -19,7 +19,12 @@
 	NSButton *autostart;
 	SFAuthorizationView *authorizationView;
 	NSMutableArray *variables;
-	NSMutableArray *arguments;
+	NSMutableArray *jenkinsArgs;
+	NSMutableArray *javaArgs;
+	NSArray *headerIndices;
+	int environmentHeaderIndex;
+	int javaHeaderIndex;
+	int jenkinsHeaderIndex;
 }
 @property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
@@ -29,12 +34,12 @@
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
 @property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
 @property (nonatomic, readwrite, retain) NSMutableArray *variables;
-@property (nonatomic, readwrite, retain) NSMutableArray *arguments;
+@property (nonatomic, readwrite, retain) NSMutableArray *jenkinsArgs;
+@property (nonatomic, readwrite, retain) NSMutableArray *javaArgs;
 
 - (void)mainViewDidLoad;
 
 - (BOOL)isUnlocked;
--(NSString *)getLaunchOption:(NSString *)option;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
 

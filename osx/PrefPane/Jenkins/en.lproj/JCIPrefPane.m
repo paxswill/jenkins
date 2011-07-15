@@ -14,8 +14,9 @@ static const NSSet *javaOptions;
 @interface JCIPrefPane()
 +(NSString *)convertToArgumentString:(NSDictionary *)argumentDict;
 +(NSMutableDictionary *)parseJavaArgument:(NSString *)arg;
--(NSMutableArray *)variablesDictionaryArray;
--(NSMutableArray *)argumentsDictionaryArray;
+-(void)updateVariablesDictionaryArray;
+-(void)updateArgumentsDictionaryArray;
+-(void)setHeaderIndices;
 @end
 
 @implementation JCIPrefPane
@@ -28,7 +29,8 @@ static const NSSet *javaOptions;
 @synthesize autostart;
 @synthesize authorizationView;
 @synthesize variables;
-@synthesize arguments;
+@synthesize jenkinsArgs;
+@synthesize javaArgs;
 
 +(void)load{
 	SInt32 majorVersion;
@@ -88,8 +90,8 @@ static const NSSet *javaOptions;
 		libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
 		self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
 		[libraryPath release];
-		self.variables = [self variablesDictionaryArray];
-		self.arguments = [self argumentsDictionaryArray];
+		[self updateVariablesDictionaryArray];
+		[self updateArgumentsDictionaryArray];
 		self.plist.helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
 		[self.plist addObserver:self forKeyPath:@"environmentVariables" options:  NSKeyValueObservingOptionNew context:NULL];
 		[self.plist addObserver:self forKeyPath:@"programArguments" options:  NSKeyValueObservingOptionNew context:NULL];
@@ -119,7 +121,7 @@ static const NSSet *javaOptions;
 	}
 }
 
--(NSMutableArray *)variablesDictionaryArray{
+-(void)updateVariablesDictionaryArray{
 	NSMutableArray *vars = [[NSMutableArray alloc] initWithCapacity:[self.plist.environmentVariables count]];
 	for(NSString *key in self.plist.environmentVariables){
 		NSMutableDictionary *varDict = [NSMutableDictionary dictionaryWithCapacity:2];
@@ -127,11 +129,13 @@ static const NSSet *javaOptions;
 		[varDict setValue:[self.plist.environmentVariables valueForKey:key] forKey:@"value"];
 		[vars addObject:varDict];
 	}
-	return [vars autorelease];
+	self.variables = [vars autorelease];
+	[self setHeaderIndices];
 }
 
--(NSMutableArray *)argumentsDictionaryArray{
-	NSMutableArray *args = [[NSMutableArray alloc] initWithCapacity:[self.plist.programArguments count]];
+-(void)updateArgumentsDictionaryArray{
+	self.jenkinsArgs = [NSMutableArray array];
+	self.javaArgs = [NSMutableArray array];
 	NSArray *rawArgs = [self.plist.programArguments copy];
 	for(int i = (int)[rawArgs count] - 1; i >= 0; --i){
 		NSString *argument = [rawArgs objectAtIndex:i];
@@ -140,20 +144,24 @@ static const NSSet *javaOptions;
 			// Go back for the argument
 			value = argument;
 			argument = [rawArgs objectAtIndex:--i];
-			
-		}else if([argument rangeOfString:@"="].location != NSNotFound){
-			// Split argument
-			NSRange equalRange = [argument rangeOfString:@"="];
-			value = [argument substringFromIndex:(equalRange.location + 1)];
-			argument = [argument substringToIndex:(equalRange.location + 1)];
 		}
-		//else: the argument is a simple flag
-		NSMutableDictionary *argDict = [NSMutableDictionary dictionaryWithCapacity:2];
-		[argDict setValue:argument forKey:@"option"];
-		[argDict setValue:value forKey:@"value"];
-		[args addObject:argDict];
+		NSMutableDictionary *argDict = [JCIPrefPane parseJavaArgument:argument];
+		if(argDict){
+			[self.javaArgs addObject:argDict];
+		}else{
+			if([argument rangeOfString:@"="].location != NSNotFound){
+				// Split argument
+				NSRange equalRange = [argument rangeOfString:@"="];
+				value = [argument substringFromIndex:(equalRange.location + 1)];
+				argument = [argument substringToIndex:(equalRange.location + 1)];
+			}
+			argDict = [NSMutableDictionary dictionaryWithCapacity:2];
+			[argDict setValue:argument forKey:@"option"];
+			[argDict setValue:value forKey:@"value"];
+			[self.jenkinsArgs addObject:argDict];
+		}
 	}
-	return [args autorelease];
+	[self setHeaderIndices];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
@@ -271,43 +279,77 @@ static const NSSet *javaOptions;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView{
 	NSInteger count = 0;
 	// If there are to be rows in that section, add an extra row for a header
-	if([self.plist.environmentVariables count] > 0){
+	if([self.variables count] > 0){
 		count += [self.variables count];
 		count += 1;
 	}
-	if([self.plist.programArguments count] > 0){
-		count += [self.arguments count];
+	if([self.javaArgs count] > 0){
+		count += [self.javaArgs count];
+		count += 1;
+	}
+	if([self.jenkinsArgs count] > 0){
+		count += [self.jenkinsArgs count];
 		count += 1;
 	}
 	return count;
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
-	NSInteger varCount = (NSInteger)[self.variables count];
-	NSInteger argCount = (NSInteger)[self.arguments count];
-	if(varCount > 0 && rowIndex == 0 && [[aTableColumn identifier] isEqualToString:@"option"]){
+	if(rowIndex == environmentHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
 		return @"Environment Variables";
-	}else if((varCount == 0 && argCount > 0 && rowIndex == 0) || ((varCount > 0 && argCount > 0 && rowIndex == (varCount + 1)) && [[aTableColumn identifier] isEqualToString:@"option"])){
-		return @"Launch Arguments";
-	}else if(rowIndex < (varCount + 1) && rowIndex > 0){
-		// Environment Variable Data row
-		return [[self.variables objectAtIndex:(rowIndex - 1)] valueForKey:[aTableColumn identifier]];
-	}else if(rowIndex > (varCount + 1)){
-		// Arguments data row
-		return [[self.arguments objectAtIndex:(rowIndex - varCount - 2)] valueForKey:[aTableColumn identifier]];
+	}else if(rowIndex == javaHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
+		return @"Java Options";
+	}else if(rowIndex == jenkinsHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
+		return @"Jenkins Options";
 	}else{
-		return nil;
+		// This section is evil and should be rewritten
+		int offset = 0;
+		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
+			// Environment Variable
+			offset = 1;
+			return [[self.variables objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
+		}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
+			// Java
+			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+			return [[self.javaArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
+		}else if(rowIndex > jenkinsHeaderIndex){
+			// Jenkins
+			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+			offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
+			return [[self.jenkinsArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
+		}
 	}
 }
 
 #pragma mark - NSTableViewDelegate
 
-- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row{
-	if(row == 0 || ([self.variables count] > 0 && [self.arguments count] > 0 && (row == (NSInteger)[self.variables count] + 1))){
-		return YES;
+-(void)setHeaderIndices{
+	int offset = 0;
+	// Env
+	if([self.variables count] > 0){
+		environmentHeaderIndex = 0;
+		offset += [self.variables count] + 1;
 	}else{
-		return NO;
+		environmentHeaderIndex = -1;
 	}
+	// Java
+	if([self.javaArgs count] > 0){
+		javaHeaderIndex = offset;
+		offset += [self.javaArgs count] + 1;
+	}else{
+		javaHeaderIndex = -1;
+	}
+	// Jenkins
+	if([self.jenkinsArgs count] > 0){
+		jenkinsHeaderIndex = offset;
+		offset += [self.jenkinsArgs count] + 1;
+	}else{
+		jenkinsHeaderIndex = -1;
+	}
+}
+
+- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row{
+	return row == environmentHeaderIndex || row == javaHeaderIndex || row == jenkinsHeaderIndex;
 }
 
 #pragma mark - SFAuthorizationView Delegate
