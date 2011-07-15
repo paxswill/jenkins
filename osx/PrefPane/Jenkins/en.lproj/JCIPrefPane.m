@@ -299,9 +299,9 @@ static const NSSet *javaOptions;
 }
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
-	if(rowIndex == environmentHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
+	if(rowIndex == environmentHeaderIndex){
 		return @"Environment Variables";
-	}else if(rowIndex == javaHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
+	}else if(rowIndex == javaHeaderIndex){
 		return @"Java Options";
 	}else if(rowIndex == jenkinsHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
 		return @"Jenkins Options";
@@ -354,6 +354,16 @@ static const NSSet *javaOptions;
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row{
 	return row == environmentHeaderIndex || row == javaHeaderIndex || row == jenkinsHeaderIndex;
+}
+
+- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
+	if([self tableView:tableView isGroupRow:row]){
+		return [[[NSTextFieldCell alloc] init] autorelease];
+	}else if(tableColumn != nil && [[tableColumn identifier] isEqualToString:@"option"]){
+		return [[[NSComboBoxCell alloc] init] autorelease];
+	}else{
+		return [[[NSTextFieldCell alloc] init] autorelease];
+	}
 }
 
 #pragma mark - SFAuthorizationView Delegate
