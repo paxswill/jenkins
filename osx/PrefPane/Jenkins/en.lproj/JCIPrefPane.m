@@ -266,8 +266,12 @@ static const JCIComboSource *environmentVariableSource;
 	}
 }
 
-// This would be nice to put in a category on NSString, NSNumber and possibly other classes, but PrefPanes run within
-// System Preferences.app, and categories can collide.
+/*
+ This would be nice to put in a category on NSString, 
+ NSNumber and possibly other classes, but PrefPanes
+ run within System Preferences.app, and categories
+ can collide.
+ */
 +(NSString *)convertToArgumentString:(NSDictionary *)argumentDict{
 	id<NSObject> value = [argumentDict valueForKey:@"value"];
 	if(value != [NSNull null]){
