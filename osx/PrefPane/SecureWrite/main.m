@@ -33,13 +33,13 @@ int main (int argc, const char * argv[])
 	size_t actualSize;
 	void *buffer = malloc(bufferSize);
 	while(actualSize = read(readFD, buffer, bufferSize), actualSize != 0){
-		fprintf(stderr, "Writing %d bytes\n", actualSize);
+		fprintf(stderr, "Writing %zu bytes\n", actualSize);
 		if(writeFD < 0){
 			fprintf(stderr, "Error reading file: %s (%d)\n", strerror(errno), errno);
 			exit(1);
 		}
 		ssize_t writtenBytes = write(writeFD, buffer, actualSize);
-		if(writeFD < 0){
+		if(writtenBytes < 0){
 			fprintf(stderr, "Error writing file: %s (%d)\n", strerror(errno), errno);
 			exit(1);
 		}
