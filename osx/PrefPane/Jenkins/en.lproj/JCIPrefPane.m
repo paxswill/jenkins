@@ -16,7 +16,7 @@ static const JCIComboSource *jenkinsComboSource;
 static const JCIComboSource *environmentVariableSource;
 
 @interface JCIPrefPane()
-+(NSString *)convertToArgumentString:(NSDictionary *)argumentDict;
++(NSArray *)convertToArgumentString:(NSDictionary *)argumentDict;
 +(NSMutableDictionary *)parseJavaArgument:(NSString *)arg;
 -(void)updateVariablesDictionaryArray;
 -(void)updateArgumentsDictionaryArray;
@@ -272,12 +272,20 @@ static const JCIComboSource *environmentVariableSource;
  run within System Preferences.app, and categories
  can collide.
  */
-+(NSString *)convertToArgumentString:(NSDictionary *)argumentDict{
++(NSArray *)convertToArgumentString:(NSDictionary *)argumentDict{
 	id<NSObject> value = [argumentDict valueForKey:@"value"];
 	if(value != [NSNull null]){
-		return [[argumentDict valueForKey:@"option"] stringByAppendingString:(NSString *)value];
+		NSString *option = [argumentDict valueForKey:@"option"];
+		if([option characterAtIndex:([option length] - 1)] == ' '){
+			return [NSArray arrayWithObjects:
+					[option substringToIndex:([option length] - 1)],
+					value,
+					nil];
+		}else{
+			return [NSArray arrayWithObject:[option stringByAppendingString:(NSString *)value]];
+		}
 	}else{
-		return [argumentDict valueForKey:@"option"];
+		return [NSArray arrayWithObject:[argumentDict valueForKey:@"option"]];
 	}
 }
 
@@ -289,14 +297,14 @@ static const JCIComboSource *environmentVariableSource;
 		if([[arg valueForKey:@"option"] isEqualToString:@"-jar "]){
 			jarDict = [arg retain];
 		}else{
-			[newArgs addObject:[JCIPrefPane convertToArgumentString:arg]];
+			[newArgs addObjectsFromArray:[JCIPrefPane convertToArgumentString:arg]];
 		}
 	}
 	// Now add the jar after all java options
-	[newArgs addObject:[JCIPrefPane convertToArgumentString:jarDict]];
+	[newArgs addObjectsFromArray:[JCIPrefPane convertToArgumentString:jarDict]];
 	// Add Jenkins arguments
 	for(NSMutableDictionary *arg in self.jenkinsArgs){
-		[newArgs addObject:[JCIPrefPane convertToArgumentString:arg]];
+		[newArgs addObjectsFromArray:[JCIPrefPane convertToArgumentString:arg]];
 	}
 	self.plist.programArguments = [newArgs autorelease];
 }
