@@ -36,7 +36,7 @@ static const NSArray *localizedEnvironmentVariables;
 	javaArgs = [[NSArray alloc] initWithObjects:
 				@"-client",
 				@"-server",
-				@"agentlib:",
+				@"-agentlib:",
 				@"-agentpath",
 				@"-classpath ",
 				@"-cp ",
@@ -80,7 +80,7 @@ static const NSArray *localizedEnvironmentVariables;
 				@"-Xms",
 				@"-Xmx",
 				@"-Xprof",
-				@"-Xrunhprof:"
+				@"-Xrunhprof:",
 				@"-Xrs",
 				@"-Xss",
 				@"-XX:+UseAltSigs",
