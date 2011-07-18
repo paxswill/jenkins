@@ -20,6 +20,7 @@
 	NSButton *autostart;
 	SFAuthorizationView *authorizationView;
 	DKActionButton *actionButton;
+	NSTableView *tableView;
 	NSMutableArray *variables;
 	NSMutableArray *jenkinsArgs;
 	NSMutableArray *javaArgs;
