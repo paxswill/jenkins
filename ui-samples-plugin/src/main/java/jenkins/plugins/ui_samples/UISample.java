@@ -1,4 +1,4 @@
-package hudson.plugins.ui_samples;
+package jenkins.plugins.ui_samples;
 
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
@@ -84,7 +84,7 @@ public abstract class UISample implements ExtensionPoint, Action, Describable<UI
 
         public URL resolve() {
             return UISample.this.getClass().getResource(
-                name.endsWith(".jelly") ? UISample.this.getClass().getSimpleName()+"/"+name : name);
+                (name.endsWith(".jelly") || name.endsWith(".groovy")) ? UISample.this.getClass().getSimpleName()+"/"+name : name);
         }
 
         /**
