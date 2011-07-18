@@ -137,14 +137,14 @@ static const NSArray *localizedEnvironmentVariables;
 	[localTemp release];
 	// Jenkins
 	localTemp = [[NSMutableArray alloc] initWithCapacity:[jenkinsArgs count]];
-	for(NSString *arg in javaArgs){
+	for(NSString *arg in jenkinsArgs){
 		[localTemp addObject:NSLocalizedString(arg, arg)];
 	}
 	localizedJenkins = [[localTemp sortedArrayUsingSelector:@selector(compare:)] retain];
 	[localTemp release];
-	// 
+	// Environmnet Variables
 	localTemp = [[NSMutableArray alloc] initWithCapacity:[environmentVariables count]];
-	for(NSString *arg in javaArgs){
+	for(NSString *arg in environmentVariables){
 		[localTemp addObject:NSLocalizedString(arg, arg)];
 	}
 	localizedEnvironmentVariables = [[localTemp sortedArrayUsingSelector:@selector(compare:)] retain];
