@@ -237,6 +237,7 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 +(NSMutableDictionary *)parseJavaArgument:(NSString *)arg{
+	// First handle easily seperated options, then manually pull apart the run-on options
 	if([javaOptions containsObject:arg]){
 		return [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNull null], @"value", arg, @"option", nil];
 	}else if([arg rangeOfString:@"-agentlib:"].location == 0){
