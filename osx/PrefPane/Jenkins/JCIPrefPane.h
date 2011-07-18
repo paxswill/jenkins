@@ -8,6 +8,7 @@
 
 #import <PreferencePanes/PreferencePanes.h>
 #import <SecurityInterface/SFAuthorizationView.h>
+#import "DKActionButton.h"
 #import "JCILaunchdPlist.h"
 
 @interface JCIPrefPane : NSPreferencePane{
@@ -18,10 +19,10 @@
 	NSButton *updateButton;
 	NSButton *autostart;
 	SFAuthorizationView *authorizationView;
+	DKActionButton *actionButton;
 	NSMutableArray *variables;
 	NSMutableArray *jenkinsArgs;
 	NSMutableArray *javaArgs;
-	NSArray *headerIndices;
 	int environmentHeaderIndex;
 	int javaHeaderIndex;
 	int jenkinsHeaderIndex;
@@ -33,6 +34,8 @@
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
 @property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
+@property (nonatomic, readwrite, assign) IBOutlet DKActionButton *actionButton;
+@property (nonatomic, readwrite, assign) IBOutlet NSTableView *tableView;
 @property (nonatomic, readwrite, retain) NSMutableArray *variables;
 @property (nonatomic, readwrite, retain) NSMutableArray *jenkinsArgs;
 @property (nonatomic, readwrite, retain) NSMutableArray *javaArgs;

@@ -22,6 +22,9 @@ static const JCIComboSource *environmentVariableSource;
 -(void)updateArgumentsDictionaryArray;
 -(void)setHeaderIndices;
 -(void)saveArguments;
+-(void)addEnvironmentVariable;
+-(void)addJavaArgument;
+-(void)addJenkinsArgument;
 @end
 
 @implementation JCIPrefPane
@@ -33,9 +36,12 @@ static const JCIComboSource *environmentVariableSource;
 @synthesize updateButton;
 @synthesize autostart;
 @synthesize authorizationView;
+@synthesize actionButton;
+@synthesize tableView;
 @synthesize variables;
 @synthesize jenkinsArgs;
 @synthesize javaArgs;
+
 
 +(void)load{
 	// 10.6 formalized a lot of previously informal protocols
@@ -109,16 +115,27 @@ static const JCIComboSource *environmentVariableSource;
 
 - (void)mainViewDidLoad{
 	// Setup authorization
-	[self.authorizationView setAutoupdate:YES];
 	AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
     AuthorizationRights rights = {1, &items};
 	[self.authorizationView setAuthorizationRights:&rights];
 	self.authorizationView.delegate = self;
+	[self.authorizationView setAutoupdate:YES];
 	self.uiEnabled = [self isUnlocked];
 	self.plist.authorization = self.authorizationView.authorization;
+	// Setup the action button
+	NSMenu *addMenu = [[NSMenu alloc] init];
+	[addMenu addItem:[[[NSMenuItem alloc] init] autorelease]];
+	[addMenu addItemWithTitle:NSLocalizedString(@"Add environment variable", "Add environment variable") action:@selector(addEnvironmentVariable) keyEquivalent:@""];
+	[addMenu addItemWithTitle:NSLocalizedString(@"Add Java argument", "Add Java argument") action:@selector(addJavaArgument) keyEquivalent:@""];
+	[addMenu addItemWithTitle:NSLocalizedString(@"Add Jenkins argument", "Add Jenkins argument") action:@selector(addJenkinsArgument) keyEquivalent:@""];
+	[[addMenu itemArray] makeObjectsPerformSelector:@selector(setTarget:) withObject:self];
+	[[self.actionButton cell] setMenu:addMenu];
+	//[addMenu release];
 }
 
 -(void)willSelect{
+	// Update the authorization view
+	[self.authorizationView authorizationState];
 	// Set the start/stop button
 	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
 	// Set autostart checkbox
@@ -139,6 +156,36 @@ static const JCIComboSource *environmentVariableSource;
 
 - (IBAction)updateJenkins:(id)sender{
 	// This will be an extensive task
+}
+
+-(void)addEnvironmentVariable{
+	NSMutableDictionary *newVar = [[NSMutableDictionary alloc] init];
+	[newVar setValue:[NSNull null] forKey:@"option"];
+	[newVar setValue:[NSNull null] forKey:@"value"];
+	[self.variables addObject:newVar];
+	[newVar release];
+	[self setHeaderIndices];
+	[self.tableView reloadData];
+}
+
+-(void)addJavaArgument{
+	NSMutableDictionary *newArg = [[NSMutableDictionary alloc] init];
+	[newArg setValue:[NSNull null] forKey:@"option"];
+	[newArg setValue:[NSNull null] forKey:@"value"];
+	[self.javaArgs addObject:newArg];
+	[newArg release];
+	[self setHeaderIndices];
+	[self.tableView reloadData];
+}
+
+-(void)addJenkinsArgument{
+	NSMutableDictionary *newArg = [[NSMutableDictionary alloc] init];
+	[newArg setValue:[NSNull null] forKey:@"option"];
+	[newArg setValue:[NSNull null] forKey:@"value"];
+	[self.jenkinsArgs addObject:newArg];
+	[newArg release];
+	[self setHeaderIndices];
+	[self.tableView reloadData];
 }
 
 #pragma mark - PLIST Interface
@@ -334,7 +381,7 @@ static const JCIComboSource *environmentVariableSource;
 		return @"Environment Variables";
 	}else if(rowIndex == javaHeaderIndex){
 		return @"Java Options";
-	}else if(rowIndex == jenkinsHeaderIndex && [[aTableColumn identifier] isEqualToString:@"option"]){
+	}else if(rowIndex == jenkinsHeaderIndex){
 		return @"Jenkins Options";
 	}else{
 		int offset = 1;
@@ -418,13 +465,13 @@ static const JCIComboSource *environmentVariableSource;
 		[comboCell setUsesDataSource:YES];
 		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
 			// Environment Variable
-			[comboCell setDataSource:environmentVariableSource];
+			[comboCell setDataSource:(id<NSComboBoxCellDataSource>)environmentVariableSource];
 		}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
 			// Java
-			[comboCell setDataSource:javaComboSource];
+			[comboCell setDataSource:(id<NSComboBoxCellDataSource>)javaComboSource];
 		}else if(rowIndex > jenkinsHeaderIndex){
 			// Jenkins
-			[comboCell setDataSource:jenkinsComboSource];
+			[comboCell setDataSource:(id<NSComboBoxCellDataSource>)jenkinsComboSource];
 		}
 	}
 }
