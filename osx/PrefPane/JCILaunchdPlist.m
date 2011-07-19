@@ -84,6 +84,19 @@ static NSSet *propertySet = nil;
 	return self;
 }
 
+- (void)dealloc {
+	if(self.authorization){
+		[self save];
+		[self unload];
+		[self load];
+	}
+	self.path = nil;
+	self.plist = nil;
+	self.helperPath = nil;
+	self.authorization = nil;
+    [super dealloc];
+}
+
 -(void)load{
 	// Reload and start the daemon
 	const char *argv[] = { "load", [self.path UTF8String], NULL };
@@ -121,6 +134,7 @@ static NSSet *propertySet = nil;
 	NSFileHandle *writeHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileno(pipe) closeOnDealloc:YES];
 	[writeHandle writeData:plistData];
 	[writeHandle closeFile];
+	[writeHandle release];
 }
 
 +(NSString *)makeFirstCapital:(NSString *)string{
@@ -150,6 +164,7 @@ static NSSet *propertySet = nil;
 	NSData *existsData = [[fileHandle readDataToEndOfFile] retain];
 	[fileHandle release];
 	NSString *allLines = [[NSString alloc] initWithData:existsData encoding:NSUTF8StringEncoding];
+	[existsData release];
 	NSArray *rawLines = [[allLines componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]] retain];
 	[allLines release];
 	/*
@@ -157,6 +172,7 @@ static NSSet *propertySet = nil;
 	 PID	ExitState	launchdLabel
 	 The space between each column is '\t'. If no value is given, the character '-' is substituted
 	 */
+	BOOL found = NO;
 	for(NSString *line in rawLines){
 		if([line isEqualToString:@""]){
 			continue;
@@ -165,15 +181,18 @@ static NSSet *propertySet = nil;
 		if([[lineData objectAtIndex:2] isEqualToString:@"org.jenkins-ci"]){
 			if([[lineData objectAtIndex:0] isEqualToString:@"-"]){
 				// Loaded, not running
-				return NO;
+				found = NO;
+				break;
 			}else{
 				// Loaded and running
-				return YES;
+				found = YES;
+				break;
 			}
 		}
 	}
+	[rawLines release];
 	// Not loaded
-	return NO;
+	return found;
 }
 
 -(void)setRunning:(BOOL)runJenkins{

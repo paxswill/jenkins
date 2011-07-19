@@ -100,18 +100,26 @@ static const JCIComboSource *environmentVariableSource;
 	if((self = [super initWithBundle:bundle])){
 		// Find the Jenkins launchd plist
 		NSArray *libraryPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSLocalDomainMask, YES);
-		NSString *libraryPath = [libraryPaths count] > 0 ? [[libraryPaths objectAtIndex:0] retain] 
-		: @"/Library";
+		NSString *libraryPath = [libraryPaths count] > 0 ? [libraryPaths objectAtIndex:0] : @"/Library";
 		[libraryPaths release];
 		libraryPath = [libraryPath stringByAppendingString:@"/LaunchDaemons/"];
 		self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
-		[libraryPath release];
 		[self updateVariablesDictionaryArray];
 		[self updateArgumentsDictionaryArray];
 		self.plist.helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
 	}
 	return self;
 }
+
+- (void)dealloc {
+    self.plist = nil;
+	self.variables = nil;
+	self.javaArgs = nil;
+	self.jenkinsArgs = nil;
+    [super dealloc];
+}
+
+#pragma mark - UI Management
 
 - (void)mainViewDidLoad{
 	// Setup authorization
@@ -130,7 +138,7 @@ static const JCIComboSource *environmentVariableSource;
 	[addMenu addItemWithTitle:NSLocalizedString(@"Add Jenkins argument", "Add Jenkins argument") action:@selector(addJenkinsArgument) keyEquivalent:@""];
 	[[addMenu itemArray] makeObjectsPerformSelector:@selector(setTarget:) withObject:self];
 	[[self.actionButton cell] setMenu:addMenu];
-	//[addMenu release];
+	[addMenu release];
 }
 
 -(void)willSelect{
