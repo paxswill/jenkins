@@ -466,6 +466,7 @@ static const JCIComboSource *environmentVariableSource;
 				return [jenkinsComboSource localizedDescriptionForIndex:itemIndex];
 		}
 	}
+	return nil;
 }
 
 #pragma mark - SFAuthorizationView Delegate
