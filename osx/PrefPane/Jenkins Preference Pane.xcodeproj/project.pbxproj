@@ -408,6 +408,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				SDKROOT = macosx;
+				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = (
 					"-pedantic",
 					"-Wall",
@@ -436,6 +437,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "";
 				SDKROOT = macosx;
+				VALID_ARCHS = "ppc ppc64 i386 x86_64";
 				WARNING_CFLAGS = (
 					"-pedantic",
 					"-Wall",
