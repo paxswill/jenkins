@@ -1,0 +1,102 @@
+/* 
+  Localization.strings (English)
+  Jenkins Preference Pane
+
+  Created by William Ross on 7/19/11.
+  Copyright 2011 Will Ross. All rights reserved.
+*/
+
+/* Java Arguments */
+"-client" = "Use client JVM";
+"-server" = "Use Server JVM";
+"-agentlib:" = "Load native agent library";
+"-agentpath" = "Load native agent library from path";
+"-classpath " = "Specify a classpath";
+"-cp " = "Specify a classpath";
+"-D" = "Set system property";
+"-d32" = "Force 32-bit runtime";
+"-d64" = "Force 64-bit runtime";
+"-enableassertions" = "Enable assertions";
+"-enableassertions:" = "Enable assertions in packages";
+"-ea" = "Enable assertions";
+"-ea:" = "Enable assertion in packages";
+"-disableassertions" = "Disable assertions";
+"-disableassertions:" = "Disable assertions in packages";
+"-da" = "Disable assertions";
+"-da:" = "Disable assertions in packages";
+"-enablesystemassertions" = "Enable assertions in all system classes";
+"-enablesystemassertions:" = "Enable assertions in specified system classes";
+"-esa" = "Enable assertions in all system classes";
+"-esa:" = "Enable assertions in specified system classes";
+"-disablesystemassertions" = "Disable assertions in all system classes";
+"-disablesystemassertions:" = "Disable assertions in specified system classes";
+"-dsa" = "Disable assertions in all system classes";
+"-dsa:" = "Disable assertions in specified system classes";
+"-jar " = "jenkins.war Location";
+"-javaagent:" = "Load a Java agent";
+"-verbose" = "Log information on class loading";
+"-verbose:" = "Log information on a specific class";
+"-verbose:gc" = "Log garbage collection events";
+"-verbose:jni" = "Log JNI activity";
+"-showversion" = "Log JVM version information";
+"-Xint" = "Run in interpreted only mode";
+"-Xbatch" = "Disable background compilation";
+"-Xdebug" = "Enable JVMDI";
+"-Xbootclasspath:" = "Set a classpath for system classes";
+"-Xbootclasspath/a:" = "Append to the classpath for system classes";
+"-Xbootclasspath/p:" = "Prepend to the classpath for system classes";
+"-Xcheck:jni" = "Run extra check on the JNI interface";
+"-Xfuture" = "Enable strict class format checks";
+"-Xnoclassgc" = "Disable class garbage collection";
+"-Xincgc" = "Enable incrememntal garbage collection";
+"-Xloggc:" = "Log garbage collection events to a file";
+"-Xms" = "Set the initial memory pool size";
+"-Xmx" = "Set the maximum memory pool size";
+"-Xprof" = "Enable profiling";
+"-Xrunhprof:" = "Enable profiling in specific areas";
+"-Xrs" = "Reduce OS level signal use by the JVM";
+"-Xss" = "Set thread stack size";
+"-XX:+UseAltSigs" = "Use alternate signals by default";
+
+/* Jenkins Arguments */
+"--accessLoggerClassName=" = "Set the logger class for authentication";
+"--ajp13ListenAddress=" = "Set the AJP 1.3 listening address";
+"--ajp13Port=" = "Set the AJP 1.3 listening port";
+"--clusterClassName=" = "Set the cluster class to use";
+"--clusterNodes=" = "A list of node addresses";
+"--commonLibFolder=" = "A folder for additional jar files";
+"--config=" = "Load configuration properties form file";
+"--controlPort=" = "Set the startup/shutdown port";
+"--debug=" = "Set the logging level";
+"--directoryListings=" = "Enable directory listings";
+"--handlerCountMax=" = "Set the maximum number of worker threads";
+"--handlerCountMaxIdle=" = "Set the maximum number of idle worker threads";
+"--handlerCountStartup=" = "Set the number of worker threads to spawn at startup";
+"--httpDoHostnameLookups=" = "Enable host name lookup on HTTP connections";
+"--httpListenAddress=" = "Set the HTTP listening address";
+"--httpPort=" = "Set the HTTP listening port";
+"--httpsDoHostnameLookups=" = "Enable host name lookup on HTTPS connections";
+"--httpsKeyManagerType=" = "The SSL KeyManagerFactory type";
+"--httpsKeyStore=" = "Specify the SSL keystore";
+"--httpsKeyStorePassword=" = "The password to the SSL keystore";
+"--httpsListenAddress=" = "Set the HTTPS listening address";
+"--httpsPort=" = "Set the HTTPS listening port";
+"--invokerPrefix=" = "Set the invoker prefix";
+"--javaHome=" = "Override the JAVA_HOME variable";
+"--logThrowingLineNo=" = "Show the line number of the logging call";
+"--logThrowingThread=" = "Show the thread that logged the message";
+"--logfile=" = "Save servlet logs to file";
+"--preferredClassLoader=" = "Ovveride the webapp class loader";
+"--prefix=" = "Add this prefix to all URLs";
+"--simpleAccessLogger.file=" = "The location for access logs";
+"--simpleAccessLogger.format=" = "The file format for access logs";
+"--simulateModUniqueId=" = "Simulate Apache's mod_unique_id";
+"--toolsJar=" = "The location of tools.jar";
+"--useCluster=" = "Enable cluster support";
+"--useInvoker=" = "Enable the server invoker";
+"--useJasper=" = "Enable Jasper JSP handling";
+"--useSavedSessions=" = "Enable session persistence";
+"--useServletReloading=" = "Enable servelet reloading";
+
+/* Environment Variables */
+"JENKINS_HOME" = "Jenkins home directory";
