@@ -17,7 +17,8 @@ typedef enum{
 @interface JCIComboSource : NSObject{
 	JCIOptionType type;
 }
+@property (nonatomic, assign, readonly) JCIOptionType type;
 
 -(id)initWithType:(JCIOptionType)optionType;
-
+-(NSString *)localizedDescriptionForIndex:(NSInteger)index;
 @end

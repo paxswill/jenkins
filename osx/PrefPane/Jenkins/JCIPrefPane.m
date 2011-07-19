@@ -477,8 +477,8 @@ static const JCIComboSource *environmentVariableSource;
 	}
 }
 
-- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
-	if([self tableView:tableView isGroupRow:row]){
+- (NSCell *)tableView:(NSTableView *)aTableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
+	if([self tableView:aTableView isGroupRow:row]){
 		return [[[NSTextFieldCell alloc] init] autorelease];
 	}else if(tableColumn != nil && [[tableColumn identifier] isEqualToString:@"option"]){
 		return [tableColumn dataCellForRow:row];
@@ -486,6 +486,22 @@ static const JCIComboSource *environmentVariableSource;
 		return nil;
 	}else{
 		return [[[NSTextFieldCell alloc] init] autorelease];
+	}
+}
+
+- (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation{
+	if([aCell isKindOfClass:[NSComboBoxCell class]]){
+		NSComboBoxCell *cell = (NSComboBoxCell *)aCell;
+		NSInteger itemIndex = [cell indexOfSelectedItem];
+		JCIComboSource *source = [cell dataSource];
+		switch (source.type) {
+			case JCIEnvironmentVariable:
+				return [environmentVariableSource localizedDescriptionForIndex:itemIndex];
+			case JCIJavaArgument:
+				return [javaComboSource localizedDescriptionForIndex:itemIndex];
+			case JCIJenkinsArgument:
+				return [jenkinsComboSource localizedDescriptionForIndex:itemIndex];
+		}
 	}
 }
 
