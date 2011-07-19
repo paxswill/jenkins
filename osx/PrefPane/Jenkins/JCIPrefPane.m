@@ -188,7 +188,7 @@ static const JCIComboSource *environmentVariableSource;
 	[self.tableView reloadData];
 }
 
-#pragma mark - PLIST Interface
+#pragma mark - Property List Interface
 
 -(void)updateVariablesDictionaryArray{
 	NSMutableArray *vars = [[NSMutableArray alloc] initWithCapacity:[self.plist.environmentVariables count]];
@@ -239,59 +239,18 @@ static const JCIComboSource *environmentVariableSource;
 +(NSMutableDictionary *)parseJavaArgument:(NSString *)arg{
 	// First handle easily seperated options, then manually pull apart the run-on options
 	if([javaOptions containsObject:arg]){
+		// space separated and flag arguments
 		return [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNull null], @"value", arg, @"option", nil];
-	}else if([arg rangeOfString:@"-agentlib:"].location == 0){
-		NSString *option = [arg substringToIndex:9];
-		NSString *value = [arg substringFromIndex:9];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-agentpath:"].location == 0){
-		NSString *option = [arg substringToIndex:10];
-		NSString *value = [arg substringFromIndex:10];
+	}else if([arg rangeOfString:@"-X"].location == 0 && [arg rangeOfString:@":"].location != NSNotFound){
+		// Colon separated values
+		NSRange colonRange = [arg rangeOfString:@":"];
+		NSString *option = [arg substringToIndex:(colonRange.location + 1)];
+		NSString *value = [arg substringFromIndex:(colonRange.location + 1)];
 		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
 	}else if(([arg rangeOfString:@"-D"].location == 0) && ([arg rangeOfString:@"="].location != NSNotFound)){
 		NSRange equalRange = [arg rangeOfString:@"="];
 		NSString *option = [arg substringToIndex:(equalRange.location + 1)];
 		NSString *value = [arg substringFromIndex:(equalRange.location + 1)];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-enableassertions:"].location == 0){
-		NSString *option = [arg substringToIndex:17];
-		NSString *value = [arg substringFromIndex:17];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-ea:"].location == 0){
-		NSString *option = [arg substringToIndex:3];
-		NSString *value = [arg substringFromIndex:3];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-disableassertions:"].location == 0){
-		NSString *option = [arg substringToIndex:19];
-		NSString *value = [arg substringFromIndex:19];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-da:"].location == 0){
-		NSString *option = [arg substringToIndex:3];
-		NSString *value = [arg substringFromIndex:3];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-javaagent:"].location == 0){
-		NSString *option = [arg substringToIndex:11];
-		NSString *value = [arg substringFromIndex:11];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-verbose:"].location == 0){
-		NSString *option = [arg substringToIndex:9];
-		NSString *value = [arg substringFromIndex:9];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"−Xbootclasspath:"].location == 0){
-		NSString *option = [arg substringToIndex:16];
-		NSString *value = [arg substringFromIndex:16];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"−Xbootclasspath/a:"].location == 0){
-		NSString *option = [arg substringToIndex:18];
-		NSString *value = [arg substringFromIndex:18];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"−Xbootclasspath/p:"].location == 0){
-		NSString *option = [arg substringToIndex:18];
-		NSString *value = [arg substringFromIndex:18];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-Xloggc:"].location == 0){
-		NSString *option = [arg substringToIndex:8];
-		NSString *value = [arg substringFromIndex:8];
 		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
 	}else if([arg rangeOfString:@"-Xms"].location == 0){
 		NSString *option = [arg substringToIndex:4];
@@ -300,10 +259,6 @@ static const JCIComboSource *environmentVariableSource;
 	}else if([arg rangeOfString:@"-Xmx"].location == 0){
 		NSString *option = [arg substringToIndex:4];
 		NSString *value = [arg substringFromIndex:4];
-		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
-	}else if([arg rangeOfString:@"-Xrunhprof:"].location == 0){
-		NSString *option = [arg substringToIndex:11];
-		NSString *value = [arg substringFromIndex:11];
 		return [NSMutableDictionary dictionaryWithObjectsAndKeys:option, @"option", value, @"value", nil];
 	}else if([arg rangeOfString:@"-Xss"].location == 0){
 		NSString *option = [arg substringToIndex:4];
