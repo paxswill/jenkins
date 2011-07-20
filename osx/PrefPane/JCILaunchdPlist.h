@@ -15,6 +15,8 @@
 	NSString *path;
 	SFAuthorization *authorization;
 	NSString *helperPath;
+    BOOL saveOnChange;
+    NSLock *saveLock;
 }
 // launchd.plist values
 @property (nonatomic, retain, readwrite) NSString *label;
@@ -67,6 +69,7 @@
 @property (nonatomic, assign, readwrite, getter=isRunning) BOOL running;
 @property (nonatomic, retain, readwrite) SFAuthorization *authorization;
 @property (nonatomic, retain, readwrite) NSString *helperPath;
+@property (nonatomic, assign, readwrite) BOOL saveOnChange;
 
 -(id)initWithPath:(NSString *)plistPath;
 -(void)load;

@@ -323,6 +323,7 @@ static const JCIComboSource *environmentVariableSource;
 		[newVars setValue:[var objectForKey:@"value"] forKey:[var objectForKey:@"option"]];
 	}
 	self.plist.environmentVariables = newVars;
+    [self.plist save];
 }
 
 #pragma mark - NSTableViewDataSource

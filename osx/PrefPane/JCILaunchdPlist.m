@@ -69,6 +69,7 @@ static NSSet *propertySet = nil;
 @synthesize path;
 @synthesize authorization;
 @synthesize helperPath;
+@synthesize saveOnChange;
 
 -(id)initWithPath:(NSString *)plistPath{
 	if((self = [super init])){
@@ -80,6 +81,8 @@ static NSSet *propertySet = nil;
 			self.plist = [NSMutableDictionary dictionary];
 		}
 		[fm release];
+        self.saveOnChange = NO;
+        saveLock = [[NSLock alloc] init];
 	}
 	return self;
 }
@@ -94,6 +97,7 @@ static NSSet *propertySet = nil;
 	self.plist = nil;
 	self.helperPath = nil;
 	self.authorization = nil;
+    [saveLock release];
     [super dealloc];
 }
 
@@ -124,17 +128,20 @@ static NSSet *propertySet = nil;
 }
 
 -(void)save{
+    [saveLock lock];
 	// Set up for elevated execution
 	FILE *pipe;
 	const char *argv[] = {[self.path UTF8String], NULL};
 	// Spawn the privileged process
-	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
+    // TODO: error checking
+	OSErr error = AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
 	// Write the data out
 	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.plist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
 	NSFileHandle *writeHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileno(pipe) closeOnDealloc:YES];
 	[writeHandle writeData:plistData];
 	[writeHandle closeFile];
 	[writeHandle release];
+    [saveLock unlock];
 }
 
 +(NSString *)makeFirstCapital:(NSString *)string{
@@ -349,11 +356,15 @@ void plistSetProxy(id self, SEL sel, id value){
 			NSRange argumentsRange = NSMakeRange(1, [[self programArguments] count]);
 			[[[self plist] objectForKey:@"ProgramArguments"] replaceObjectsInRange:argumentsRange withObjectsFromArray:value];
 			[self didChangeValueForKey:littleName];
-			[self save];
+            if([self saveOnChange]){
+                [self save];
+            }
 			return;
 		}
 	}
 	[[self plist] setValue:value forKey:propertyName];
 	[self didChangeValueForKey:littleName];
-	[self save];
+    if([self saveOnChange]){
+        [self save];
+    }
 }

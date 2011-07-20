@@ -46,6 +46,7 @@ int main (int argc, const char * argv[])
 	}
 	free(buffer);
 	close(writeFD);
+    fprintf(stderr, "Writing Done\n");
     return 0;
 }
 
