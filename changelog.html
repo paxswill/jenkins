@@ -55,6 +55,9 @@ Upcoming changes</a>
 <!-- Record your changes in the trunk here. -->
 <div id="trunk" style="display:none"><!--=TRUNK-BEGIN=-->
 <ul class=image>
+  <li class=rfe>
+    Support for gziped log in consoleText
+    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10400">issue 10400</a>)
   <li class=bug>
     When run as "java -jar jenkins.war", failing to listen on HTTP ports should be fatal.
   <li class=bug>
@@ -63,6 +66,9 @@ Upcoming changes</a>
   <li class=bug>
     Fixed an occasional NPE when running Maven jobs 
     (<a href="https://issues.jenkins-ci.org/browse/JENKINS-9822">issue 9822</a>)
+  <li class=bug>
+    Fixed Maven build error if headless option is set and MAVEN_OPTS empty
+    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10375">issue 10375</a>)
 </ul>
 </div><!--=TRUNK-END=-->
 
