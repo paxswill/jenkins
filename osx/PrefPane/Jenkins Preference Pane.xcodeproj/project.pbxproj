@@ -22,8 +22,6 @@
 		24B3AF9413D09BE300E1F7FB /* JCIComboSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 24B3AF9213D09BE300E1F7FB /* JCIComboSource.m */; };
 		24D15E1B13CF4A8700ABB3A3 /* JCILaunchdPlist.h in Headers */ = {isa = PBXBuildFile; fileRef = 24D15E1913CF4A8700ABB3A3 /* JCILaunchdPlist.h */; };
 		24D15E1C13CF4A8700ABB3A3 /* JCILaunchdPlist.m in Sources */ = {isa = PBXBuildFile; fileRef = 24D15E1A13CF4A8700ABB3A3 /* JCILaunchdPlist.m */; };
-		24F4E1DC13D48F4B00073A42 /* Plus.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 24F4E1DB13D48F4B00073A42 /* Plus.tiff */; };
-		24F4E1DF13D490E200073A42 /* Minus.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 24F4E1DE13D490E200073A42 /* Minus.tiff */; };
 		24FEDBF413CB565500C6EEFF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF313CB565500C6EEFF /* Cocoa.framework */; };
 		24FEDBF613CB565500C6EEFF /* PreferencePanes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */; };
 		24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */; };
@@ -73,8 +71,6 @@
 		24B3AF9213D09BE300E1F7FB /* JCIComboSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JCIComboSource.m; sourceTree = "<group>"; };
 		24D15E1913CF4A8700ABB3A3 /* JCILaunchdPlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = JCILaunchdPlist.h; path = ../JCILaunchdPlist.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		24D15E1A13CF4A8700ABB3A3 /* JCILaunchdPlist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = JCILaunchdPlist.m; path = ../JCILaunchdPlist.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		24F4E1DB13D48F4B00073A42 /* Plus.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Plus.tiff; sourceTree = "<group>"; };
-		24F4E1DE13D490E200073A42 /* Minus.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Minus.tiff; sourceTree = "<group>"; };
 		24FEDBF013CB565500C6EEFF /* Jenkins Preference Pane.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Jenkins Preference Pane.prefPane"; sourceTree = BUILT_PRODUCTS_DIR; };
 		24FEDBF313CB565500C6EEFF /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		24FEDBF513CB565500C6EEFF /* PreferencePanes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PreferencePanes.framework; path = System/Library/Frameworks/PreferencePanes.framework; sourceTree = SDKROOT; };
@@ -196,9 +192,7 @@
 		24FEDBFC13CB565500C6EEFF /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				24F4E1DE13D490E200073A42 /* Minus.tiff */,
 				244DF3D513D5C47F00A7AEEC /* Localizable.strings */,
-				24F4E1DB13D48F4B00073A42 /* Plus.tiff */,
 				24FEDBFD13CB565500C6EEFF /* Jenkins Preference Pane-Info.plist */,
 				24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */,
 				24FEDC0113CB565500C6EEFF /* Jenkins Preference Pane-Prefix.pch */,
@@ -296,8 +290,6 @@
 				24FEDC0013CB565500C6EEFF /* InfoPlist.strings in Resources */,
 				24FEDC0A13CB565500C6EEFF /* Jenkins.xib in Resources */,
 				B18D4C5313D009A30053E20B /* Jenkins.tiff in Resources */,
-				24F4E1DC13D48F4B00073A42 /* Plus.tiff in Resources */,
-				24F4E1DF13D490E200073A42 /* Minus.tiff in Resources */,
 				244DF3D713D5C47F00A7AEEC /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

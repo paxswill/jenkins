@@ -455,7 +455,6 @@ static const JCIComboSource *environmentVariableSource;
 - (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation{
 	if([aCell isKindOfClass:[NSComboBoxCell class]]){
 		NSComboBoxCell *cell = (NSComboBoxCell *)aCell;
-		JCIComboSource *source = [cell dataSource];
 		return [[self bundle] localizedStringForKey:[cell stringValue] value:[cell stringValue] table:nil];
 	}
 	return nil;
