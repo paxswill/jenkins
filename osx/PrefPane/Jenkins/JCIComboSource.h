@@ -20,7 +20,6 @@ typedef enum{
 @property (nonatomic, assign, readonly) JCIOptionType type;
 
 -(id)initWithType:(JCIOptionType)optionType;
--(NSString *)localizedDescriptionForIndex:(NSInteger)index;
 
 - (NSUInteger)comboBoxCell:(NSComboBoxCell *)aComboBoxCell indexOfItemWithStringValue:(NSString *)aString;
 - (id)comboBoxCell:(NSComboBoxCell *)aComboBoxCell objectValueForItemAtIndex:(NSInteger)index;
