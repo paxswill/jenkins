@@ -182,20 +182,4 @@ static const NSArray *environmentVariables;
 	}
 }
 
-#pragma mark - Tool tips
-
--(NSString *)localizedDescriptionForIndex:(NSInteger)index{
-	NSString *value;
-	switch (self.type) {
-		case JCIEnvironmentVariable:
-			value = [environmentVariables objectAtIndex:index];
-		case JCIJavaArgument:
-			value = [javaArgs objectAtIndex:index];
-		case JCIJenkinsArgument:
-			value = [jenkinsArgs objectAtIndex:index];
-	}
-	return [[NSBundle bundleForClass:[JCIComboSource class]] localizedStringForKey:value value:value table:nil];
-}
-
-
 @end

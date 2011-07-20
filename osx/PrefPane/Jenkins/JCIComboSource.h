@@ -25,5 +25,4 @@ typedef enum{
 - (NSUInteger)comboBoxCell:(NSComboBoxCell *)aComboBoxCell indexOfItemWithStringValue:(NSString *)aString;
 - (id)comboBoxCell:(NSComboBoxCell *)aComboBoxCell objectValueForItemAtIndex:(NSInteger)index;
 - (NSInteger)numberOfItemsInComboBoxCell:(NSComboBoxCell *)aComboBoxCell;
--(NSString *)localizedDescriptionForIndex:(NSInteger)index;
 @end

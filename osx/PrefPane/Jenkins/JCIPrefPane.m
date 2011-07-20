@@ -456,18 +456,7 @@ static const JCIComboSource *environmentVariableSource;
 	if([aCell isKindOfClass:[NSComboBoxCell class]]){
 		NSComboBoxCell *cell = (NSComboBoxCell *)aCell;
 		JCIComboSource *source = [cell dataSource];
-		NSInteger itemIndex = [source comboBoxCell:cell indexOfItemWithStringValue:[cell stringValue]];
-		if(itemIndex < 0){
-			return nil;
-		}
-		switch (source.type) {
-			case JCIEnvironmentVariable:
-				return [environmentVariableSource localizedDescriptionForIndex:itemIndex];
-			case JCIJavaArgument:
-				return [javaComboSource localizedDescriptionForIndex:itemIndex];
-			case JCIJenkinsArgument:
-				return [jenkinsComboSource localizedDescriptionForIndex:itemIndex];
-		}
+		[[NSBundle bundleForClass:[JCIComboSource class]] localizedStringForKey:[cell stringValue] value:[cell stringValue] table:nil];
 	}
 	return nil;
 }
