@@ -424,7 +424,10 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
-	if(![self tableView:aTableView isGroupRow:rowIndex] && [[aTableColumn identifier] isEqualToString:@"option"]){
+    if([aCell isKindOfClass:[NSTextFieldCell class]]){
+        [aCell setEditable:YES];
+    }
+	if([aCell isKindOfClass:[NSComboBoxCell class]]){
 		NSComboBoxCell *comboCell = (NSComboBoxCell *)aCell;
 		[comboCell setUsesDataSource:YES];
 		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
