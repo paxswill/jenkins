@@ -138,6 +138,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{11, 201}, {135, 32}}</string>
 												<reference key="NSSuperview" ref="185545690"/>
+												<reference key="NSNextKeyView" ref="1003328111"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="557241788">
 													<int key="NSCellFlags">67239424</int>
@@ -716,27 +717,27 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">enabled: uiEnabled</string>
+						<string key="label">editable: uiEnabled</string>
 						<reference key="source" ref="372213545"/>
 						<reference key="destination" ref="294453543"/>
 						<object class="NSNibBindingConnector" key="connector">
 							<reference key="NSSource" ref="372213545"/>
 							<reference key="NSDestination" ref="294453543"/>
-							<string key="NSLabel">enabled: uiEnabled</string>
-							<string key="NSBinding">enabled</string>
+							<string key="NSLabel">editable: uiEnabled</string>
+							<string key="NSBinding">editable</string>
 							<string key="NSKeyPath">uiEnabled</string>
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">333</int>
+					<int key="connectionID">339</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">enabled: uiEnabled</string>
-						<reference key="source" ref="136710042"/>
+						<reference key="source" ref="15379024"/>
 						<reference key="destination" ref="294453543"/>
 						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="136710042"/>
+							<reference key="NSSource" ref="15379024"/>
 							<reference key="NSDestination" ref="294453543"/>
 							<string key="NSLabel">enabled: uiEnabled</string>
 							<string key="NSBinding">enabled</string>
@@ -744,7 +745,23 @@
 							<int key="NSNibBindingConnectorVersion">2</int>
 						</object>
 					</object>
-					<int key="connectionID">336</int>
+					<int key="connectionID">343</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">editable: uiEnabled</string>
+						<reference key="source" ref="136710042"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="136710042"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">editable: uiEnabled</string>
+							<string key="NSBinding">editable</string>
+							<string key="NSKeyPath">uiEnabled</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">346</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1091,7 +1108,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">336</int>
+			<int key="maxID">346</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
