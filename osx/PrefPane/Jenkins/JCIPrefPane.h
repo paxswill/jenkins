@@ -21,7 +21,7 @@
 	SFAuthorizationView *authorizationView;
 	DKActionButton *actionButton;
 	NSTableView *tableView;
-	NSMutableArray *variables;
+	NSMutableArray *environmentVariables;
 	NSMutableArray *jenkinsArgs;
 	NSMutableArray *javaArgs;
 	int environmentHeaderIndex;
@@ -37,7 +37,7 @@
 @property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
 @property (nonatomic, readwrite, assign) IBOutlet DKActionButton *actionButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSTableView *tableView;
-@property (nonatomic, readwrite, retain) NSMutableArray *variables;
+@property (nonatomic, readwrite, retain) NSMutableArray *environmentVariables;
 @property (nonatomic, readwrite, retain) NSMutableArray *jenkinsArgs;
 @property (nonatomic, readwrite, retain) NSMutableArray *javaArgs;
 

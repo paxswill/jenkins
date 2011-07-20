@@ -21,7 +21,7 @@ static const JCIComboSource *environmentVariableSource;
 -(void)updateVariablesDictionaryArray;
 -(void)updateArgumentsDictionaryArray;
 -(void)setHeaderIndices;
--(void)saveArguments;
+-(void)saveOptions;
 -(void)addEnvironmentVariable;
 -(void)addJavaArgument;
 -(void)addJenkinsArgument;
@@ -38,7 +38,7 @@ static const JCIComboSource *environmentVariableSource;
 @synthesize authorizationView;
 @synthesize actionButton;
 @synthesize tableView;
-@synthesize variables;
+@synthesize environmentVariables;
 @synthesize jenkinsArgs;
 @synthesize javaArgs;
 
@@ -113,7 +113,7 @@ static const JCIComboSource *environmentVariableSource;
 
 - (void)dealloc {
     self.plist = nil;
-	self.variables = nil;
+	self.environmentVariables = nil;
 	self.javaArgs = nil;
 	self.jenkinsArgs = nil;
     [super dealloc];
@@ -170,7 +170,7 @@ static const JCIComboSource *environmentVariableSource;
 	NSMutableDictionary *newVar = [[NSMutableDictionary alloc] init];
 	[newVar setValue:[NSNull null] forKey:@"option"];
 	[newVar setValue:[NSNull null] forKey:@"value"];
-	[self.variables addObject:newVar];
+	[self.environmentVariables addObject:newVar];
 	[newVar release];
 	[self setHeaderIndices];
 	[self.tableView reloadData];
@@ -206,7 +206,7 @@ static const JCIComboSource *environmentVariableSource;
 		[varDict setValue:[self.plist.environmentVariables valueForKey:key] forKey:@"value"];
 		[vars addObject:varDict];
 	}
-	self.variables = [vars autorelease];
+	self.environmentVariables = [vars autorelease];
 	[self setHeaderIndices];
 }
 
@@ -300,8 +300,8 @@ static const JCIComboSource *environmentVariableSource;
 	}
 }
 
--(void)saveArguments{
-	NSMutableArray *newArgs = [[NSMutableArray alloc] init];
+-(void)saveOptions{
+	NSMutableArray *newArgs = [NSMutableArray arrayWithCapacity:([jenkinsArgs count] + [javaArgs count])];
 	// First the Java arguments (except for -jar)
 	NSMutableDictionary *jarDict = nil;
 	for(NSMutableDictionary *arg in self.javaArgs){
@@ -317,7 +317,12 @@ static const JCIComboSource *environmentVariableSource;
 	for(NSMutableDictionary *arg in self.jenkinsArgs){
 		[newArgs addObjectsFromArray:[JCIPrefPane convertToArgumentString:arg]];
 	}
-	self.plist.programArguments = [newArgs autorelease];
+	self.plist.programArguments = newArgs;
+	NSMutableDictionary *newVars = [NSMutableDictionary dictionaryWithCapacity:[self.environmentVariables count]];
+	for(NSMutableDictionary *var in environmentVariables){
+		[newVars setValue:[var objectForKey:@"value"] forKey:[var objectForKey:@"option"]];
+	}
+	self.plist.environmentVariables = newVars;
 }
 
 #pragma mark - NSTableViewDataSource
@@ -325,8 +330,8 @@ static const JCIComboSource *environmentVariableSource;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView{
 	NSInteger count = 0;
 	// If there are to be rows in that section, add an extra row for a header
-	if([self.variables count] > 0){
-		count += [self.variables count];
+	if([self.environmentVariables count] > 0){
+		count += [self.environmentVariables count];
 		count += 1;
 	}
 	if([self.javaArgs count] > 0){
@@ -351,14 +356,14 @@ static const JCIComboSource *environmentVariableSource;
 		int offset = 1;
 		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
 			// Environment Variable
-			return [[self.variables objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
+			return [[self.environmentVariables objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
 			// Java
-			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+			offset += [self.environmentVariables count] > 0 ? [self.environmentVariables count] + 1 : 0;
 			return [[self.javaArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else if(rowIndex > jenkinsHeaderIndex){
 			// Jenkins
-			offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+			offset += [self.environmentVariables count] > 0 ? [self.environmentVariables count] + 1 : 0;
 			offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
 			return [[self.jenkinsArgs objectAtIndex:(rowIndex - offset)] valueForKey:[aTableColumn identifier]];
 		}else{
@@ -372,19 +377,19 @@ static const JCIComboSource *environmentVariableSource;
 	int offset = 1;
 	if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
 		// Environment Variable
-		argumentDict = [self.variables objectAtIndex:(rowIndex - offset)];
+		argumentDict = [self.environmentVariables objectAtIndex:(rowIndex - offset)];
 	}else if(rowIndex < jenkinsHeaderIndex && rowIndex > javaHeaderIndex){
 		// Java
-		offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+		offset += [self.environmentVariables count] > 0 ? [self.environmentVariables count] + 1 : 0;
 		argumentDict = [self.javaArgs objectAtIndex:(rowIndex - offset)];
 	}else if(rowIndex > jenkinsHeaderIndex){
 		// Jenkins
-		offset += [self.variables count] > 0 ? [self.variables count] + 1 : 0;
+		offset += [self.environmentVariables count] > 0 ? [self.environmentVariables count] + 1 : 0;
 		offset += [self.javaArgs count] > 0 ? [self.javaArgs count] + 1 : 0;
 		argumentDict = [self.jenkinsArgs objectAtIndex:(rowIndex - offset)];
 	}
 	[argumentDict setValue:anObject forKey:[aTableColumn identifier]];
-	[self saveArguments];
+	[self saveOptions];
 }
 
 
@@ -393,9 +398,9 @@ static const JCIComboSource *environmentVariableSource;
 -(void)setHeaderIndices{
 	int offset = 0;
 	// Env
-	if([self.variables count] > 0){
+	if([self.environmentVariables count] > 0){
 		environmentHeaderIndex = 0;
-		offset += [self.variables count] + 1;
+		offset += [self.environmentVariables count] + 1;
 	}else{
 		environmentHeaderIndex = INT_MAX;
 	}
