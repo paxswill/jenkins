@@ -9,6 +9,8 @@
 #import "JCIPrefPane.h"
 #import <objc/runtime.h>
 #import "JCIComboSource.h"
+#import "ASIHTTPRequest.h"
+#import "SBJson.h"
 
 static const NSSet *javaOptions;
 static const JCIComboSource *javaComboSource;
@@ -31,6 +33,7 @@ static const JCIComboSource *environmentVariableSource;
 
 @synthesize plist;
 @synthesize uiEnabled;
+@synthesize jenkinsVersion;
 
 @synthesize startButton;
 @synthesize updateButton;
@@ -112,6 +115,7 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 - (void)dealloc {
+	[jsonParser release];
     self.plist = nil;
 	self.environmentVariables = nil;
 	self.javaArgs = nil;
@@ -139,6 +143,23 @@ static const JCIComboSource *environmentVariableSource;
 	[[addMenu itemArray] makeObjectsPerformSelector:@selector(setTarget:) withObject:self];
 	[[self.actionButton cell] setMenu:addMenu];
 	[addMenu release];
+	// Get the version of Jenkins we're running
+	NSDictionary *jarArgument;
+	for(NSDictionary *arg in self.javaArgs){
+		if([[arg valueForKey:@"option"] isEqualToString:@"-jar "]){
+			jarArgument = arg;
+		}
+	}
+	NSString *warPath = [jarArgument objectForKey:@"value"];
+	// TODO: Inspect the war for the version
+	// Set up for updating
+	jsonAdapter = [[SBJsonStreamParserAdapter alloc] init];
+	jsonAdapter.delegate = self;
+	jsonParser = [[SBJsonStreamParser alloc] init];
+	jsonParser.delegate = jsonAdapter;
+	ASIHTTPRequest *updatesRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/updates/update-center.json"]];
+	updatesRequest.delegate = self;
+	[updatesRequest startAsynchronous];
 }
 
 -(void)willSelect{
@@ -490,6 +511,28 @@ static const JCIComboSource *environmentVariableSource;
 
 - (void)authorizationViewReleasedAuthorization:(SFAuthorizationView *)view{
 	self.plist.authorization = nil;
+}
+
+#pragma mark - ASIHTTPRequestDelegate
+
+-(void)requestStarted:(ASIHTTPRequest *)request{
+	self.updateButton.title = [[self bundle] localizedStringForKey:@"Checking For Jenkins Update" value:@"Checking" table:nil];
+}
+
+- (void)request:(ASIHTTPRequest *)request didReceiveData:(NSData *)data{
+	[jsonParser parse:data];
+}
+
+#pragma mark - SBJsonStreamParserAdapterDelegate
+
+-(void)parser:(SBJsonStreamParser *)parser foundObject:(NSDictionary *)object{
+	if([[object valueForKey:@"name"] isEqualToString:@"core"]){
+		if([[object valueForKey:@"version"] floatValue] > [self.jenkinsVersion floatValue]){
+			self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
+		}else{
+			self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
+		}
+	}
 }
 
 @end

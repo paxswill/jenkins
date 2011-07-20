@@ -10,10 +10,13 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "DKActionButton.h"
 #import "JCILaunchdPlist.h"
+#import "SBJsonStreamParserAdapter.h"
+#import "ASIHTTPRequestDelegate.h"
 
-@interface JCIPrefPane : NSPreferencePane{
+@interface JCIPrefPane : NSPreferencePane<SBJsonStreamParserAdapterDelegate, ASIHTTPRequestDelegate>{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
+	NSString *jenkinsVersion;
 
 	NSButton *startButton;
 	NSButton *updateButton;
@@ -27,9 +30,13 @@
 	int environmentHeaderIndex;
 	int javaHeaderIndex;
 	int jenkinsHeaderIndex;
+	
+	SBJsonStreamParser *jsonParser;
+	SBJsonStreamParserAdapter *jsonAdapter;
 }
 @property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
+@property (nonatomic, readwrite, assign) NSString *jenkinsVersion;
 
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
