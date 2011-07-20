@@ -420,10 +420,13 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldEditTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
-	return ![self tableView:aTableView isGroupRow:rowIndex];
+	return ![self tableView:aTableView isGroupRow:rowIndex] && self.uiEnabled;
 }
 
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
+    if([aCell isKindOfClass:[NSTextFieldCell class]]){
+        [aCell setEditable:YES];
+    }
 	if([aCell isKindOfClass:[NSComboBoxCell class]]){
 		NSComboBoxCell *comboCell = (NSComboBoxCell *)aCell;
 		[comboCell setUsesDataSource:YES];
