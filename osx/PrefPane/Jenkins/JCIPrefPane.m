@@ -455,8 +455,11 @@ static const JCIComboSource *environmentVariableSource;
 - (NSString *)tableView:(NSTableView *)aTableView toolTipForCell:(NSCell *)aCell rect:(NSRectPointer)rect tableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)row mouseLocation:(NSPoint)mouseLocation{
 	if([aCell isKindOfClass:[NSComboBoxCell class]]){
 		NSComboBoxCell *cell = (NSComboBoxCell *)aCell;
-		NSInteger itemIndex = [cell indexOfSelectedItem];
 		JCIComboSource *source = [cell dataSource];
+		NSInteger itemIndex = [source comboBoxCell:cell indexOfItemWithStringValue:[cell stringValue]];
+		if(itemIndex < 0){
+			return nil;
+		}
 		switch (source.type) {
 			case JCIEnvironmentVariable:
 				return [environmentVariableSource localizedDescriptionForIndex:itemIndex];
