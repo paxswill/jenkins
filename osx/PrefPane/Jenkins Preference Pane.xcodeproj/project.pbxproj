@@ -12,7 +12,7 @@
 		2412DE4413D48D9000EB8C76 /* DKActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 2412DE4013D48D9000EB8C76 /* DKActionButton.m */; };
 		2412DE4513D48D9000EB8C76 /* DKActionButtonCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 2412DE4113D48D9000EB8C76 /* DKActionButtonCell.h */; };
 		2412DE4613D48D9000EB8C76 /* DKActionButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2412DE4213D48D9000EB8C76 /* DKActionButtonCell.m */; };
-		244DF3D713D5C47F00A7AEEC /* Localization.strings in Resources */ = {isa = PBXBuildFile; fileRef = 244DF3D513D5C47F00A7AEEC /* Localization.strings */; };
+		244DF3D713D5C47F00A7AEEC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 244DF3D513D5C47F00A7AEEC /* Localizable.strings */; };
 		24828E9313CCCF9800A1A1D4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24828E9213CCCF9800A1A1D4 /* Foundation.framework */; };
 		24828E9613CCCF9800A1A1D4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 24828E9513CCCF9800A1A1D4 /* main.m */; };
 		24828E9A13CCCF9800A1A1D4 /* SecureWrite.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 24828E9913CCCF9800A1A1D4 /* SecureWrite.1 */; };
@@ -62,7 +62,7 @@
 		2412DE4013D48D9000EB8C76 /* DKActionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DKActionButton.m; path = ../DKActionButton.m; sourceTree = "<group>"; };
 		2412DE4113D48D9000EB8C76 /* DKActionButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DKActionButtonCell.h; path = ../DKActionButtonCell.h; sourceTree = "<group>"; };
 		2412DE4213D48D9000EB8C76 /* DKActionButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DKActionButtonCell.m; path = ../DKActionButtonCell.m; sourceTree = "<group>"; };
-		244DF3D613D5C47F00A7AEEC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localization.strings; sourceTree = "<group>"; };
+		244DF3D613D5C47F00A7AEEC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		24828E9013CCCF9800A1A1D4 /* SecureWrite */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SecureWrite; sourceTree = BUILT_PRODUCTS_DIR; };
 		24828E9213CCCF9800A1A1D4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24828E9513CCCF9800A1A1D4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -197,7 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				24F4E1DE13D490E200073A42 /* Minus.tiff */,
-				244DF3D513D5C47F00A7AEEC /* Localization.strings */,
+				244DF3D513D5C47F00A7AEEC /* Localizable.strings */,
 				24F4E1DB13D48F4B00073A42 /* Plus.tiff */,
 				24FEDBFD13CB565500C6EEFF /* Jenkins Preference Pane-Info.plist */,
 				24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */,
@@ -298,7 +298,7 @@
 				B18D4C5313D009A30053E20B /* Jenkins.tiff in Resources */,
 				24F4E1DC13D48F4B00073A42 /* Plus.tiff in Resources */,
 				24F4E1DF13D490E200073A42 /* Minus.tiff in Resources */,
-				244DF3D713D5C47F00A7AEEC /* Localization.strings in Resources */,
+				244DF3D713D5C47F00A7AEEC /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -346,12 +346,12 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		244DF3D513D5C47F00A7AEEC /* Localization.strings */ = {
+		244DF3D513D5C47F00A7AEEC /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				244DF3D613D5C47F00A7AEEC /* en */,
 			);
-			name = Localization.strings;
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		24FEDBFE13CB565500C6EEFF /* InfoPlist.strings */ = {
