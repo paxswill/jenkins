@@ -7,6 +7,7 @@
 //
 
 #import "JCIComboSource.h"
+#import "JCIPrefPane.h"
 #import <objc/runtime.h>
 
 static const NSArray *javaArgs;
@@ -184,14 +185,16 @@ static const NSArray *environmentVariables;
 #pragma mark - Tool tips
 
 -(NSString *)localizedDescriptionForIndex:(NSInteger)index{
+	NSString *value;
 	switch (self.type) {
 		case JCIEnvironmentVariable:
-			return NSLocalizedString([environmentVariables objectAtIndex:index], [environmentVariables objectAtIndex:index]);
+			value = [environmentVariables objectAtIndex:index];
 		case JCIJavaArgument:
-			return NSLocalizedString([javaArgs objectAtIndex:index], [javaArgs objectAtIndex:index]);
+			value = [javaArgs objectAtIndex:index];
 		case JCIJenkinsArgument:
-			return NSLocalizedString([jenkinsArgs objectAtIndex:index], [jenkinsArgs objectAtIndex:index]);
+			value = [jenkinsArgs objectAtIndex:index];
 	}
+	return [[NSBundle bundleForClass:[JCIComboSource class]] localizedStringForKey:value value:value table:nil];
 }
 
 
