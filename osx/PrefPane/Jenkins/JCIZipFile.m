@@ -16,23 +16,6 @@
 #import <sys/mman.h>
 #import <zlib.h>
 
-#pragma pack(push, 1)
-typedef struct{
-	uint32_t signature;
-	uint16_t minimumVersion;
-	uint16_t flag;
-	uint16_t compressionMethod;
-	uint16_t modificationTime;
-	uint16_t modificationDate;
-	uint32_t crc32;
-	uint32_t compressedSize;
-	uint32_t uncompressedSize;
-	uint16_t fileNameLength;
-	uint16_t extraLength;
-	void *fileName;
-} JCIZipFileHeader;
-#pragma pack(pop)
-
 @interface JCIZipFile()
 -(NSData *)inflate:(NSData *)input;
 @end
@@ -85,26 +68,29 @@ typedef struct{
 	NSUInteger dataLength = [self.fileData length];
 	while(headerSignatureRange.location != NSNotFound){
 		NSUInteger signatureOffset = headerSignatureRange.location;
-		const JCIZipFileHeader *fileHeader = (JCIZipFileHeader *)rawData + signatureOffset;
-		NSString *fileName = [[NSString alloc] initWithBytes:fileHeader->fileName length:fileHeader->fileNameLength encoding:NSUTF8StringEncoding];
+		uint16_t fileNameLength = (uint16_t)(*(rawData + signatureOffset + 26));
+		uint16_t extraLength = (uint16_t)(*(rawData + signatureOffset + 28));
+		NSString *fileName = [[NSString alloc] initWithBytes:(rawData + signatureOffset + 30) length:fileNameLength encoding:NSUTF8StringEncoding];
 		if([fileName rangeOfString:@"META-INF/MANIFEST.MF"].location != NSNotFound){
-			NSUInteger fileDataOffset = signatureOffset + 30 + fileHeader->fileNameLength + fileHeader->extraLength;
+			uint16_t flag = (uint16_t)(*(rawData + signatureOffset + 6));
+			uint16_t compressionMethod = (uint16_t)(*(rawData + signatureOffset + 8));
+			NSUInteger fileDataOffset = signatureOffset + 30 + fileNameLength + extraLength;
 			NSUInteger fileDataLength;
-			if(fileHeader->flag & 0x8){
+			if(flag & 0x8){
 				// file size in footer
 				uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
 				NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
 				NSRange footerRange = [self.fileData rangeOfData:footerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
 				if(footerRange.location != NSNotFound){
-					fileDataLength = footerRange.location - 1 - (30 + fileHeader->fileNameLength + fileHeader->extraLength);
+					fileDataLength = footerRange.location - 1 - (30 + fileNameLength + extraLength);
 				}else{
 					NSLog(@"Problem finding end of file");
 					return nil;
 				}
 			}else{
-				fileDataLength = fileHeader->compressedSize;
+				fileDataLength = (NSUInteger)((uint32_t)(*(rawData + signatureOffset + 18)));
 			}
-			if(fileHeader->compressionMethod == 8){
+			if(compressionMethod == 8){
 				// deflate
 				NSString *manifest = [[NSString alloc] initWithData:[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:fileDataLength]] encoding:NSUTF8StringEncoding];
 				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -117,7 +103,7 @@ typedef struct{
 					}
 				}
 			}else{
-				NSLog(@"Unsupported compression algorithm (%d)", fileHeader->compressionMethod);
+				NSLog(@"Unsupported compression algorithm (%d)", compressionMethod);
 			}
 		}
 		signatureOffset += 4;
