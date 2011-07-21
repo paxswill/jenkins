@@ -16,6 +16,7 @@
 #import <sys/mman.h>
 #import <zlib.h>
 
+#pragma pack(push, 1)
 typedef struct{
 	uint32_t signature;
 	uint16_t minimumVersion;
@@ -30,6 +31,7 @@ typedef struct{
 	uint16_t extraLength;
 	void *fileName;
 } JCIZipFileHeader;
+#pragma pack(pop)
 
 @interface JCIZipFile()
 -(NSData *)inflate:(NSData *)input;
