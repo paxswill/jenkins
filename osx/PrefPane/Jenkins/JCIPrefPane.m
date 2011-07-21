@@ -11,6 +11,7 @@
 #import "JCIComboSource.h"
 #import "ASIHTTPRequest.h"
 #import "SBJson.h"
+#import "JCIZipFile.h"
 
 static const NSSet *javaOptions;
 static const JCIComboSource *javaComboSource;
@@ -151,7 +152,9 @@ static const JCIComboSource *environmentVariableSource;
 		}
 	}
 	NSString *warPath = [jarArgument objectForKey:@"value"];
-	// TODO: Inspect the war for the version
+	JCIZipFile *warFile = [[JCIZipFile alloc] initWithFile:warPath];
+	self.jenkinsVersion = [warFile jarVersion];
+	[warFile release];
 	// Set up for updating
 	jsonAdapter = [[SBJsonStreamParserAdapter alloc] init];
 	jsonAdapter.delegate = self;
@@ -527,12 +530,17 @@ static const JCIComboSource *environmentVariableSource;
 
 -(void)parser:(SBJsonStreamParser *)parser foundObject:(NSDictionary *)object{
 	if([[object valueForKey:@"name"] isEqualToString:@"core"]){
-		if([[object valueForKey:@"version"] floatValue] > [self.jenkinsVersion floatValue]){
+		float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
+		if([[object valueForKey:@"version"] floatValue] > currentVersion){
 			self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
 		}else{
 			self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
 		}
 	}
+}
+
+- (void)parser:(SBJsonStreamParser*)parser foundArray:(NSArray*)array{
+	// Do nothing
 }
 
 @end
