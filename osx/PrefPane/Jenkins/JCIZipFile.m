@@ -78,7 +78,7 @@ typedef struct{
 	// This is more than a little naive, but /shouldn't/ take too much time, as the manifest should be the first file
 	uint32_t headerSignature = CFSwapInt32LittleToHost(0x04034b50);
 	NSData *headerSignatureData = [NSData dataWithBytes:&headerSignature length:4];
-	NSRange headerSignatureRange = [self.fileData rangeOfData:headerSignatureData options:NSDataSearchBackwards range:NSMakeRange(0, [self.fileData length])];
+	NSRange headerSignatureRange = [self.fileData rangeOfData:headerSignatureData options:0 range:NSMakeRange(0, [self.fileData length])];
 	const uint8_t *rawData = [self.fileData bytes];
 	NSUInteger dataLength = [self.fileData length];
 	while(headerSignatureRange.location != NSNotFound){
