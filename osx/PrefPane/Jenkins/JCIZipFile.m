@@ -87,21 +87,35 @@ typedef struct{
 		NSString *fileName = [[NSString alloc] initWithBytes:fileHeader->fileName length:fileHeader->fileNameLength encoding:NSUTF8StringEncoding];
 		if([fileName rangeOfString:@"META-INF/MANIFEST.MF"].location != NSNotFound){
 			NSUInteger fileDataOffset = signatureOffset + 30 + fileHeader->fileNameLength + fileHeader->extraLength;
-			NSUInteger fileDataLength = fileHeader->compressedSize;
+			NSUInteger fileDataLength;
+			if(fileHeader->flag & 0x8){
+				// file size in footer
+				uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
+				NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
+				NSRange footerRange = [self.fileData rangeOfData:footerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
+				if(footerRange.location != NSNotFound){
+					fileDataLength = footerRange.location - 1 - (30 + fileHeader->fileNameLength + fileHeader->extraLength);
+				}else{
+					NSLog(@"Problem finding end of file");
+					return nil;
+				}
+			}else{
+				fileDataLength = fileHeader->compressedSize;
+			}
 			if(fileHeader->compressionMethod == 8){
 				// deflate
+				NSString *manifest = [[NSString alloc] initWithData:[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:fileDataLength]] encoding:NSUTF8StringEncoding];
+				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				[manifest release];
+				for(NSString *line in lines){
+					NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
+					if(versionRange.location != NSNotFound){
+						return [line substringFromIndex:versionRange.location];
+						
+					}
+				}
 			}else{
 				NSLog(@"Unsupported compression algorithm (%d)", fileHeader->compressionMethod);
-			}
-			NSString *manifest = [[NSString alloc] initWithData:[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:fileDataLength]] encoding:NSUTF8StringEncoding];
-			NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-			[manifest release];
-			for(NSString *line in lines){
-				NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
-				if(versionRange.location != NSNotFound){
-					return [line substringFromIndex:versionRange.location];
-					
-				}
 			}
 		}
 		signatureOffset += 4;
