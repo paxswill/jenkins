@@ -120,6 +120,7 @@
 	stream.avail_in = Z_NULL;
 	stream.avail_out = Z_NULL;
 	
+	NSMutableData *inData = [input mutableCopy];
 	NSMutableData *outData = [[NSMutableData alloc] init];
 	const size_t bufferSize = 1024 * 4;
 	void *buffer = malloc(bufferSize);
@@ -129,7 +130,7 @@
 		return nil;
 	}
 	stream.avail_in = (uInt)[input length];
-	stream.next_in = (Bytef *)[input bytes];
+	stream.next_in = (Bytef *)[inData mutableBytes];
 	// Inflate
 	do {
 		stream.avail_out = bufferSize;
