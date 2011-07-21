@@ -128,7 +128,8 @@
 	if(err != Z_OK){
 		return nil;
 	}
-	stream.avail_in = [input length];
+	stream.avail_in = (uInt)[input length];
+	stream.next_in = (Bytef *)[input bytes];
 	// Inflate
 	do {
 		stream.avail_out = bufferSize;
