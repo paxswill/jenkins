@@ -17,7 +17,7 @@
 #import <zlib.h>
 
 @interface JCIZipFile()
--(NSData *)inflate:(NSData *)input;
+-(void)inflate:(NSData *)input toData:(NSMutableData *)output;
 @end
 
 
@@ -75,24 +75,29 @@
 			uint16_t flag = (uint16_t)(*(rawData + signatureOffset + 6));
 			uint16_t compressionMethod = (uint16_t)(*(rawData + signatureOffset + 8));
 			NSUInteger fileDataOffset = signatureOffset + 30 + fileNameLength + extraLength;
-			NSUInteger fileDataLength;
+			NSUInteger compressedLength;
+			NSUInteger uncompressedLength;
 			if(flag & 0x8){
 				// file size in footer
 				uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
 				NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
 				NSRange footerRange = [self.fileData rangeOfData:footerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
 				if(footerRange.location != NSNotFound){
-					fileDataLength = footerRange.location - 1 - (30 + fileNameLength + extraLength);
+					compressedLength = (NSUInteger)((uint32_t)(*(rawData + footerRange.location + 8)));
+					uncompressedLength = (NSUInteger)((uint32_t)(*(rawData + footerRange.location + 12)));
 				}else{
 					NSLog(@"Problem finding end of file");
 					return nil;
 				}
 			}else{
-				fileDataLength = (NSUInteger)((uint32_t)(*(rawData + signatureOffset + 18)));
+				compressedLength = (NSUInteger)((uint32_t)(*(rawData + signatureOffset + 18)));
+				uncompressedLength = (NSUInteger)((uint32_t)(*(rawData + signatureOffset + 22)));
 			}
 			if(compressionMethod == 8){
 				// deflate
-				NSString *manifest = [[NSString alloc] initWithData:[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:fileDataLength]] encoding:NSUTF8StringEncoding];
+				NSMutableData *manifestData = [NSMutableData dataWithLength:uncompressedLength];
+				[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedLength] toData:manifestData];
+				NSString *manifest = [[NSString alloc] initWithData:manifestData encoding:NSUTF8StringEncoding];
 				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				[manifest release];
 				for(NSString *line in lines){
@@ -112,7 +117,7 @@
 	return nil;
 }
 
--(NSData *)inflate:(NSData *)input{
+-(void)inflate:(NSData *)input toData:(NSMutableData *)output{
 	z_stream stream;
 	stream.zalloc = Z_NULL;
 	stream.zfree = Z_NULL;
@@ -120,34 +125,26 @@
 	stream.avail_in = Z_NULL;
 	stream.avail_out = Z_NULL;
 	
-	NSMutableData *inData = [input mutableCopy];
-	NSMutableData *outData = [[NSMutableData alloc] init];
-	const size_t bufferSize = 1024 * 4;
-	void *buffer = malloc(bufferSize);
-	
 	int err = inflateInit(&stream);
 	if(err != Z_OK){
-		return nil;
+		NSLog(@"Error initializing infation");
+		return;
 	}
+	// Set source and destination
 	stream.avail_in = (uInt)[input length];
-	stream.next_in = (Bytef *)[inData mutableBytes];
+	stream.next_in = (Bytef *)[input bytes];
+	stream.avail_out = (uInt)[output length];
+	stream.next_out = (Bytef *)[output mutableBytes];
 	// Inflate
-	do {
-		stream.avail_out = bufferSize;
-		stream.next_out = buffer;
-		err = inflate(&stream, Z_NO_FLUSH);
-		switch (err) {
-			case Z_NEED_DICT:
-				err = Z_DATA_ERROR;
-			case Z_DATA_ERROR:
-			case Z_MEM_ERROR:
-				inflateEnd(&stream);
-				return nil;
-		}
-		[outData appendBytes:buffer length:(bufferSize - stream.avail_out)];
-	} while (err != Z_STREAM_END);
-	free(buffer);
-	return [outData autorelease];
+	err = inflate(&stream, Z_FINISH);
+	switch (err) {
+		case Z_NEED_DICT:
+			err = Z_DATA_ERROR;
+		case Z_DATA_ERROR:
+		case Z_MEM_ERROR:
+			inflateEnd(&stream);
+			NSLog(@"Error inflating (%d)", err);
+	}
 }
 
 @end
