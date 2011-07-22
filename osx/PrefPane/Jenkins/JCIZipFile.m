@@ -169,7 +169,9 @@ void debugFree(void *opaque, void *address);
                 NSLog(@"Error inflating: %s (%d)", stream.msg, err);
                 return;
         }
-    }while(err != Z_STREAM_END);
+    }while(stream.avail_in != 0);
+	inflateEnd(&stream);
+	[output setLength:stream.total_out];
 }
 
 @end
