@@ -10,7 +10,16 @@
 
 
 #import "JCIZipFile.h"
-#import "NSData+ZKAdditions.h"
+#import <stdint.h>
+#import <fcntl.h>
+#import <sys/stat.h>
+#import <sys/mman.h>
+#import <zlib.h>
+
+@interface JCIZipFile()
+-(void)inflate:(NSData *)input toData:(NSMutableData *)output;
+@end
+
 
 @implementation JCIZipFile
 
@@ -86,14 +95,16 @@
 			}
 			if(compressionMethod == 8){
 				// deflate
-				NSMutableData *manifestData = [NSData dataWithBytes:(rawData + fileDataOffset) length:compressedLength];
-				NSString *manifest = [[NSString alloc] initWithData:[manifestData JCIzk_inflate] encoding:NSUTF8StringEncoding];
+				NSMutableData *manifestData = [NSMutableData dataWithLength:uncompressedLength];
+				[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedLength] toData:manifestData];
+				NSString *manifest = [[NSString alloc] initWithData:manifestData encoding:NSUTF8StringEncoding];
 				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				[manifest release];
 				for(NSString *line in lines){
 					NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
 					if(versionRange.location != NSNotFound){
 						return [line substringFromIndex:versionRange.location];
+						
 					}
 				}
 			}else{
@@ -104,6 +115,36 @@
 		headerSignatureRange = [self.fileData rangeOfData:headerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
 	}
 	return nil;
+}
+
+-(void)inflate:(NSData *)input toData:(NSMutableData *)output{
+	z_stream stream;
+	stream.zalloc = Z_NULL;
+	stream.zfree = Z_NULL;
+	stream.opaque = Z_NULL;
+	stream.avail_in = Z_NULL;
+	stream.avail_out = Z_NULL;
+	
+	int err = inflateInit(&stream);
+	if(err != Z_OK){
+		NSLog(@"Error initializing infation");
+		return;
+	}
+	// Set source and destination
+	stream.avail_in = (uInt)[input length];
+	stream.next_in = (Bytef *)[input bytes];
+	stream.avail_out = (uInt)[output length];
+	stream.next_out = (Bytef *)[output mutableBytes];
+	// Inflate
+	err = inflate(&stream, Z_FINISH);
+	switch (err) {
+		case Z_NEED_DICT:
+			err = Z_DATA_ERROR;
+		case Z_DATA_ERROR:
+		case Z_MEM_ERROR:
+			inflateEnd(&stream);
+			NSLog(@"Error inflating (%d)", err);
+	}
 }
 
 @end
