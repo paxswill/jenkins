@@ -11,14 +11,8 @@
 
 #import "JCIZipFile.h"
 #import <stdint.h>
-#import <fcntl.h>
-#import <sys/stat.h>
-#import <sys/mman.h>
+#import <string.h>
 #import <zlib.h>
-
-
-void * debugAlloc(void *opaque, uInt items, uInt size);
-void debugFree(void *opaque, void *address);
 
 @interface JCIZipFile()
 -(void)inflate:(NSData *)input toData:(NSMutableData *)output;
@@ -64,75 +58,103 @@ void debugFree(void *opaque, void *address);
 }
 
 -(NSString *)jarVersion{
-	// This is more than a little naive, but /shouldn't/ take too much time, as the manifest should be the first file
-	uint32_t headerSignature = CFSwapInt32LittleToHost(0x04034b50);
-	NSData *headerSignatureData = [NSData dataWithBytes:&headerSignature length:4];
-	NSRange headerSignatureRange = [self.fileData rangeOfData:headerSignatureData options:0 range:NSMakeRange(0, [self.fileData length])];
 	const uint8_t *rawData = [self.fileData bytes];
-	NSUInteger dataLength = [self.fileData length];
-	while(headerSignatureRange.location != NSNotFound){
-		NSUInteger signatureOffset = headerSignatureRange.location;
-		uint16_t fileNameLength = (uint16_t)(*(rawData + signatureOffset + 26));
-		uint16_t extraLength = (uint16_t)(*(rawData + signatureOffset + 28));
-		NSString *fileName = [[NSString alloc] initWithBytes:(rawData + signatureOffset + 30) length:fileNameLength encoding:NSUTF8StringEncoding];
-		if([fileName rangeOfString:@"META-INF/MANIFEST.MF"].location != NSNotFound){
-			uint16_t flag = (uint16_t)(*(rawData + signatureOffset + 6));
-			uint16_t compressionMethod = (uint16_t)(*(rawData + signatureOffset + 8));
-			NSUInteger fileDataOffset = signatureOffset + 30 + fileNameLength + extraLength;
-			uint32_t originalCRC;
-			uint32_t compressedLength;
-			uint32_t uncompressedLength;
-			if(flag & 0x8){
-				// file size in footer
-				uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
-				NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
-				NSRange footerRange = [self.fileData rangeOfData:footerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
-				if(footerRange.location != NSNotFound){
-					originalCRC = (uint32_t)(*(rawData + footerRange.location + 4));
-					compressedLength = (uint32_t)(*(rawData + footerRange.location + 8));
-					uncompressedLength = (uint32_t)(*(rawData + footerRange.location + 12));
-				}else{
-					NSLog(@"Problem finding end of file");
-					return nil;
-				}
-			}else{
-				originalCRC = (uint32_t)(*(rawData + signatureOffset + 14));
-				compressedLength = (uint32_t)(*(rawData + signatureOffset + 18));
-				uncompressedLength = (uint32_t)(*(rawData + signatureOffset + 22));
-			}
-			if(compressionMethod == 8){
-				// deflate
-				NSMutableData *manifestData = [NSMutableData dataWithLength:uncompressedLength + uncompressedLength / 2];
-				[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedLength] toData:manifestData];
-				// Pull the version out
-				NSString *manifest = [[NSString alloc] initWithData:manifestData encoding:NSUTF8StringEncoding];
-				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-				[manifest release];
-				for(NSString *line in lines){
-					NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
-					if(versionRange.location != NSNotFound){
-						return [line substringFromIndex:versionRange.length];
-					}
-				}
-			}else{
-				NSLog(@"Unsupported compression algorithm (%d)", compressionMethod);
-			}
+	// Magic signatures
+	uint32_t directoryListingSignature = CFSwapInt32LittleToHost(0x02014b50);
+	uint32_t directoryListingEndSignature = CFSwapInt32LittleToHost(0x06054b50);
+	NSData *directoryListingEndSignatureData = [NSData dataWithBytes:&directoryListingEndSignature length:4];
+	uint32_t headerSignature = CFSwapInt32LittleToHost(0x04034b50);
+	uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
+	NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
+	// Look through the directory for our file
+	NSUInteger directoryEndOffset = [self.fileData rangeOfData:directoryListingEndSignatureData options:NSBackwardsSearch range:NSMakeRange(0, [self.fileData length])].location;
+	if(directoryEndOffset == NSNotFound){
+		NSLog(@"Directory ending not found");
+		return nil;
+	}
+	// Assume only one "disk"
+	uint32_t directoryOffset = (uint32_t)(*(rawData + directoryEndOffset + 16));
+	uint16_t numRecords = (uint16_t)(*(rawData + directoryEndOffset + 10));
+	uint32_t recordOffset = directoryOffset;
+	BOOL found = NO;
+	for(int i = 0; i < numRecords; ++i){
+		// Check that this is a directory record
+		uint32_t checkRecordSignature = (uint32_t)(*(rawData + recordOffset + 16));
+		if(checkRecordSignature != directoryListingSignature){
+			NSLog(@"Directory listing mismatch, aborting");
+			return nil;
 		}
-		signatureOffset += 4;
-		headerSignatureRange = [self.fileData rangeOfData:headerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
+		// Get variable lengths
+		uint16_t nameLength = (uint16_t)(*(rawData + recordOffset + 28));
+		uint16_t extraLength = (uint16_t)(*(rawData + recordOffset + 30));
+		uint16_t commentLength = (uint16_t)(*(rawData + recordOffset + 32));
+		// Look for "META-INF/MANIFEST.MF"
+		if(nameLength == 20 && strncmp("META-INF/MANIFEST.MF", (const char *)(rawData + recordOffset + 46), nameLength)){
+			found = YES;
+			break;
+		}
+		// Increment the record offset
+		recordOffset += 46 + nameLength + extraLength + commentLength;
+	}
+	if(!found){
+		NSLog(@"Manifest not found");
+		return nil;
+	}
+	uint32_t directoryReferenceCRC = (uint32_t)(*(rawData + recordOffset + 16));
+	uint16_t compressionMethod = (uint16_t)(*(rawData + recordOffset + 10));
+	uint32_t compressedSize = (uint32_t)(*(rawData + recordOffset + 20));
+	uint32_t uncompressedSize = (uint32_t)(*(rawData + recordOffset + 24));
+	uint32_t localHeaderOffset = (uint32_t)(*(rawData + recordOffset + 42));
+	// Go to the file and start reading it
+	uint32_t checkLocalSignature = (uint32_t)(*(rawData + localHeaderOffset));
+	if(checkLocalSignature != headerSignature){
+		NSLog(@"Local Header signature does not match");
+		return nil;
+	}
+	uint16_t nameLength = (uint16_t)(*(rawData + localHeaderOffset + 26));
+	uint16_t extraLength = (uint16_t)(*(rawData + localHeaderOffset + 28));
+	uint32_t fileDataOffset = localHeaderOffset + 30 + nameLength + extraLength;
+	// Decompress
+	NSData *manifestData;
+	if(compressionMethod == 0){
+		// No Compression
+		manifestData = [NSData dataWithBytes:(rawData + fileDataOffset) length:compressedSize];
+	}else if(compressionMethod == 8){
+		// DEFLATE
+		manifestData = [NSMutableData dataWithLength:uncompressedSize];
+		[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedSize] toData:(NSMutableData *)manifestData];
+	}else{
+		NSLog(@"Unsupported compression algorithm (%d)", compressionMethod);
+	}
+	// Check CRC
+	uint32_t checkCRC = (uint32_t)crc32(0L, Z_NULL, 0);
+	checkCRC = (uint32_t)crc32(checkCRC, [manifestData bytes], (uInt)[manifestData length]);
+	if(checkCRC != directoryReferenceCRC){
+		NSLog(@"CRC mismatch");
+		return nil;
+	}
+	// Find the version
+	NSString *manifest = [[NSString alloc] initWithData:manifestData encoding:NSUTF8StringEncoding];
+	NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+	[manifest release];
+	for(NSString *line in lines){
+		NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
+		if(versionRange.location != NSNotFound){
+			return [line substringFromIndex:versionRange.length];
+		}
 	}
 	return nil;
 }
 
 -(void)inflate:(NSData *)input toData:(NSMutableData *)output{
 	z_stream stream;
-	stream.zalloc = debugAlloc;
-	stream.zfree = debugFree;
+	stream.zalloc = Z_NULL;
+	stream.zfree = Z_NULL;
 	stream.opaque = Z_NULL;
 	
 	// Set source and destination
 	stream.avail_in = (uInt)[input length];
-	stream.next_in = [input bytes];
+	stream.next_in = (Bytef *)[input bytes];
 	stream.avail_out = (uInt)[output length];
 	stream.next_out = [output mutableBytes];
 	
@@ -148,7 +170,7 @@ void debugFree(void *opaque, void *address);
         switch (err) {
             case Z_BUF_ERROR:
             {
-                uInt growSize = [output length] / 2;
+                uInt growSize = (uInt)[output length] / 2;
                 [output increaseLengthBy:(growSize)];
                 stream.avail_out = growSize;
                 stream.next_out = (uint8_t *)[output mutableBytes] + growSize;
@@ -169,21 +191,4 @@ void debugFree(void *opaque, void *address);
 }
 
 @end
-
-void * debugAlloc(void *opaque, uInt items, uInt size){
-	void *mem = malloc(items * size);
-	if(!mem){
-		NSLog(@"Error allocating memory for zlib");
-		return Z_NULL;
-	}else{
-		return mem;
-	}
-}
-
-void debugFree(void *opaque, void *address){
-	free(address);
-}
-
-
-
 
