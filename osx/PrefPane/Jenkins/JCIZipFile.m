@@ -16,6 +16,10 @@
 #import <sys/mman.h>
 #import <zlib.h>
 
+
+void * debugAlloc(void *opaque, uInt items, uInt size);
+void debugFree(void *opaque, void *address);
+
 @interface JCIZipFile()
 -(void)inflate:(NSData *)input toData:(NSMutableData *)output;
 @end
@@ -75,28 +79,38 @@
 			uint16_t flag = (uint16_t)(*(rawData + signatureOffset + 6));
 			uint16_t compressionMethod = (uint16_t)(*(rawData + signatureOffset + 8));
 			NSUInteger fileDataOffset = signatureOffset + 30 + fileNameLength + extraLength;
-			NSUInteger compressedLength;
-			NSUInteger uncompressedLength;
+			uint32_t originalCRC;
+			uint32_t compressedLength;
+			uint32_t uncompressedLength;
 			if(flag & 0x8){
 				// file size in footer
 				uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
 				NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
 				NSRange footerRange = [self.fileData rangeOfData:footerSignatureData options:0 range:NSMakeRange(signatureOffset, dataLength - signatureOffset)];
 				if(footerRange.location != NSNotFound){
-					compressedLength = (NSUInteger)((uint32_t)(*(rawData + footerRange.location + 8)));
-					uncompressedLength = (NSUInteger)((uint32_t)(*(rawData + footerRange.location + 12)));
+					originalCRC = (uint32_t)(*(rawData + footerRange.location + 4));
+					compressedLength = (uint32_t)(*(rawData + footerRange.location + 8));
+					uncompressedLength = (uint32_t)(*(rawData + footerRange.location + 12));
 				}else{
 					NSLog(@"Problem finding end of file");
 					return nil;
 				}
 			}else{
-				compressedLength = (NSUInteger)((uint32_t)(*(rawData + signatureOffset + 18)));
-				uncompressedLength = (NSUInteger)((uint32_t)(*(rawData + signatureOffset + 22)));
+				originalCRC = (uint32_t)(*(rawData + signatureOffset + 14));
+				compressedLength = (uint32_t)(*(rawData + signatureOffset + 18));
+				uncompressedLength = (uint32_t)(*(rawData + signatureOffset + 22));
 			}
 			if(compressionMethod == 8){
 				// deflate
 				NSMutableData *manifestData = [NSMutableData dataWithLength:uncompressedLength];
 				[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedLength] toData:manifestData];
+				// Check the CRC
+				uint32_t computedCRC = (uint32_t)crc32(0L, Z_NULL, 0);
+				computedCRC = (uint32_t)crc32(computedCRC, [manifestData bytes], (uInt)[manifestData length]);
+				if(computedCRC != originalCRC){
+					NSLog(@"CRC's don't match, inflation failed");
+				}
+				// Pull the version out
 				NSString *manifest = [[NSString alloc] initWithData:manifestData encoding:NSUTF8StringEncoding];
 				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 				[manifest release];
@@ -104,7 +118,6 @@
 					NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
 					if(versionRange.location != NSNotFound){
 						return [line substringFromIndex:versionRange.location];
-						
 					}
 				}
 			}else{
@@ -119,22 +132,24 @@
 
 -(void)inflate:(NSData *)input toData:(NSMutableData *)output{
 	z_stream stream;
-	stream.zalloc = Z_NULL;
-	stream.zfree = Z_NULL;
+	stream.zalloc = debugAlloc;
+	stream.zfree = debugFree;
 	stream.opaque = Z_NULL;
 	stream.avail_in = Z_NULL;
 	stream.avail_out = Z_NULL;
 	
-	int err = inflateInit(&stream);
-	if(err != Z_OK){
-		NSLog(@"Error initializing infation");
-		return;
-	}
 	// Set source and destination
 	stream.avail_in = (uInt)[input length];
 	stream.next_in = (Bytef *)[input bytes];
 	stream.avail_out = (uInt)[output length];
 	stream.next_out = (Bytef *)[output mutableBytes];
+	
+	int err = inflateInit2(&stream, -MAX_WBITS);
+	if(err != Z_OK){
+		NSLog(@"Error initializing infation: %s", stream.msg);
+		return;
+	}
+	
 	// Inflate
 	err = inflate(&stream, Z_FINISH);
 	switch (err) {
@@ -143,11 +158,26 @@
 		case Z_DATA_ERROR:
 		case Z_MEM_ERROR:
 			inflateEnd(&stream);
-			NSLog(@"Error inflating (%d)", err);
+			NSLog(@"Error inflating: %s (%d)", stream.msg, err);
 	}
 }
 
 @end
+
+void * debugAlloc(void *opaque, uInt items, uInt size){
+	void *mem = malloc(items * size);
+	if(!mem){
+		NSLog(@"Error allocating memory for zlib");
+		return Z_NULL;
+	}else{
+		return mem;
+	}
+}
+
+void debugFree(void *opaque, void *address){
+	free(address);
+}
+
 
 
 
