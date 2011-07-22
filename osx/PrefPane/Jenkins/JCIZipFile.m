@@ -102,22 +102,16 @@ void debugFree(void *opaque, void *address);
 			}
 			if(compressionMethod == 8){
 				// deflate
-				NSMutableData *manifestData = [NSMutableData dataWithLength:uncompressedLength];
+				NSMutableData *manifestData = [NSMutableData dataWithLength:uncompressedLength + uncompressedLength / 2];
 				[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedLength] toData:manifestData];
-				// Check the CRC
-				uint32_t computedCRC = (uint32_t)crc32(0L, Z_NULL, 0);
-				computedCRC = (uint32_t)crc32(computedCRC, [manifestData bytes], (uInt)[manifestData length]);
-				if(computedCRC != originalCRC){
-					NSLog(@"CRC's don't match, inflation failed");
-				}
 				// Pull the version out
 				NSString *manifest = [[NSString alloc] initWithData:manifestData encoding:NSUTF8StringEncoding];
-				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+				NSArray *lines = [manifest componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 				[manifest release];
 				for(NSString *line in lines){
 					NSRange versionRange = [line rangeOfString:@"Implementation-Version: "];
 					if(versionRange.location != NSNotFound){
-						return [line substringFromIndex:versionRange.location];
+						return [line substringFromIndex:versionRange.length];
 					}
 				}
 			}else{
