@@ -39,7 +39,7 @@ void debugFree(void *opaque, void *address);
 		Gestalt(gestaltSystemVersionMinor, &minorVersion);
 		NSDataReadingOptions readOptions = 0;
 		if(majorVersion >= 10 && minorVersion >= 7){
-// This is here so I can continue working on my dev machine (on 10.6) while partially adding support for 10.7
+            // This is here so I can continue working on my dev machine (on 10.6) while partially adding support for 10.7
 #ifdef MAC_OS_X_VERSION_10_7
 			readOptions |= NSDataReadingMappedIfSafe;
 #endif
@@ -135,14 +135,12 @@ void debugFree(void *opaque, void *address);
 	stream.zalloc = debugAlloc;
 	stream.zfree = debugFree;
 	stream.opaque = Z_NULL;
-	stream.avail_in = Z_NULL;
-	stream.avail_out = Z_NULL;
 	
 	// Set source and destination
 	stream.avail_in = (uInt)[input length];
-	stream.next_in = (Bytef *)[input bytes];
+	stream.next_in = [input bytes];
 	stream.avail_out = (uInt)[output length];
-	stream.next_out = (Bytef *)[output mutableBytes];
+	stream.next_out = [output mutableBytes];
 	
 	int err = inflateInit2(&stream, -MAX_WBITS);
 	if(err != Z_OK){
@@ -151,15 +149,27 @@ void debugFree(void *opaque, void *address);
 	}
 	
 	// Inflate
-	err = inflate(&stream, Z_FINISH);
-	switch (err) {
-		case Z_NEED_DICT:
-			err = Z_DATA_ERROR;
-		case Z_DATA_ERROR:
-		case Z_MEM_ERROR:
-			inflateEnd(&stream);
-			NSLog(@"Error inflating: %s (%d)", stream.msg, err);
-	}
+    do{
+        err = inflate(&stream, Z_FINISH);
+        switch (err) {
+            case Z_BUF_ERROR:
+            {
+                uInt growSize = [output length] / 2;
+                [output increaseLengthBy:(growSize)];
+                stream.avail_out = growSize;
+                stream.next_out = (uint8_t *)[output mutableBytes] + growSize;
+                err = Z_OK;
+                break;   
+            }
+            case Z_NEED_DICT:
+                err = Z_DATA_ERROR;
+            case Z_DATA_ERROR:
+            case Z_MEM_ERROR:
+                inflateEnd(&stream);
+                NSLog(@"Error inflating: %s (%d)", stream.msg, err);
+                return;
+        }
+    }while(err != Z_STREAM_END);
 }
 
 @end
