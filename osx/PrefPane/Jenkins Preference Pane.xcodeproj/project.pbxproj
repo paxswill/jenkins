@@ -261,6 +261,7 @@
 		24FEDBE513CB565500C6EEFF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastUpgradeCheck = 0420;
 				ORGANIZATIONNAME = "Will Ross";
 			};
 			buildConfigurationList = 24FEDBE813CB565500C6EEFF /* Build configuration list for PBXProject "Jenkins Preference Pane" */;
