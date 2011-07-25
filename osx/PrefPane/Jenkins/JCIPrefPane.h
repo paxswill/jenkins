@@ -36,7 +36,7 @@
 
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
-@property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
+@property (nonatomic, readwrite, assign) IBOutlet NSButton *autostartCheckBox;
 @property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
 @property (nonatomic, readwrite, assign) IBOutlet DKActionButton *actionButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSTableView *tableView;

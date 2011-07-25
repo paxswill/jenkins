@@ -38,7 +38,7 @@ static const JCIComboSource *environmentVariableSource;
 
 @synthesize startButton;
 @synthesize updateButton;
-@synthesize autostart;
+@synthesize autostartCheckBox;
 @synthesize authorizationView;
 @synthesize actionButton;
 @synthesize tableView;
@@ -167,9 +167,9 @@ static const JCIComboSource *environmentVariableSource;
 	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
 	// Set autostart checkbox
 	if(![self.plist.disabled boolValue] && [self.plist.runAtLoad boolValue]){
-		[self.autostart setState:NSOnState];
+		[self.autostartCheckBox setState:NSOnState];
 	}else{
-		[self.autostart setState:NSOffState];
+		[self.autostartCheckBox setState:NSOffState];
 	}
 }
 
