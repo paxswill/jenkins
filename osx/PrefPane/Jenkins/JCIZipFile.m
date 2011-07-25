@@ -58,14 +58,11 @@
 }
 
 -(NSString *)jarVersion{
-	const uint8_t *rawData = [self.fileData bytes];
 	// Magic signatures
 	uint32_t directoryListingSignature = CFSwapInt32LittleToHost(0x02014b50);
 	uint32_t directoryListingEndSignature = CFSwapInt32LittleToHost(0x06054b50);
 	NSData *directoryListingEndSignatureData = [NSData dataWithBytes:&directoryListingEndSignature length:4];
 	uint32_t headerSignature = CFSwapInt32LittleToHost(0x04034b50);
-	uint32_t footerSignature = CFSwapInt32LittleToHost(0x08074b50);
-	NSData *footerSignatureData = [NSData dataWithBytes:&footerSignature length:4];
 	// Look through the directory for our file
 	NSUInteger directoryEndOffset = [self.fileData rangeOfData:directoryListingEndSignatureData options:NSBackwardsSearch range:NSMakeRange(0, [self.fileData length])].location;
 	if(directoryEndOffset == NSNotFound){
@@ -73,23 +70,29 @@
 		return nil;
 	}
 	// Assume only one "disk"
-	uint32_t directoryOffset = *((uint32_t *)(rawData + directoryEndOffset + 16));
-	uint16_t numRecords = *((uint16_t *)(rawData + directoryEndOffset + 10));
+	uint32_t directoryOffset;
+	[self.fileData getBytes:&directoryOffset range:NSMakeRange(directoryEndOffset + 16, 4)];
+	uint16_t numRecords;
+	[self.fileData getBytes:&numRecords range:NSMakeRange(directoryEndOffset + 10, 2)];
 	uint32_t recordOffset = directoryOffset;
 	BOOL found = NO;
 	for(int i = 0; i < numRecords; ++i){
 		// Check that this is a directory record
-		uint32_t checkRecordSignature = *((uint32_t *)(rawData + recordOffset + 16));
+		uint32_t checkRecordSignature;
+		[self.fileData getBytes:&checkRecordSignature range:NSMakeRange(recordOffset + 16, 4)];
 		if(checkRecordSignature != directoryListingSignature){
 			NSLog(@"Directory listing mismatch, aborting");
 			return nil;
 		}
 		// Get variable lengths
-		uint16_t nameLength = *((uint16_t *)(rawData + recordOffset + 28));
-		uint16_t extraLength = *((uint16_t *)(rawData + recordOffset + 30));
-		uint16_t commentLength = *((uint16_t *)(rawData + recordOffset + 32));
+		uint16_t nameLength;
+		[self.fileData getBytes:&nameLength range:NSMakeRange(recordOffset + 28, 2)];
+		uint16_t extraLength;
+		[self.fileData getBytes:&extraLength range:NSMakeRange(recordOffset + 30, 2)];
+		uint16_t commentLength;
+		[self.fileData getBytes:&commentLength range:NSMakeRange(recordOffset + 32, 2)];
 		// Look for "META-INF/MANIFEST.MF"
-		if(nameLength == 20 && strncmp("META-INF/MANIFEST.MF", (const char *)(rawData + recordOffset + 46), nameLength)){
+		if(nameLength == 20 && strncmp("META-INF/MANIFEST.MF", (const char *)((uint8_t *)[self.fileData bytes] + recordOffset + 46), nameLength)){
 			found = YES;
 			break;
 		}
@@ -100,29 +103,37 @@
 		NSLog(@"Manifest not found");
 		return nil;
 	}
-	uint32_t directoryReferenceCRC = *((uint32_t *)(rawData + recordOffset + 16));
-	uint16_t compressionMethod = *((uint16_t *)(rawData + recordOffset + 10));
-	uint32_t compressedSize = *((uint32_t *)(rawData + recordOffset + 20));
-	uint32_t uncompressedSize = *((uint32_t *)(rawData + recordOffset + 24));
-	uint32_t localHeaderOffset = *((uint32_t *)(rawData + recordOffset + 42));
+	uint32_t directoryReferenceCRC;
+	[self.fileData getBytes:&directoryReferenceCRC range:NSMakeRange(recordOffset + 16, 4)];
+	uint16_t compressionMethod;
+	[self.fileData getBytes:&compressionMethod range:NSMakeRange(recordOffset + 10, 2)];
+	uint32_t compressedSize;
+	[self.fileData getBytes:&compressedSize range:NSMakeRange(recordOffset + 20, 4)];
+	uint32_t uncompressedSize;
+	[self.fileData getBytes:&uncompressedSize range:NSMakeRange(recordOffset + 24, 4)];
+	uint32_t localHeaderOffset;
+	[self.fileData getBytes:&localHeaderOffset range:NSMakeRange(recordOffset + 42, 4)];
 	// Go to the file and start reading it
-	uint32_t checkLocalSignature = (uint32_t)(*(rawData + localHeaderOffset));
+	uint32_t checkLocalSignature;
+	[self.fileData getBytes:&checkLocalSignature range:NSMakeRange(localHeaderOffset, 4)];
 	if(checkLocalSignature != headerSignature){
 		NSLog(@"Local Header signature does not match");
 		return nil;
 	}
-	uint16_t nameLength = *((uint16_t *)(rawData + localHeaderOffset + 26));
-	uint16_t extraLength = *((uint16_t *)(rawData + localHeaderOffset + 28));
+	uint16_t nameLength;
+	[self.fileData getBytes:&nameLength range:NSMakeRange(localHeaderOffset + 26, 2)];
+	uint16_t extraLength;
+	[self.fileData getBytes:&extraLength range:NSMakeRange(localHeaderOffset + 28, 2)];
 	uint32_t fileDataOffset = localHeaderOffset + 30 + nameLength + extraLength;
 	// Decompress
 	NSData *manifestData;
 	if(compressionMethod == 0){
 		// No Compression
-		manifestData = [NSData dataWithBytes:(rawData + fileDataOffset) length:compressedSize];
+		manifestData = [self.fileData subdataWithRange:NSMakeRange(fileDataOffset, compressedSize)];
 	}else if(compressionMethod == 8){
 		// DEFLATE
 		manifestData = [NSMutableData dataWithLength:uncompressedSize];
-		[self inflate:[NSData dataWithBytes:(rawData + fileDataOffset) length:compressedSize] toData:(NSMutableData *)manifestData];
+		[self inflate:[self.fileData subdataWithRange:NSMakeRange(fileDataOffset, compressedSize)] toData:(NSMutableData *)manifestData];
 	}else{
 		NSLog(@"Unsupported compression algorithm (%d)", compressionMethod);
 	}
