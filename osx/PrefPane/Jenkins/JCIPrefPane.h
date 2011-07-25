@@ -10,10 +10,9 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "DKActionButton.h"
 #import "JCILaunchdPlist.h"
-#import "SBJsonStreamParserAdapter.h"
 #import "ASIHTTPRequestDelegate.h"
 
-@interface JCIPrefPane : NSPreferencePane<SBJsonStreamParserAdapterDelegate, ASIHTTPRequestDelegate>{
+@interface JCIPrefPane : NSPreferencePane<ASIHTTPRequestDelegate>{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
 	NSString *jenkinsVersion;
@@ -30,9 +29,6 @@
 	int environmentHeaderIndex;
 	int javaHeaderIndex;
 	int jenkinsHeaderIndex;
-	
-	SBJsonStreamParser *jsonParser;
-	SBJsonStreamParserAdapter *jsonAdapter;
 }
 @property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
@@ -53,5 +49,4 @@
 - (BOOL)isUnlocked;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
-
 @end

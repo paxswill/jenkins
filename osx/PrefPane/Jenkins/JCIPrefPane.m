@@ -10,7 +10,7 @@
 #import <objc/runtime.h>
 #import "JCIComboSource.h"
 #import "ASIHTTPRequest.h"
-#import "SBJson.h"
+#import "NSObject+SBJson.h"
 #import "JCIZipFile.h"
 
 static const NSSet *javaOptions;
@@ -116,7 +116,6 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 - (void)dealloc {
-	[jsonParser release];
     self.plist = nil;
 	self.environmentVariables = nil;
 	self.javaArgs = nil;
@@ -156,10 +155,6 @@ static const JCIComboSource *environmentVariableSource;
 	self.jenkinsVersion = [warFile jarVersion];
 	[warFile release];
 	// Set up for updating
-	jsonAdapter = [[SBJsonStreamParserAdapter alloc] init];
-	jsonAdapter.delegate = self;
-	jsonParser = [[SBJsonStreamParser alloc] init];
-	jsonParser.delegate = jsonAdapter;
 	ASIHTTPRequest *updatesRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/updates/update-center.json"]];
 	updatesRequest.delegate = self;
 	[updatesRequest startAsynchronous];
@@ -522,25 +517,20 @@ static const JCIComboSource *environmentVariableSource;
 	self.updateButton.title = [[self bundle] localizedStringForKey:@"Checking For Jenkins Update" value:@"Checking" table:nil];
 }
 
-- (void)request:(ASIHTTPRequest *)request didReceiveData:(NSData *)data{
-	[jsonParser parse:data];
-}
-
-#pragma mark - SBJsonStreamParserAdapterDelegate
-
--(void)parser:(SBJsonStreamParser *)parser foundObject:(NSDictionary *)object{
-	if([[object valueForKey:@"name"] isEqualToString:@"core"]){
-		float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
-		if([[object valueForKey:@"version"] floatValue] > currentVersion){
-			self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
-		}else{
-			self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
-		}
-	}
-}
-
-- (void)parser:(SBJsonStreamParser*)parser foundArray:(NSArray*)array{
-	// Do nothing
+-(void)requestFinished:(ASIHTTPRequest *)request{
+    // Trim "updateCenter.post(" and the trailing ")" out
+    NSString *trimmed = [request.responseString substringWithRange:NSMakeRange(18, [request.responseString length] - 21)];
+    NSDictionary *json = [trimmed JSONValue];
+    for(NSDictionary *object in json){
+        if([[object valueForKey:@"name"] isEqualToString:@"core"]){
+            float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
+            if([[object valueForKey:@"version"] floatValue] > currentVersion){
+                self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
+            }else{
+                self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
+            }
+        }
+    }
 }
 
 @end
