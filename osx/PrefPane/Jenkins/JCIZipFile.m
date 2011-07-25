@@ -79,7 +79,7 @@
 	for(int i = 0; i < numRecords; ++i){
 		// Check that this is a directory record
 		uint32_t checkRecordSignature;
-		[self.fileData getBytes:&checkRecordSignature range:NSMakeRange(recordOffset + 16, 4)];
+		[self.fileData getBytes:&checkRecordSignature range:NSMakeRange(recordOffset, 4)];
 		if(checkRecordSignature != directoryListingSignature){
 			NSLog(@"Directory listing mismatch, aborting");
 			return nil;
