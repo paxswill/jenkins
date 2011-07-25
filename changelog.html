@@ -55,9 +55,28 @@ Upcoming changes</a>
 <!-- Record your changes in the trunk here. -->
 <div id="trunk" style="display:none"><!--=TRUNK-BEGIN=-->
 <ul class=image>
+  <li class=bug>
+    Fixed Maven build error if headless option is set and MAVEN_OPTS empty
+    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10375">issue 10375</a>)
+  <li class=bug>
+    Tests not recognized as failed if test initialization failed
+    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-6700">issue 6700</a>)
   <li class=rfe>
-    Support for gziped log in consoleText
+    Support for gzipped log in consoleText
     (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10400">issue 10400</a>)
+  <li class=rfe>
+    Expand variables in the Maven POM definition in Maven projects.
+    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-5885">issue 5885</a>)
+  <li class=bug>
+    Some CLI command are not available.
+    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10418">issue 10418</a>)
+</ul>
+</div><!--=TRUNK-END=-->
+
+<!-- these changes are controlled by the release process. DO NOT MODIFY -->
+<div id="rc" style="display:none;"><!--=BEGIN=-->
+<h3><a name=v1.422>What's new in 1.422</a> <!--=DATE=--></h3>
+<ul class=image>
   <li class=bug>
     When run as "java -jar jenkins.war", failing to listen on HTTP ports should be fatal.
   <li class=bug>
@@ -66,16 +85,7 @@ Upcoming changes</a>
   <li class=bug>
     Fixed an occasional NPE when running Maven jobs 
     (<a href="https://issues.jenkins-ci.org/browse/JENKINS-9822">issue 9822</a>)
-  <li class=bug>
-    Fixed Maven build error if headless option is set and MAVEN_OPTS empty
-    (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10375">issue 10375</a>)
 </ul>
-</div><!--=TRUNK-END=-->
-
-<!-- these changes are controlled by the release process. DO NOT MODIFY -->
-<div id="rc" style="display:none;"><!--=BEGIN=-->
-<h3><a name=v1.422>What's new in 1.422</a> <!--=DATE=--></h3>
-<!--=RC-CHANGES=-->
 </div><!--=END=-->
 <h3><a name=v1.421>What's new in 1.421</a> (2011/07/17)</h3>
 <ul class=image>
@@ -96,6 +106,8 @@ Upcoming changes</a>
   <li class=bug>
     Label Alignment does not correctly work for top-level entries that span several lines
     (<a href="https://issues.jenkins-ci.org/browse/JENKINS-10253">issue 10253</a>)
+  <li class=bug>
+    Fixed a bug in Groovy view taglib rendering for "/lib/hudson"
   <li class=rfe>
     PAM authentication now works with CLI login mechanism.
     (<a href="https://issues.jenkins-ci.org/browse/JENKINS-9681">issue 9681</a>)
@@ -234,10 +246,13 @@ Upcoming changes</a>
     Make captcha support optional; remove LGPL jcaptcha
     (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9915">issue 9915</a>)
   <li class=bug>
-  	Validate new view name relative to current context
+    Validate new view name relative to current context
   <li class=bug>
     Unfilled custom workspace textbox shouldn't be allowed.
     (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9806">issue 9806</a>)
+  <li class=bug>
+    Fixed a race condition between remoting I/O operations.
+    (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9189">issue 9189</a>)
   <li class=bug>
     Fixed a bug in LDAP group search based on memberUid
     (<a href="https://github.com/jenkinsci/jenkins/pull/151">pull request #151</a>)
@@ -256,12 +271,14 @@ Upcoming changes</a>
     Label/node tree is not visible in multi-configuration project config page
     (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9689">issue 9689</a>)
   <li class=rfe>
-    <tt>LDAPBindSecurityRealm.groovy</tt> can be now overridden in <tt>$JENKINS_HOME</tt> if it exists.
+    <tt>LDAPBindSecurityRealm.groovy</tt> can be now overridden in <tt>$JENKINS_HOME</tt>
+    if it exists.
   <li class=rfe>
     AJP port is customizable in RPM/OpenSUSE packages
     (<a href="https://github.com/jenkinsci/jenkins/pull/149">pull request #149</a>)
   <li class=rfe>
-    "Deploy to Maven repository" post build task should default to unique version, as per Maven3 default.
+    "Deploy to Maven repository" post build task should default to unique version,
+    as per Maven3 default.
     (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9807">issue 9807</a>)
   <li class=rfe>
     Improved the URL hyperlinking behavior in the console output
@@ -349,8 +366,8 @@ Upcoming changes</a>
 <h3><a name=v1.413>What's new in 1.413</a> (2011/05/22)</h3>
 <ul class=image>
   <li class=bug>
-	Fixed extra ' character in french translation.
-	(<a href="http://issues.jenkins-ci.org/browse/JENKINS-9197">issue 9197</a>)
+    Fixed extra ' character in french translation.
+    (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9197">issue 9197</a>)
   <li class=bug>
     "Downgrade Jenkins" incorrectly shows 1.395
     (<a href="http://issues.jenkins-ci.org/browse/JENKINS-9656">issue 9656</a>)
