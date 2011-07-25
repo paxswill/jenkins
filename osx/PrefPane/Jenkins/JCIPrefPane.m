@@ -521,16 +521,13 @@ static const JCIComboSource *environmentVariableSource;
     // Trim "updateCenter.post(" and the trailing ")" out
     NSString *trimmed = [request.responseString substringWithRange:NSMakeRange(18, [request.responseString length] - 21)];
     NSDictionary *json = [trimmed JSONValue];
-    for(NSDictionary *object in json){
-        if([[object valueForKey:@"name"] isEqualToString:@"core"]){
-            float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
-            if([[object valueForKey:@"version"] floatValue] > currentVersion){
-                self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
-            }else{
-                self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
-            }
-        }
-    }
+	float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
+	NSDictionary *core = [json objectForKey:@"core"];
+	if([[core valueForKey:@"version"] floatValue] > currentVersion){
+		self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
+	}else{
+		self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
+	}
 }
 
 @end
