@@ -73,21 +73,21 @@
 		return nil;
 	}
 	// Assume only one "disk"
-	uint32_t directoryOffset = (uint32_t)(*(rawData + directoryEndOffset + 16));
-	uint16_t numRecords = (uint16_t)(*(rawData + directoryEndOffset + 10));
+	uint32_t directoryOffset = *((uint32_t *)(rawData + directoryEndOffset + 16));
+	uint16_t numRecords = *((uint16_t *)(rawData + directoryEndOffset + 10));
 	uint32_t recordOffset = directoryOffset;
 	BOOL found = NO;
 	for(int i = 0; i < numRecords; ++i){
 		// Check that this is a directory record
-		uint32_t checkRecordSignature = (uint32_t)(*(rawData + recordOffset + 16));
+		uint32_t checkRecordSignature = *((uint32_t *)(rawData + recordOffset + 16));
 		if(checkRecordSignature != directoryListingSignature){
 			NSLog(@"Directory listing mismatch, aborting");
 			return nil;
 		}
 		// Get variable lengths
-		uint16_t nameLength = (uint16_t)(*(rawData + recordOffset + 28));
-		uint16_t extraLength = (uint16_t)(*(rawData + recordOffset + 30));
-		uint16_t commentLength = (uint16_t)(*(rawData + recordOffset + 32));
+		uint16_t nameLength = *((uint16_t *)(rawData + recordOffset + 28));
+		uint16_t extraLength = *((uint16_t *)(rawData + recordOffset + 30));
+		uint16_t commentLength = *((uint16_t *)(rawData + recordOffset + 32));
 		// Look for "META-INF/MANIFEST.MF"
 		if(nameLength == 20 && strncmp("META-INF/MANIFEST.MF", (const char *)(rawData + recordOffset + 46), nameLength)){
 			found = YES;
@@ -100,19 +100,19 @@
 		NSLog(@"Manifest not found");
 		return nil;
 	}
-	uint32_t directoryReferenceCRC = (uint32_t)(*(rawData + recordOffset + 16));
-	uint16_t compressionMethod = (uint16_t)(*(rawData + recordOffset + 10));
-	uint32_t compressedSize = (uint32_t)(*(rawData + recordOffset + 20));
-	uint32_t uncompressedSize = (uint32_t)(*(rawData + recordOffset + 24));
-	uint32_t localHeaderOffset = (uint32_t)(*(rawData + recordOffset + 42));
+	uint32_t directoryReferenceCRC = *((uint32_t *)(rawData + recordOffset + 16));
+	uint16_t compressionMethod = *((uint16_t *)(rawData + recordOffset + 10));
+	uint32_t compressedSize = *((uint32_t *)(rawData + recordOffset + 20));
+	uint32_t uncompressedSize = *((uint32_t *)(rawData + recordOffset + 24));
+	uint32_t localHeaderOffset = *((uint32_t *)(rawData + recordOffset + 42));
 	// Go to the file and start reading it
 	uint32_t checkLocalSignature = (uint32_t)(*(rawData + localHeaderOffset));
 	if(checkLocalSignature != headerSignature){
 		NSLog(@"Local Header signature does not match");
 		return nil;
 	}
-	uint16_t nameLength = (uint16_t)(*(rawData + localHeaderOffset + 26));
-	uint16_t extraLength = (uint16_t)(*(rawData + localHeaderOffset + 28));
+	uint16_t nameLength = *((uint16_t *)(rawData + localHeaderOffset + 26));
+	uint16_t extraLength = *((uint16_t *)(rawData + localHeaderOffset + 28));
 	uint32_t fileDataOffset = localHeaderOffset + 30 + nameLength + extraLength;
 	// Decompress
 	NSData *manifestData;
