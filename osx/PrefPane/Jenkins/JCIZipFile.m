@@ -92,9 +92,13 @@
 		uint16_t commentLength;
 		[self.fileData getBytes:&commentLength range:NSMakeRange(recordOffset + 32, 2)];
 		// Look for "META-INF/MANIFEST.MF"
-		if(nameLength == 20 && strncmp("META-INF/MANIFEST.MF", (const char *)((uint8_t *)[self.fileData bytes] + recordOffset + 46), nameLength)){
-			found = YES;
-			break;
+		if(nameLength == 20){
+			char * name = malloc(sizeof(char) * nameLength);
+			[self.fileData getBytes:name range:NSMakeRange(recordOffset + 46, nameLength)];
+			if(strncmp("META-INF/MANIFEST.MF", name, nameLength)){
+				found = YES;
+				break;
+			}
 		}
 		// Increment the record offset
 		recordOffset += 46 + nameLength + extraLength + commentLength;
