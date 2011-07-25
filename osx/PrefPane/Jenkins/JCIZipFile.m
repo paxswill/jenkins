@@ -95,7 +95,7 @@
 		if(nameLength == 20){
 			char * name = malloc(sizeof(char) * nameLength);
 			[self.fileData getBytes:name range:NSMakeRange(recordOffset + 46, nameLength)];
-			if(strncmp("META-INF/MANIFEST.MF", name, nameLength)){
+			if(strncmp("META-INF/MANIFEST.MF", name, nameLength) == 0){
 				found = YES;
 				break;
 			}
