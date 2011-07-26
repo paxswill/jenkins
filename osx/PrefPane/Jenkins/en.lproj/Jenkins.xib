@@ -138,8 +138,8 @@
 											</object>
 											<object class="NSButton" id="264718029">
 												<reference key="NSNextResponder" ref="185545690"/>
-												<int key="NSvFlags">268</int>
-												<string key="NSFrame">{{11, 201}, {135, 32}}</string>
+												<int key="NSvFlags">270</int>
+												<string key="NSFrame">{{11, 201}, {105, 32}}</string>
 												<reference key="NSSuperview" ref="185545690"/>
 												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="1055628607"/>
@@ -147,7 +147,7 @@
 												<object class="NSButtonCell" key="NSCell" id="557241788">
 													<int key="NSCellFlags">67239424</int>
 													<int key="NSCellFlags2">134217728</int>
-													<string key="NSContents">Update Jenkins</string>
+													<string key="NSContents">&lt;update&gt;</string>
 													<reference key="NSSupport" ref="333609977"/>
 													<reference key="NSControlView" ref="264718029"/>
 													<int key="NSButtonFlags">-2038284033</int>
@@ -627,7 +627,7 @@
 						<string key="label">enabled: uiEnabled</string>
 						<reference key="source" ref="264718029"/>
 						<reference key="destination" ref="294453543"/>
-						<object class="NSNibBindingConnector" key="connector">
+						<object class="NSNibBindingConnector" key="connector" id="940883843">
 							<reference key="NSSource" ref="264718029"/>
 							<reference key="NSDestination" ref="294453543"/>
 							<string key="NSLabel">enabled: uiEnabled</string>
@@ -810,6 +810,60 @@
 					</object>
 					<int key="connectionID">371</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">enabled2: updateAvailable</string>
+						<reference key="source" ref="264718029"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="264718029"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">enabled2: updateAvailable</string>
+							<string key="NSBinding">enabled2</string>
+							<string key="NSKeyPath">updateAvailable</string>
+							<object class="NSDictionary" key="NSOptions">
+								<bool key="EncodedWithXMLCoder">YES</bool>
+								<object class="NSArray" key="dict.sortedKeys">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>NSMultipleValuesPlaceholder</string>
+									<string>NSNoSelectionPlaceholder</string>
+									<string>NSNotApplicablePlaceholder</string>
+									<string>NSNullPlaceholder</string>
+								</object>
+								<object class="NSMutableArray" key="dict.values">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<integer value="-1"/>
+									<integer value="-1"/>
+									<integer value="-1"/>
+									<integer value="-1"/>
+								</object>
+							</object>
+							<reference key="NSPreviousConnector" ref="940883843"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">373</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">title: updateAvailable</string>
+						<reference key="source" ref="264718029"/>
+						<reference key="destination" ref="294453543"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="264718029"/>
+							<reference key="NSDestination" ref="294453543"/>
+							<string key="NSLabel">title: updateAvailable</string>
+							<string key="NSBinding">title</string>
+							<string key="NSKeyPath">updateAvailable</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSValueTransformerName</string>
+								<string key="NS.object.0">JCIUpdateAvailableTransformer</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">376</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -905,9 +959,9 @@
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="1066777037"/>
-							<reference ref="264718029"/>
 							<reference ref="1055628607"/>
 							<reference ref="669340817"/>
+							<reference ref="264718029"/>
 						</object>
 						<reference key="parent" ref="574402615"/>
 					</object>
@@ -1174,7 +1228,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">371</int>
+			<int key="maxID">376</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

@@ -33,6 +33,7 @@
 @property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
 @property (nonatomic, readwrite, assign) NSString *jenkinsVersion;
+@property (readwrite, assign) BOOL updateAvailable;
 
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;

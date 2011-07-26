@@ -35,6 +35,7 @@ static const JCIComboSource *environmentVariableSource;
 @synthesize plist;
 @synthesize uiEnabled;
 @synthesize jenkinsVersion;
+@synthesize updateAvailable;
 
 @synthesize startButton;
 @synthesize updateButton;
@@ -528,11 +529,7 @@ static const JCIComboSource *environmentVariableSource;
     NSDictionary *json = [trimmed JSONValue];
 	float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
 	NSDictionary *core = [json objectForKey:@"core"];
-	if([[core valueForKey:@"version"] floatValue] > currentVersion){
-		self.updateButton.title = [[self bundle] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
-	}else{
-		self.updateButton.title = [[self bundle] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
-	}
+	self.updateAvailable = [[core valueForKey:@"version"] floatValue] > currentVersion;
 }
 
 @end
