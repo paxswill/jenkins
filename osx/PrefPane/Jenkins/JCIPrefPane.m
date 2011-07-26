@@ -184,8 +184,15 @@ static const JCIComboSource *environmentVariableSource;
 			break;
 		}
 	}
+	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:warPath, @"warPath", nil];
+	NSString *tempPath = NSTemporaryDirectory();
+	tempPath = tempPath ? tempPath : @"/tmp";
+	char *tempName = "jenkins.war.XXXXX";
+	mkstemps(tempName, 5);
+	tempPath = [tempPath stringByAppendingPathExtension:[NSString stringWithUTF8String:tempName]];
 	ASIHTTPRequest *newJenkinsRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/war/latest/jenkins.war"]];
-	newJenkinsRequest.downloadDestinationPath = warPath;
+	newJenkinsRequest.downloadDestinationPath = tempPath;
+	newJenkinsRequest.userInfo = userInfo;
 	newJenkinsRequest.didStartSelector = @selector(updateRetrieveStarted:);
 	newJenkinsRequest.didFinishSelector = @selector(updateRetrieveFinished:);
 	newJenkinsRequest.didFailSelector = @selector(updateRetrieveFailed:);
@@ -571,6 +578,8 @@ static const JCIComboSource *environmentVariableSource;
 
 -(void)updateRetrieveFinished:(ASIHTTPRequest *)request{
 	[self.plist stop];
+	const char *argv[] = { [[request.userInfo objectForKey:@"warPath"] fileSystemRepresentation], [request.downloadDestinationPath fileSystemRepresentation], NULL };
+	AuthorizationExecuteWithPrivileges([self.authorizationView.authorization authorizationRef], "/bin/mv", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 	[self.plist start];
 	[self updateJenkinsVersion];
 }
