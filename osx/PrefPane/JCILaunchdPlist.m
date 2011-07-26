@@ -159,6 +159,9 @@ static NSSet *propertySet = nil;
 }
 
 -(BOOL)isRunning{
+	if(self.authorization == nil){
+		return NO;
+	}
 	// Get launchd listing (/bin/launchctl list)
 	FILE *pipe;
 	const char *argv[] = { "list", NULL };

@@ -164,8 +164,6 @@ static const JCIComboSource *environmentVariableSource;
 -(void)willSelect{
 	// Update the authorization view
 	[self.authorizationView authorizationState];
-	// Set the start/stop button
-	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
 }
 
 -(BOOL)isUnlocked{
