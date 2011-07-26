@@ -533,11 +533,8 @@ static const JCIComboSource *environmentVariableSource;
 
 - (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];
-	if(self.plist.running){
-		self.startButton.title = [[self bundle] localizedStringForKey:@"Start Jenkins" value:@"!Start!" table:nil];
-	}else{
-		self.startButton.title = [[self bundle] localizedStringForKey:@"Stop Jenkins" value:@"!Stop!" table:nil];
-	}
+	// Just triggers a button update
+	self.plist.running = self.plist.running;
 }
 
 - (void)authorizationViewDidDeauthorize:(SFAuthorizationView *)view {
