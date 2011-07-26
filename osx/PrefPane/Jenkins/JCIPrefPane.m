@@ -565,14 +565,20 @@ static const JCIComboSource *environmentVariableSource;
 	float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
 	NSDictionary *core = [json objectForKey:@"core"];
 	self.updateAvailable = [[core valueForKey:@"version"] floatValue] > currentVersion;
+	[self.updateButton sizeToFit];
+	[self.updateButton setNeedsDisplay];
 }
 
 -(void)updateRetrieveStarted:(ASIHTTPRequest *)request{
 	self.updateAvailable = NO;
+	[self.updateButton sizeToFit];
+	[self.updateButton setNeedsDisplay];
 }
 
 -(void)updateRetrieveFailed:(ASIHTTPRequest *)request{
 	self.updateAvailable = YES;
+	[self.updateButton sizeToFit];
+	[self.updateButton setNeedsDisplay];
 	NSLog(@"Update download failed");
 }
 
