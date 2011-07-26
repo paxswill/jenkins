@@ -187,8 +187,7 @@ static const JCIComboSource *environmentVariableSource;
 	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:warPath, @"warPath", nil];
 	NSString *tempPath = NSTemporaryDirectory();
 	tempPath = tempPath ? tempPath : @"/tmp";
-	char *tempName = "jenkins.war.XXXXX";
-	mkstemps(tempName, 5);
+	char *tempName = mktemp("jenkins.war.XXXXX");
 	tempPath = [tempPath stringByAppendingPathComponent:[NSString stringWithUTF8String:tempName]];
 	ASIHTTPRequest *newJenkinsRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/war/latest/jenkins.war"]];
 	newJenkinsRequest.downloadDestinationPath = tempPath;
@@ -578,7 +577,7 @@ static const JCIComboSource *environmentVariableSource;
 
 -(void)updateRetrieveFinished:(ASIHTTPRequest *)request{
 	[self.plist stop];
-	const char *argv[] = { [[request.userInfo objectForKey:@"warPath"] fileSystemRepresentation], [request.downloadDestinationPath fileSystemRepresentation], NULL };
+	const char *argv[] = { [request.downloadDestinationPath fileSystemRepresentation], [[request.userInfo objectForKey:@"warPath"] fileSystemRepresentation], NULL };
 	AuthorizationExecuteWithPrivileges([self.authorizationView.authorization authorizationRef], "/bin/mv", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 	[self.plist start];
 	[self updateJenkinsVersion];
