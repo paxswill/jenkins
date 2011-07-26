@@ -187,7 +187,8 @@ static const JCIComboSource *environmentVariableSource;
 	newJenkinsRequest.downloadDestinationPath = warPath;
 	newJenkinsRequest.didStartSelector = @selector(updateRetrieveStarted:);
 	newJenkinsRequest.didFinishSelector = @selector(updateRetrieveFinished:);
-	[newJenkinsRequest startSynchronous];
+	newJenkinsRequest.delegate = self;
+	[newJenkinsRequest startAsynchronous];
 	[self.plist stop];
 	[self.plist start];
 }
