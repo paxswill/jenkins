@@ -12,6 +12,7 @@
 #import "ASIHTTPRequest.h"
 #import "NSObject+SBJson.h"
 #import "JCIZipFile.h"
+#import "ASIHTTPRequest.h"
 
 static const NSSet *javaOptions;
 static const JCIComboSource *javaComboSource;
@@ -28,6 +29,11 @@ static const JCIComboSource *environmentVariableSource;
 -(void)addEnvironmentVariable;
 -(void)addJavaArgument;
 -(void)addJenkinsArgument;
+-(void)updateJenkinsVersion;
+-(void)updateCheckStarted:(ASIHTTPRequest *)request;
+-(void)updateCheckFinished:(ASIHTTPRequest *)request;
+-(void)updateRetrieveStarted:(ASIHTTPRequest *)request;
+-(void)updateRetrieveFinished:(ASIHTTPRequest *)request;
 @end
 
 @implementation JCIPrefPane
@@ -145,18 +151,11 @@ static const JCIComboSource *environmentVariableSource;
 	[[self.actionButton cell] setMenu:addMenu];
 	[addMenu release];
 	// Get the version of Jenkins we're running
-	NSDictionary *jarArgument;
-	for(NSDictionary *arg in self.javaArgs){
-		if([[arg valueForKey:@"option"] isEqualToString:@"-jar "]){
-			jarArgument = arg;
-		}
-	}
-	NSString *warPath = [jarArgument objectForKey:@"value"];
-	JCIZipFile *warFile = [[JCIZipFile alloc] initWithFile:warPath];
-	self.jenkinsVersion = [warFile jarVersion];
-	[warFile release];
+	[self updateJenkinsVersion];
 	// Set up for updating
 	ASIHTTPRequest *updatesRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/updates/update-center.json"]];
+	updatesRequest.didStartSelector = @selector(updateCheckStarted:);
+	updatesRequest.didFinishSelector = @selector(updateCheckFinished:);
 	updatesRequest.delegate = self;
 	[updatesRequest startAsynchronous];
 }
@@ -177,7 +176,20 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 - (IBAction)updateJenkins:(id)sender{
-	// This will be an extensive task
+	NSString *warPath = nil;
+	for(NSDictionary *javaArg in self.javaArgs){
+		if([[javaArg objectForKey:@"option"] isEqualToString:@"-jar "]){
+			warPath = [javaArg valueForKey:@"value"];
+			break;
+		}
+	}
+	ASIHTTPRequest *newJenkinsRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/war/latest/jenkins.war"]];
+	newJenkinsRequest.downloadDestinationPath = warPath;
+	newJenkinsRequest.didStartSelector = @selector(updateRetrieveStarted:);
+	newJenkinsRequest.didFinishSelector = @selector(updateRetrieveFinished:);
+	[newJenkinsRequest startSynchronous];
+	[self.plist stop];
+	[self.plist start];
 }
 
 -(void)addEnvironmentVariable{
@@ -216,6 +228,19 @@ static const JCIComboSource *environmentVariableSource;
 	}else{
 		return @"Jenkins version Unknown";
 	}
+}
+
+-(void)updateJenkinsVersion{
+	NSDictionary *jarArgument;
+	for(NSDictionary *arg in self.javaArgs){
+		if([[arg valueForKey:@"option"] isEqualToString:@"-jar "]){
+			jarArgument = arg;
+		}
+	}
+	NSString *warPath = [jarArgument objectForKey:@"value"];
+	JCIZipFile *warFile = [[JCIZipFile alloc] initWithFile:warPath];
+	self.jenkinsVersion = [warFile jarVersion];
+	[warFile release];
 }
 
 #pragma mark - Property List Interface
@@ -519,17 +544,27 @@ static const JCIComboSource *environmentVariableSource;
 
 #pragma mark - ASIHTTPRequestDelegate
 
--(void)requestStarted:(ASIHTTPRequest *)request{
+-(void)updateCheckStarted:(ASIHTTPRequest *)request{
 	self.updateButton.title = [[self bundle] localizedStringForKey:@"Checking For Jenkins Update" value:@"Checking" table:nil];
 }
 
--(void)requestFinished:(ASIHTTPRequest *)request{
+-(void)updateCheckFinished:(ASIHTTPRequest *)request{
     // Trim "updateCenter.post(" and the trailing ")" out
     NSString *trimmed = [request.responseString substringWithRange:NSMakeRange(18, [request.responseString length] - 21)];
     NSDictionary *json = [trimmed JSONValue];
 	float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
 	NSDictionary *core = [json objectForKey:@"core"];
 	self.updateAvailable = [[core valueForKey:@"version"] floatValue] > currentVersion;
+}
+
+-(void)updateRetrieveStarted:(ASIHTTPRequest *)request{
+	self.updateAvailable = NO;
+}
+
+-(void)updateRetrieveFinished:(ASIHTTPRequest *)request{
+	[self.plist stop];
+	[self.plist start];
+	[self updateJenkinsVersion];
 }
 
 @end

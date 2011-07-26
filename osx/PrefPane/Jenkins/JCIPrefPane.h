@@ -10,9 +10,8 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "DKActionButton.h"
 #import "JCILaunchdPlist.h"
-#import "ASIHTTPRequestDelegate.h"
 
-@interface JCIPrefPane : NSPreferencePane<ASIHTTPRequestDelegate>{
+@interface JCIPrefPane : NSPreferencePane{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
 	NSString *jenkinsVersion;
