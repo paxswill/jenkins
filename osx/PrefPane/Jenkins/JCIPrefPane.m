@@ -33,6 +33,7 @@ static const JCIComboSource *environmentVariableSource;
 -(void)updateCheckStarted:(ASIHTTPRequest *)request;
 -(void)updateCheckFinished:(ASIHTTPRequest *)request;
 -(void)updateRetrieveStarted:(ASIHTTPRequest *)request;
+-(void)updateRetrieveFailed:(ASIHTTPRequest *)request;
 -(void)updateRetrieveFinished:(ASIHTTPRequest *)request;
 @end
 
@@ -187,6 +188,7 @@ static const JCIComboSource *environmentVariableSource;
 	newJenkinsRequest.downloadDestinationPath = warPath;
 	newJenkinsRequest.didStartSelector = @selector(updateRetrieveStarted:);
 	newJenkinsRequest.didFinishSelector = @selector(updateRetrieveFinished:);
+	newJenkinsRequest.didFailSelector = @selector(updateRetrieveFailed:);
 	newJenkinsRequest.delegate = self;
 	[newJenkinsRequest startAsynchronous];
 	[self.plist stop];
@@ -560,6 +562,11 @@ static const JCIComboSource *environmentVariableSource;
 
 -(void)updateRetrieveStarted:(ASIHTTPRequest *)request{
 	self.updateAvailable = NO;
+}
+
+-(void)updateRetrieveFailed:(ASIHTTPRequest *)request{
+	self.updateAvailable = YES;
+	NSLog(@"Update download failed");
 }
 
 -(void)updateRetrieveFinished:(ASIHTTPRequest *)request{
