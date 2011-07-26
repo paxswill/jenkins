@@ -16,10 +16,11 @@
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
 	NSString *jenkinsVersion;
+	BOOL updateAvailable;
 
 	NSButton *startButton;
 	NSButton *updateButton;
-	NSButton *autostart;
+	NSButton *autostartCheckBox;
 	SFAuthorizationView *authorizationView;
 	DKActionButton *actionButton;
 	NSTableView *tableView;
