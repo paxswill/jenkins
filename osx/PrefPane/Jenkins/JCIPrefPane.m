@@ -165,12 +165,6 @@ static const JCIComboSource *environmentVariableSource;
 	[self.authorizationView authorizationState];
 	// Set the start/stop button
 	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
-	// Set autostart checkbox
-	if(![self.plist.disabled boolValue] && [self.plist.runAtLoad boolValue]){
-		[self.autostartCheckBox setState:NSOnState];
-	}else{
-		[self.autostartCheckBox setState:NSOffState];
-	}
 }
 
 -(BOOL)isUnlocked{
