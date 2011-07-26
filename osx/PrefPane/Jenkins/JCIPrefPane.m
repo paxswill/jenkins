@@ -209,6 +209,14 @@ static const JCIComboSource *environmentVariableSource;
 	[self.tableView reloadData];
 }
 
+-(NSString *)jenkinsVersion{
+	if(jenkinsVersion){
+		return [NSString stringWithFormat:@"Jenkins version: %@", jenkinsVersion];
+	}else{
+		return @"Jenkins version Unknown";
+	}
+}
+
 #pragma mark - Property List Interface
 
 -(void)updateVariablesDictionaryArray{
