@@ -228,7 +228,7 @@ static NSSet *propertySet = nil;
 			return class_addMethod([self class], sel, (IMP)&plistGetProxy, "@:");
 		}
 	}else{
-		return NO;
+		return [super resolveInstanceMethod:sel];
 	}
 }
 
@@ -276,6 +276,22 @@ static NSSet *propertySet = nil;
 												 @"launchOnlyOnce",
 												 @"machServices",
 												 @"sockets", nil];
+}
+
+-(id)valueForUndefinedKey:(NSString *)key{
+	if([propertySet containsObject:key]){
+		return plistGetProxy(self, NSSelectorFromString(key));
+	}else{
+		return [super valueForUndefinedKey:key];
+	}
+}
+
+-(void)setValue:(id)value forUndefinedKey:(NSString *)key{
+	if([propertySet containsObject:key]){
+		plistSetProxy(self, NSSelectorFromString([NSString stringWithFormat:@"set%@:", key]), value);
+	}else{
+		[super setValue:value forUndefinedKey:key];
+	}
 }
 
 @end
