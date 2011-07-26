@@ -189,7 +189,7 @@ static const JCIComboSource *environmentVariableSource;
 	tempPath = tempPath ? tempPath : @"/tmp";
 	char *tempName = "jenkins.war.XXXXX";
 	mkstemps(tempName, 5);
-	tempPath = [tempPath stringByAppendingPathExtension:[NSString stringWithUTF8String:tempName]];
+	tempPath = [tempPath stringByAppendingPathComponent:[NSString stringWithUTF8String:tempName]];
 	ASIHTTPRequest *newJenkinsRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/war/latest/jenkins.war"]];
 	newJenkinsRequest.downloadDestinationPath = tempPath;
 	newJenkinsRequest.userInfo = userInfo;
