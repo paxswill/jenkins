@@ -9,6 +9,9 @@
 #import "JCIPrefPane.h"
 #import <objc/runtime.h>
 #import "JCIComboSource.h"
+#import "ASIHTTPRequest.h"
+#import "NSObject+SBJson.h"
+#import "JCIZipFile.h"
 
 static const NSSet *javaOptions;
 static const JCIComboSource *javaComboSource;
@@ -31,10 +34,12 @@ static const JCIComboSource *environmentVariableSource;
 
 @synthesize plist;
 @synthesize uiEnabled;
+@synthesize jenkinsVersion;
+@synthesize updateAvailable;
 
 @synthesize startButton;
 @synthesize updateButton;
-@synthesize autostart;
+@synthesize autostartCheckBox;
 @synthesize authorizationView;
 @synthesize actionButton;
 @synthesize tableView;
@@ -139,6 +144,21 @@ static const JCIComboSource *environmentVariableSource;
 	[[addMenu itemArray] makeObjectsPerformSelector:@selector(setTarget:) withObject:self];
 	[[self.actionButton cell] setMenu:addMenu];
 	[addMenu release];
+	// Get the version of Jenkins we're running
+	NSDictionary *jarArgument;
+	for(NSDictionary *arg in self.javaArgs){
+		if([[arg valueForKey:@"option"] isEqualToString:@"-jar "]){
+			jarArgument = arg;
+		}
+	}
+	NSString *warPath = [jarArgument objectForKey:@"value"];
+	JCIZipFile *warFile = [[JCIZipFile alloc] initWithFile:warPath];
+	self.jenkinsVersion = [warFile jarVersion];
+	[warFile release];
+	// Set up for updating
+	ASIHTTPRequest *updatesRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://mirrors.jenkins-ci.org/updates/update-center.json"]];
+	updatesRequest.delegate = self;
+	[updatesRequest startAsynchronous];
 }
 
 -(void)willSelect{
@@ -146,12 +166,6 @@ static const JCIComboSource *environmentVariableSource;
 	[self.authorizationView authorizationState];
 	// Set the start/stop button
 	self.startButton.title = self.plist.running ? @"Stop" : @"Start";
-	// Set autostart checkbox
-	if(![self.plist.disabled boolValue] && [self.plist.runAtLoad boolValue]){
-		[self.autostart setState:NSOnState];
-	}else{
-		[self.autostart setState:NSOffState];
-	}
 }
 
 -(BOOL)isUnlocked{
@@ -194,6 +208,14 @@ static const JCIComboSource *environmentVariableSource;
 	[newArg release];
 	[self setHeaderIndices];
 	[self.tableView reloadData];
+}
+
+-(NSString *)jenkinsVersion{
+	if(jenkinsVersion){
+		return [NSString stringWithFormat:@"Jenkins version: %@", jenkinsVersion];
+	}else{
+		return @"Jenkins version Unknown";
+	}
 }
 
 #pragma mark - Property List Interface
@@ -301,6 +323,8 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 -(void)saveOptions{
+	// Multiple fast updates makes authorization services cry
+	self.plist.saveOnChange = NO;
 	NSMutableArray *newArgs = [NSMutableArray arrayWithCapacity:([jenkinsArgs count] + [javaArgs count])];
 	// First the Java arguments (except for -jar)
 	NSMutableDictionary *jarDict = nil;
@@ -324,6 +348,7 @@ static const JCIComboSource *environmentVariableSource;
 	}
 	self.plist.environmentVariables = newVars;
     [self.plist save];
+	self.plist.saveOnChange = YES;
 }
 
 #pragma mark - NSTableViewDataSource
@@ -490,6 +515,21 @@ static const JCIComboSource *environmentVariableSource;
 
 - (void)authorizationViewReleasedAuthorization:(SFAuthorizationView *)view{
 	self.plist.authorization = nil;
+}
+
+#pragma mark - ASIHTTPRequestDelegate
+
+-(void)requestStarted:(ASIHTTPRequest *)request{
+	self.updateButton.title = [[self bundle] localizedStringForKey:@"Checking For Jenkins Update" value:@"Checking" table:nil];
+}
+
+-(void)requestFinished:(ASIHTTPRequest *)request{
+    // Trim "updateCenter.post(" and the trailing ")" out
+    NSString *trimmed = [request.responseString substringWithRange:NSMakeRange(18, [request.responseString length] - 21)];
+    NSDictionary *json = [trimmed JSONValue];
+	float currentVersion = self.jenkinsVersion ? [self.jenkinsVersion floatValue] : 0.0;
+	NSDictionary *core = [json objectForKey:@"core"];
+	self.updateAvailable = [[core valueForKey:@"version"] floatValue] > currentVersion;
 }
 
 @end

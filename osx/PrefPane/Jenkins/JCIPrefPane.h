@@ -10,10 +10,12 @@
 #import <SecurityInterface/SFAuthorizationView.h>
 #import "DKActionButton.h"
 #import "JCILaunchdPlist.h"
+#import "ASIHTTPRequestDelegate.h"
 
-@interface JCIPrefPane : NSPreferencePane{
+@interface JCIPrefPane : NSPreferencePane<ASIHTTPRequestDelegate>{
 	JCILaunchdPlist *plist;
 	BOOL uiEnabled;
+	NSString *jenkinsVersion;
 
 	NSButton *startButton;
 	NSButton *updateButton;
@@ -30,10 +32,12 @@
 }
 @property (nonatomic, readwrite, retain) JCILaunchdPlist *plist;
 @property (readwrite, assign) BOOL uiEnabled;
+@property (nonatomic, readwrite, assign) NSString *jenkinsVersion;
+@property (readwrite, assign) BOOL updateAvailable;
 
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *startButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSButton *updateButton;
-@property (nonatomic, readwrite, assign) IBOutlet NSButton *autostart;
+@property (nonatomic, readwrite, assign) IBOutlet NSButton *autostartCheckBox;
 @property (nonatomic, readwrite, assign) IBOutlet SFAuthorizationView *authorizationView;
 @property (nonatomic, readwrite, assign) IBOutlet DKActionButton *actionButton;
 @property (nonatomic, readwrite, assign) IBOutlet NSTableView *tableView;
@@ -46,5 +50,4 @@
 - (BOOL)isUnlocked;
 - (IBAction)toggleJenkins:(id)sender;
 - (IBAction)updateJenkins:(id)sender;
-
 @end
