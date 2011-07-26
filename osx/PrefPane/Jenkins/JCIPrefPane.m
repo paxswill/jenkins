@@ -534,7 +534,7 @@ static const JCIComboSource *environmentVariableSource;
 - (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];
 	// Just triggers a button update
-	self.plist.running = self.plist.running;
+	[self.plist didChangeValueForKey:@"running"];
 }
 
 - (void)authorizationViewDidDeauthorize:(SFAuthorizationView *)view {
