@@ -21,9 +21,9 @@
 -(id)transformedValue:(id)value{
 	// Takes an NSNumber containing a BOOL
 	if([value boolValue]){
-		return [[NSBundle bundleWithIdentifier:@"org.jenkins-ci.JenkinsPrefPane"] localizedStringForKey:@"Update Jenkins" value:@"Update" table:nil];
+		return [[NSBundle bundleWithIdentifier:@"org.jenkins-ci.JenkinsPrefPane"] localizedStringForKey:@"Update Jenkins" value:@"!Update!" table:nil];
 	}else{
-		return [[NSBundle bundleWithIdentifier:@"org.jenkins-ci.JenkinsPrefPane"] localizedStringForKey:@"No Jenkins Update" value:@"No Update" table:nil];
+		return [[NSBundle bundleWithIdentifier:@"org.jenkins-ci.JenkinsPrefPane"] localizedStringForKey:@"No Jenkins Update" value:@"!No Update!" table:nil];
 	}
 }
 

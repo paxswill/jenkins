@@ -104,3 +104,17 @@
 /* UI Strings */
 "Start Jenkins" = "Start";
 "Stop Jenkins" = "Stop";
+"Version prefix" = "Jenkins version:";
+"Unknown version" = "Jenkins version Unknown";
+"Start Jenkins" = "Start";
+"Stop Jenkins" = "Stop Jenkins";
+"Update Jenkins" = "Update";
+"No Jenkins Update" = "No Update";
+"Add environment" = "Add environment variable";
+"Add Java" = "Add Java argument";
+"Add Jenkins" = "Add Jenkins argument";
+"Environment Table Header" = "Environment Variables";
+"Java Table Header" = "Java Arguments";
+"Jenkins Table Header" = "Jenkins Arguments";
+"Checking For Jenkins Update" = "Checking";
+

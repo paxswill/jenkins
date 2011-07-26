@@ -145,9 +145,9 @@ static const JCIComboSource *environmentVariableSource;
 	// Setup the action button
 	NSMenu *addMenu = [[NSMenu alloc] init];
 	[addMenu addItem:[[[NSMenuItem alloc] init] autorelease]];
-	[addMenu addItemWithTitle:NSLocalizedString(@"Add environment variable", "Add environment variable") action:@selector(addEnvironmentVariable) keyEquivalent:@""];
-	[addMenu addItemWithTitle:NSLocalizedString(@"Add Java argument", "Add Java argument") action:@selector(addJavaArgument) keyEquivalent:@""];
-	[addMenu addItemWithTitle:NSLocalizedString(@"Add Jenkins argument", "Add Jenkins argument") action:@selector(addJenkinsArgument) keyEquivalent:@""];
+	[addMenu addItemWithTitle:[[self bundle] localizedStringForKey:@"Add environment" value:@"!Add environment variable!" table:nil] action:@selector(addEnvironmentVariable) keyEquivalent:@""];
+	[addMenu addItemWithTitle:[[self bundle] localizedStringForKey:@"Add Java" value:@"!Add Java value!" table:nil] action:@selector(addJavaArgument) keyEquivalent:@""];
+	[addMenu addItemWithTitle:[[self bundle] localizedStringForKey:@"Add Jenkins" value:@"!Add Jenkins argument!" table:nil] action:@selector(addJenkinsArgument) keyEquivalent:@""];
 	[[addMenu itemArray] makeObjectsPerformSelector:@selector(setTarget:) withObject:self];
 	[[self.actionButton cell] setMenu:addMenu];
 	[addMenu release];
@@ -231,9 +231,10 @@ static const JCIComboSource *environmentVariableSource;
 
 -(NSString *)jenkinsVersion{
 	if(jenkinsVersion){
-		return [NSString stringWithFormat:@"Jenkins version: %@", jenkinsVersion];
+		NSString *prefix = [[self bundle] localizedStringForKey:@"Version prefix" value:@"!Jenkins version:!" table:nil];
+		return [NSString stringWithFormat:@"%@ %@", prefix, jenkinsVersion];
 	}else{
-		return @"Jenkins version Unknown";
+		return [[self bundle] localizedStringForKey:@"Unknown version" value:@"!Jenkins version Unknown!" table:nil];
 	}
 }
 
@@ -405,11 +406,11 @@ static const JCIComboSource *environmentVariableSource;
 
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex{
 	if(rowIndex == environmentHeaderIndex){
-		return @"Environment Variables";
+		return [[self bundle] localizedStringForKey:@"Environment Table Header" value:@"!Environment Variables!" table:nil];
 	}else if(rowIndex == javaHeaderIndex){
-		return @"Java Options";
+		return [[self bundle] localizedStringForKey:@"Java Table Header" value:@"!Java Arguments!" table:nil];
 	}else if(rowIndex == jenkinsHeaderIndex){
-		return @"Jenkins Options";
+		return [[self bundle] localizedStringForKey:@"Jenkins Table Header" value:@"!Jenkins Arguments!" table:nil];
 	}else{
 		int offset = 1;
 		if(rowIndex < javaHeaderIndex && rowIndex > environmentHeaderIndex){
@@ -531,9 +532,9 @@ static const JCIComboSource *environmentVariableSource;
 - (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];
 	if(self.plist.running){
-		self.startButton.title = [[self bundle] localizedStringForKey:@"Start Jenkins" value:@"Start" table:nil];
+		self.startButton.title = [[self bundle] localizedStringForKey:@"Start Jenkins" value:@"!Start!" table:nil];
 	}else{
-		self.startButton.title = [[self bundle] localizedStringForKey:@"Stop Jenkins" value:@"Stop" table:nil];
+		self.startButton.title = [[self bundle] localizedStringForKey:@"Stop Jenkins" value:@"!Stop!" table:nil];
 	}
 }
 
@@ -552,7 +553,7 @@ static const JCIComboSource *environmentVariableSource;
 #pragma mark - ASIHTTPRequestDelegate
 
 -(void)updateCheckStarted:(ASIHTTPRequest *)request{
-	self.updateButton.title = [[self bundle] localizedStringForKey:@"Checking For Jenkins Update" value:@"Checking" table:nil];
+	self.updateButton.title = [[self bundle] localizedStringForKey:@"Checking For Jenkins Update" value:@"!Checking!" table:nil];
 }
 
 -(void)updateCheckFinished:(ASIHTTPRequest *)request{
@@ -575,7 +576,11 @@ static const JCIComboSource *environmentVariableSource;
 
 -(void)updateRetrieveFinished:(ASIHTTPRequest *)request{
 	[self.plist stop];
-	const char *argv[] = { [request.downloadDestinationPath fileSystemRepresentation], [[request.userInfo objectForKey:@"warPath"] fileSystemRepresentation], NULL };
+	const char *argv[] = {
+		[request.downloadDestinationPath fileSystemRepresentation],
+		[[request.userInfo objectForKey:@"warPath"] fileSystemRepresentation],
+		NULL
+	};
 	AuthorizationExecuteWithPrivileges([self.authorizationView.authorization authorizationRef], "/bin/mv", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 	[self.plist start];
 	[self updateJenkinsVersion];
