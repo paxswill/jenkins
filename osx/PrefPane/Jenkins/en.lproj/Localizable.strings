@@ -106,8 +106,6 @@
 "Stop Jenkins" = "Stop";
 "Version prefix" = "Jenkins version:";
 "Unknown version" = "Jenkins version Unknown";
-"Start Jenkins" = "Start";
-"Stop Jenkins" = "Stop Jenkins";
 "Update Jenkins" = "Update";
 "No Jenkins Update" = "No Update";
 "Add environment" = "Add environment variable";
