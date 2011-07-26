@@ -81,7 +81,7 @@ static NSSet *propertySet = nil;
 			self.plist = [NSMutableDictionary dictionary];
 		}
 		[fm release];
-        self.saveOnChange = NO;
+        self.saveOnChange = YES;
         saveLock = [[NSLock alloc] init];
 	}
 	return self;

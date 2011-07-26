@@ -320,6 +320,8 @@ static const JCIComboSource *environmentVariableSource;
 }
 
 -(void)saveOptions{
+	// Multiple fast updates makes authorization services cry
+	self.plist.saveOnChange = NO;
 	NSMutableArray *newArgs = [NSMutableArray arrayWithCapacity:([jenkinsArgs count] + [javaArgs count])];
 	// First the Java arguments (except for -jar)
 	NSMutableDictionary *jarDict = nil;
@@ -343,6 +345,7 @@ static const JCIComboSource *environmentVariableSource;
 	}
 	self.plist.environmentVariables = newVars;
     [self.plist save];
+	self.plist.saveOnChange = YES;
 }
 
 #pragma mark - NSTableViewDataSource
