@@ -118,7 +118,7 @@ static const JCIComboSource *environmentVariableSource;
 		self.plist = [[[JCILaunchdPlist alloc] initWithPath:[libraryPath stringByAppendingString:@"org.jenkins-ci.plist"]] autorelease];
 		[self updateVariablesDictionaryArray];
 		[self updateArgumentsDictionaryArray];
-		self.plist.helperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
+		self.plist.saveHelperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
 	}
 	return self;
 }

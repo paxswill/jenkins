@@ -68,7 +68,8 @@ static NSSet *propertySet = nil;
 @synthesize plist;
 @synthesize path;
 @synthesize authorization;
-@synthesize helperPath;
+@synthesize saveHelperPath;
+@synthesize sudoHelperPath;
 @synthesize saveOnChange;
 
 -(id)initWithPath:(NSString *)plistPath{
@@ -95,7 +96,8 @@ static NSSet *propertySet = nil;
 	}
 	self.path = nil;
 	self.plist = nil;
-	self.helperPath = nil;
+	self.saveHelperPath = nil;
+	self.sudoHelperPath = nil;
 	self.authorization = nil;
     [saveLock release];
     [super dealloc];
@@ -103,23 +105,21 @@ static NSSet *propertySet = nil;
 
 -(void)load{
 	// Reload and start the daemon
-	const char *argv[] = { "load", [self.path UTF8String], NULL };
+	const char *argv[] = { "load", "-D", "system", [self.path UTF8String], NULL };
 	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
 -(void)unload{
-	const char *argv[] = { "unload", [self.path UTF8String], NULL };
+	const char *argv[] = { "unload", "-D", "system", [self.path UTF8String], NULL };
 	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
 }
 
 -(void)start{
-	const char *argv[] = { "start", [self.label UTF8String], NULL };
-	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
+	[self load];
 }
 
 -(void)stop{
-	const char *argv[] = { "stop", [self.label UTF8String], NULL };
-	AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, NULL);
+	[self unload];
 }
 
 -(void)read{
@@ -134,7 +134,10 @@ static NSSet *propertySet = nil;
 	const char *argv[] = {[self.path UTF8String], NULL};
 	// Spawn the privileged process
     // TODO: error checking
-	OSErr error = AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.helperPath UTF8String], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
+	OSErr err = AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.saveHelperPath fileSystemRepresentation], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
+	if(err != errAuthorizationSuccess){
+		NSLog(@"Error elevating process (%d)", err);
+	}
 	// Write the data out
 	NSData *plistData = [NSPropertyListSerialization dataFromPropertyList:self.plist format:NSPropertyListXMLFormat_v1_0 errorDescription:NULL];
 	NSFileHandle *writeHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileno(pipe) closeOnDealloc:YES];
@@ -159,13 +162,20 @@ static NSSet *propertySet = nil;
 }
 
 -(BOOL)isRunning{
+	/*
+	 Mini-rant on launchctl:
+	 launchctl supports a domain argument for it's load and unload commands (-D), but not for list. To list
+	 the 'system' domain, you have to switch to root. "Okay, I'll just use AuthorizationExecuteWithPrivileges
+	 to call launchctl!" you think, but that call still runs the program as your user, just with elevated
+	 priviledges. You have to call a helper that setuid()s to root, then execs the subcommand.
+	 */
 	if(self.authorization == nil){
 		return NO;
 	}
 	// Get launchd listing (/bin/launchctl list)
 	FILE *pipe;
-	const char *argv[] = { "list", NULL };
-	OSErr err = AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], "/bin/launchctl", kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
+	const char *argv[] = { "/bin/launchctl", "list", NULL };
+	OSErr err = AuthorizationExecuteWithPrivileges([self.authorization authorizationRef], [self.sudoHelperPath fileSystemRepresentation], kAuthorizationFlagDefaults, (char * const *)argv, &pipe);
 	if(err != errAuthorizationSuccess){
 		NSLog(@"Error elevating process (%d)", err);
 		return NO;
@@ -188,7 +198,7 @@ static NSSet *propertySet = nil;
 			continue;
 		}
 		NSArray *lineData = [line componentsSeparatedByString:@"\t"];
-		if([[lineData objectAtIndex:2] isEqualToString:@"org.jenkins-ci"]){
+		if([[lineData objectAtIndex:2] isEqualToString:self.label]){
 			if([[lineData objectAtIndex:0] isEqualToString:@"-"]){
 				// Loaded, not running
 				found = NO;
@@ -201,15 +211,14 @@ static NSSet *propertySet = nil;
 		}
 	}
 	[rawLines release];
-	// Not loaded
 	return found;
 }
 
--(void)setRunning:(BOOL)runJenkins{
-	if(self.running != runJenkins){
+-(void)setRunning:(BOOL)runJob{
+	if(self.running != runJob){
 		[self willChangeValueForKey:@"running"];
 		[self unload];
-		if(runJenkins){
+		if(runJob){
 			[self load];
 		}
 		[self didChangeValueForKey:@"running"];

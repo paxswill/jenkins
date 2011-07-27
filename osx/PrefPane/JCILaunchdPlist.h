@@ -8,13 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import <SecurityFoundation/SFAuthorization.h>
+#include <Availability.h>
 
 @interface JCILaunchdPlist : NSObject{
 @private
 	NSMutableDictionary *plist;
 	NSString *path;
 	SFAuthorization *authorization;
-	NSString *helperPath;
+	NSString *saveHelperPath;
+	NSString *sudoHelperPath;
     BOOL saveOnChange;
     NSLock *saveLock;
 }
@@ -68,14 +70,15 @@
 @property (nonatomic, retain, readwrite) NSString *path;
 @property (nonatomic, assign, readwrite, getter=isRunning) BOOL running;
 @property (nonatomic, retain, readwrite) SFAuthorization *authorization;
-@property (nonatomic, retain, readwrite) NSString *helperPath;
+@property (nonatomic, retain, readwrite) NSString *saveHelperPath;
+@property (nonatomic, retain, readwrite) NSString *sudoHelperPath;
 @property (nonatomic, assign, readwrite) BOOL saveOnChange;
 
 -(id)initWithPath:(NSString *)plistPath;
 -(void)load;
 -(void)unload;
--(void)start;
--(void)stop;
+-(void)start DEPRECATED_ATTRIBUTE;
+-(void)stop DEPRECATED_ATTRIBUTE;
 -(void)read;
 -(void)save;
 
