@@ -119,6 +119,7 @@ static const JCIComboSource *environmentVariableSource;
 		[self updateVariablesDictionaryArray];
 		[self updateArgumentsDictionaryArray];
 		self.plist.saveHelperPath = [[self bundle] pathForResource:@"SecureWrite" ofType:nil];
+		self.plist.sudoHelperPath = [[self bundle] pathForResource:@"SudoHelper" ofType:nil];
 	}
 	return self;
 }
@@ -534,6 +535,7 @@ static const JCIComboSource *environmentVariableSource;
 - (void)authorizationViewDidAuthorize:(SFAuthorizationView *)view {
     self.uiEnabled = [self isUnlocked];
 	// Just triggers a button update
+	[self.plist willChangeValueForKey:@"running"];
 	[self.plist didChangeValueForKey:@"running"];
 }
 
