@@ -41,7 +41,7 @@ import hudson.cli.declarative.CLIResolver;
 import hudson.diagnosis.OldDataMonitor;
 import hudson.model.Cause.LegacyCodeCause;
 import hudson.model.Cause.RemoteCause;
-import hudson.model.Cause.UserCause;
+import hudson.model.Cause.UserIdCause;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Fingerprint.RangeSet;
 import hudson.model.Queue.Executable;
@@ -1589,7 +1589,7 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
             String causeText = req.getParameter("cause");
             cause = new RemoteCause(req.getRemoteAddr(), causeText);
         } else {
-            cause = new UserCause();
+            cause = new UserIdCause();
         }
         return new CauseAction(cause);
     }
@@ -1646,6 +1646,22 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         rsp.forwardToPreviousPage(req);
     }
 
+    /**
+     * Deletes this project.
+     */
+    @Override
+    public void doDoDelete(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, InterruptedException {
+        requirePOST();
+        delete();
+        if (req == null || rsp == null)
+            return;
+        View view = req.findAncestorObject(View.class);
+        if (view == null)
+            rsp.sendRedirect2(req.getContextPath() + '/' + getParent().getUrl());
+        else 
+            rsp.sendRedirect2(req.getContextPath() + '/' + view.getUrl());
+    }
+    
     @Override
     protected void submit(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException, FormException {
         super.submit(req,rsp);
@@ -1745,6 +1761,9 @@ public abstract class AbstractProject<P extends AbstractProject<P,R>,R extends A
         FilePath ws = b!=null ? b.getWorkspace() : null;
         if (ws!=null && getScm().processWorkspaceBeforeDeletion(this, ws, b.getBuiltOn())) {
             ws.deleteRecursive();
+            for (WorkspaceListener wl : WorkspaceListener.all()) {
+                wl.afterDelete(this);
+            }
             return new HttpRedirect(".");
         } else {
             // If we get here, that means the SCM blocked the workspace deletion.

@@ -25,6 +25,7 @@
  */
 package jenkins.model;
 
+import hudson.model.Messages;
 import hudson.model.Node;
 import hudson.model.AbstractCIBase;
 import hudson.model.AbstractProject;
@@ -58,7 +59,6 @@ import hudson.model.LoadBalancer;
 import hudson.model.ManagementLink;
 import hudson.model.ModifiableItemGroup;
 import hudson.model.NoFingerprintMatch;
-import hudson.model.Node.Mode;
 import hudson.model.OverallLoadStatistics;
 import hudson.model.Project;
 import hudson.model.RestartListener;
@@ -101,7 +101,6 @@ import hudson.Plugin;
 import hudson.PluginManager;
 import hudson.PluginWrapper;
 import hudson.ProxyConfiguration;
-import hudson.StructuredForm;
 import hudson.TcpSlaveAgentListener;
 import hudson.UDPBroadcastThread;
 import hudson.Util;
@@ -668,6 +667,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
      * @param pluginManager
      *      If non-null, use existing plugin manager.  create a new one.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SC_START_IN_CTOR") // bug in FindBugs. It flags UDPBroadcastThread.start() call but that's for another class
     protected Jenkins(File root, ServletContext context, PluginManager pluginManager) throws IOException, InterruptedException, ReactorException {
     	// As hudson is starting, grant this process full control
     	SecurityContextHolder.getContext().setAuthentication(ACL.SYSTEM);
@@ -871,6 +871,27 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     @Exported
     public int getSlaveAgentPort() {
         return slaveAgentPort;
+    }
+
+    /**
+     * @param port
+     *      0 to indicate random available TCP port. -1 to disable this service.
+     */
+    public void setSlaveAgentPort(int port) throws IOException {
+        this.slaveAgentPort = port;
+
+        // relaunch the agent
+        if(tcpSlaveAgentListener==null) {
+            if(slaveAgentPort!=-1)
+                tcpSlaveAgentListener = new TcpSlaveAgentListener(slaveAgentPort);
+        } else {
+            if(tcpSlaveAgentListener.configuredPort!=slaveAgentPort) {
+                tcpSlaveAgentListener.shutdown();
+                tcpSlaveAgentListener = null;
+                if(slaveAgentPort!=-1)
+                    tcpSlaveAgentListener = new TcpSlaveAgentListener(slaveAgentPort);
+            }
+        }
     }
 
     public void setNodeName(String name) {
@@ -1331,7 +1352,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
         return names;
     }
 
-    public synchronized View getView(String name) {
+    public View getView(String name) {
         return viewGroupMixIn.getView(name);
     }
 
@@ -1367,8 +1388,16 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
         return viewGroupMixIn.getPrimaryView();
      }
 
+    public void setPrimaryView(View v) {
+        this.primaryView = v.getViewName();
+    }
+
     public ViewsTabBar getViewsTabBar() {
         return viewsTabBar;
+    }
+
+    public void setViewsTabBar(ViewsTabBar viewsTabBar) {
+        this.viewsTabBar = viewsTabBar;
     }
 
     public Jenkins getItemGroup() {
@@ -1377,6 +1406,10 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
 
     public MyViewsTabBar getMyViewsTabBar() {
         return myViewsTabBar;
+    }
+
+    public void setMyViewsTabBar(MyViewsTabBar myViewsTabBar) {
+        this.myViewsTabBar = myViewsTabBar;
     }
 
     /**
@@ -1657,10 +1690,26 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     }
 
     /**
+     * Sets the global quiet period.
+     *
+     * @param quietPeriod
+     *      null to the default value.
+     */
+    public void setQuietPeriod(Integer quietPeriod) throws IOException {
+        this.quietPeriod = quietPeriod;
+        save();
+    }
+
+    /**
      * Gets the global SCM check out retry count.
      */
     public int getScmCheckoutRetryCount() {
         return scmCheckoutRetryCount;
+    }
+
+    public void setScmCheckoutRetryCount(int scmCheckoutRetryCount) throws IOException {
+        this.scmCheckoutRetryCount = scmCheckoutRetryCount;
+        save();
     }
 
     @Override
@@ -1714,7 +1763,10 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     public String getRootUrl() {
         // for compatibility. the actual data is stored in Mailer
         String url = Mailer.descriptor().getUrl();
-        if(url!=null)   return url;
+        if(url!=null) {
+            if (!url.endsWith("/")) url += '/';
+            return url;
+        }
 
         StaplerRequest req = Stapler.getCurrentRequest();
         if(req!=null)
@@ -1849,6 +1901,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     public void setSecurityRealm(SecurityRealm securityRealm) {
         if(securityRealm==null)
             securityRealm= SecurityRealm.NO_AUTHENTICATION;
+        this.useSecurity = true;
         this.securityRealm = securityRealm;
         // reset the filters and proxies for the new SecurityRealm
         try {
@@ -1871,7 +1924,15 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     public void setAuthorizationStrategy(AuthorizationStrategy a) {
         if (a == null)
             a = AuthorizationStrategy.UNSECURED;
+        useSecurity = true;
         authorizationStrategy = a;
+    }
+
+    public void disableSecurity() {
+        useSecurity = null;
+        setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
+        authorizationStrategy = AuthorizationStrategy.UNSECURED;
+        markupFormatter = null;
     }
 
     public Lifecycle getLifecycle() {
@@ -1938,6 +1999,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
      * can be finished while other current pending builds
      * are still in progress.
      */
+    @Exported
     public boolean isQuietingDown() {
         return isQuietingDown;
     }
@@ -1995,6 +2057,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
      */
     public Item getItem(String relativeName, ItemGroup context) {
         if (context==null)  context = this;
+        if (relativeName==null) return null;
 
         if (relativeName.startsWith("/"))   // absolute
             return getItemByFullName(relativeName);
@@ -2219,8 +2282,18 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
         return mode;
     }
 
+    public void setMode(Mode m) throws IOException {
+        this.mode = m;
+        save();
+    }
+
     public String getLabelString() {
         return fixNull(label).trim();
+    }
+
+    public void setLabelString(String label) throws IOException {
+        this.label = label;
+        save();
     }
 
     @Override
@@ -2422,91 +2495,6 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
             workspaceDir = json.getString("rawWorkspaceDir");
             buildsDir = json.getString("rawBuildsDir");
 
-            // keep using 'useSecurity' field as the main configuration setting
-            // until we get the new security implementation working
-            // useSecurity = null;
-            if (json.has("use_security")) {
-                useSecurity = true;
-                JSONObject security = json.getJSONObject("use_security");
-                setSecurityRealm(SecurityRealm.all().newInstanceFromRadioList(security,"realm"));
-                setAuthorizationStrategy(AuthorizationStrategy.all().newInstanceFromRadioList(security, "authorization"));
-
-                if (security.has("markupFormatter")) {
-                    markupFormatter = req.bindJSON(MarkupFormatter.class,security.getJSONObject("markupFormatter"));
-                } else {
-                    markupFormatter = null;
-                }
-            } else {
-                useSecurity = null;
-                setSecurityRealm(SecurityRealm.NO_AUTHENTICATION);
-                authorizationStrategy = AuthorizationStrategy.UNSECURED;
-                markupFormatter = null;
-            }
-
-            if (json.has("csrf")) {
-            	JSONObject csrf = json.getJSONObject("csrf");
-                setCrumbIssuer(CrumbIssuer.all().newInstanceFromRadioList(csrf, "issuer"));
-            } else {
-            	setCrumbIssuer(null);
-            }
-
-            if (json.has("viewsTabBar")) {
-                viewsTabBar = req.bindJSON(ViewsTabBar.class,json.getJSONObject("viewsTabBar"));
-            } else {
-                viewsTabBar = new DefaultViewsTabBar();
-            }
-
-            if (json.has("myViewsTabBar")) {
-                myViewsTabBar = req.bindJSON(MyViewsTabBar.class,json.getJSONObject("myViewsTabBar"));
-            } else {
-                myViewsTabBar = new DefaultMyViewsTabBar();
-            }
-
-            primaryView = json.has("primaryView") ? json.getString("primaryView") : getViews().iterator().next().getViewName();
-
-            noUsageStatistics = json.has("usageStatisticsCollected") ? null : true;
-
-            {
-                String v = req.getParameter("slaveAgentPortType");
-                if(!isUseSecurity() || v==null || v.equals("random"))
-                    slaveAgentPort = 0;
-                else
-                if(v.equals("disable"))
-                    slaveAgentPort = -1;
-                else {
-                    try {
-                        slaveAgentPort = Integer.parseInt(req.getParameter("slaveAgentPort"));
-                    } catch (NumberFormatException e) {
-                        throw new FormException(Messages.Hudson_BadPortNumber(req.getParameter("slaveAgentPort")),"slaveAgentPort");
-                    }
-                }
-
-                // relaunch the agent
-                if(tcpSlaveAgentListener==null) {
-                    if(slaveAgentPort!=-1)
-                        tcpSlaveAgentListener = new TcpSlaveAgentListener(slaveAgentPort);
-                } else {
-                    if(tcpSlaveAgentListener.configuredPort!=slaveAgentPort) {
-                        tcpSlaveAgentListener.shutdown();
-                        tcpSlaveAgentListener = null;
-                        if(slaveAgentPort!=-1)
-                            tcpSlaveAgentListener = new TcpSlaveAgentListener(slaveAgentPort);
-                    }
-                }
-            }
-
-            numExecutors = json.getInt("numExecutors");
-            if(req.hasParameter("master.mode"))
-                mode = Mode.valueOf(req.getParameter("master.mode"));
-            else
-                mode = Mode.NORMAL;
-
-            label = json.optString("labelString","");
-
-            quietPeriod = json.getInt("quiet_period");
-
-            scmCheckoutRetryCount = json.getInt("retry_count");
-
             systemMessage = Util.nullify(req.getParameter("system_message"));
 
             jdks.clear();
@@ -2515,16 +2503,6 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
             boolean result = true;
             for( Descriptor<?> d : Functions.getSortedDescriptorsForGlobalConfig() )
                 result &= configureDescriptor(req,json,d);
-
-            for( JSONObject o : StructuredForm.toList(json,"plugin"))
-                pluginManager.getPlugin(o.getString("name")).getPlugin().configure(req, o);
-
-            clouds.rebuildHetero(req,json, Cloud.all(), "cloud");
-
-            JSONObject np = json.getJSONObject("globalNodeProperties");
-            if (!np.isNullObject()) {
-                globalNodeProperties.rebuild(req, np, NodeProperty.for_(this));
-            }
 
             version = VERSION;
 
@@ -2818,7 +2796,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     }
 
     public Slave.JnlpJar doJnlpJars(StaplerRequest req) {
-        return new Slave.JnlpJar(req.getRestOfPath());
+        return new Slave.JnlpJar(req.getRestOfPath().substring(1));
     }
 
     /**
@@ -2879,6 +2857,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     /**
      * For debugging. Expose URL to perform GC.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_GC")
     public void doGc(StaplerResponse rsp) throws IOException {
         checkPermission(Jenkins.ADMINISTER);
         System.gc();
@@ -3065,15 +3044,18 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
      * Shutdown the system.
      * @since 1.161
      */
+    @CLIMethod(name="shutdown")
     public void doExit( StaplerRequest req, StaplerResponse rsp ) throws IOException {
         checkPermission(ADMINISTER);
         LOGGER.severe(String.format("Shutting down VM as requested by %s from %s",
-                getAuthentication().getName(), req.getRemoteAddr()));
-        rsp.setStatus(HttpServletResponse.SC_OK);
-        rsp.setContentType("text/plain");
-        PrintWriter w = rsp.getWriter();
-        w.println("Shutting down");
-        w.close();
+                getAuthentication().getName(), req!=null?req.getRemoteAddr():"???"));
+        if (rsp!=null) {
+            rsp.setStatus(HttpServletResponse.SC_OK);
+            rsp.setContentType("text/plain");
+            PrintWriter w = rsp.getWriter();
+            w.println("Shutting down");
+            w.close();
+        }
 
         System.exit(0);
     }
@@ -3083,6 +3065,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
      * Shutdown the system safely.
      * @since 1.332
      */
+    @CLIMethod(name="safe-shutdown")
     public HttpResponse doSafeExit(StaplerRequest req) throws IOException {
         checkPermission(ADMINISTER);
         isQuietingDown = true;
@@ -3146,7 +3129,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
 
     private void doScript(StaplerRequest req, StaplerResponse rsp, RequestDispatcher view) throws IOException, ServletException {
         // ability to run arbitrary script is dangerous
-        checkPermission(ADMINISTER);
+        checkPermission(RUN_SCRIPTS);
 
         String text = req.getParameter("script");
         if (text != null) {
@@ -3325,7 +3308,11 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
      * Rebuilds the dependency map.
      */
     public void rebuildDependencyGraph() {
-        dependencyGraph = new DependencyGraph();
+        DependencyGraph graph = new DependencyGraph();
+        graph.build();
+        // volatile acts a as a memory barrier here and therefore guarantees 
+        // that graph is fully build, before it's visible to other threads
+        dependencyGraph = graph;
     }
 
     public DependencyGraph getDependencyGraph() {
@@ -3638,6 +3625,7 @@ public class Jenkins extends AbstractCIBase implements ModifiableItemGroup<TopLe
     public static final PermissionGroup PERMISSIONS = Permission.HUDSON_PERMISSIONS;
     public static final Permission ADMINISTER = Permission.HUDSON_ADMINISTER;
     public static final Permission READ = new Permission(PERMISSIONS,"Read",Messages._Hudson_ReadPermission_Description(),Permission.READ,PermissionScope.JENKINS);
+    public static final Permission RUN_SCRIPTS = new Permission(PERMISSIONS, "RunScripts", Messages._Hudson_RunScriptsPermission_Description(),ADMINISTER,PermissionScope.JENKINS);
 
     /**
      * {@link Authentication} object that represents the anonymous user.
