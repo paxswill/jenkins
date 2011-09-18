@@ -18,7 +18,7 @@ war=`$defaults war` || war="/Applications/Jenkins/jenkins.war"
 javaArgs=""
 heapSize=`$defaults heapSize` && javaArgs="$javaArgs -Xmx${heapSize}"
 
-home=`$defaults JENKINS_HOME` && export JENKINS_HOME="$home"
+jenkinsHome=`$defaults JENKINS_HOME` && export JENKINS_HOME="$jenkinsHome"
 
 # Prepare and unlock login keychain
 keychain=`$defaults keychainLocation` || "$HOME/Library/Keychains/login.keychain"
