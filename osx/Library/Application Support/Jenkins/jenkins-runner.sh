@@ -21,7 +21,7 @@ heapSize=`$defaults heapSize` && javaArgs="$javaArgs -Xmx${heapSize}"
 home=`$defaults JENKINS_HOME` && export JENKINS_HOME="$home"
 
 # Prepare and unlock login keychain
-keychain="$home/Library/Keychains/login.keychain"
+keychain=`$defaults keychainLocation` || "$HOME/Library/Keychains/login.keychain"
 if [ -f "$keychain" ]; then
     unlock=`$defaults unlockPassword`
     if [ "X$unlock" != "X" ]; then
